@@ -71,3 +71,19 @@ A: 현재 memory는 독립적으로 판단하거나 생성하지 않고, 실행 
 ## Q: Working Memory와 Episodic Memory 차이는?
 
 A: Working Memory는 현재 실행 중 임시로 유지되는 context이고, Episodic Memory는 과거 실행 episode를 저장한 장기 기록입니다. 이 프로젝트에서는 orchestrator 내부의 실행 state가 working memory이고, `history.json`의 run records가 episodic memory입니다.
+
+## Q: Retry Loop는 왜 필요한가요?
+
+A: 평가만 하고 끝나면 agent가 결과를 개선하는 행동을 하지 못합니다. Retry Loop는 낮은 score가 나왔을 때 reflection의 suggested prompt를 사용해 한 번 더 generation과 evaluation을 수행하게 해 self-improving 구조를 만듭니다.
+
+## Q: 왜 1회 Retry로 제한했나요?
+
+A: MVP 단계에서는 무한 loop를 피하고 debug 가능성을 높이는 것이 중요합니다. 1회 retry는 reflection 기반 개선 흐름을 검증하기에 충분하고, 실행 시간과 memory schema도 단순하게 유지할 수 있습니다.
+
+## Q: RetryAgent가 직접 재생성을 수행하지 않는 이유는 무엇인가요?
+
+A: `RetryAgent`는 retry 여부를 판단하는 policy agent입니다. 실제 generation과 evaluation 실행은 workflow state를 관리하는 `OrchestratorAgent`가 담당해야 agent 책임이 분리됩니다.
+
+## Q: best_score를 저장하는 이유는 무엇인가요?
+
+A: initial attempt와 retry attempt가 모두 있을 때 최종적으로 어떤 결과를 선택했는지 추적해야 합니다. `best_score`를 저장하면 성능 비교, UI 표시, memory 기반 분석에 사용할 수 있습니다.

@@ -33,3 +33,19 @@ Self-improving AI Agent는 이전 실행 결과를 기억해야 개선 방향을
 개별 agent가 memory file이나 database에 직접 접근하면 agent 간 결합도가 높아집니다. `VisionAgent`, `PromptAgent`, `EvaluationAgent`는 자신의 전문 작업에만 집중하고, state load/save는 `OrchestratorAgent`가 담당하도록 했습니다.
 
 이 구조는 loose coupling을 유지합니다. 향후 JSON에서 SQLite 또는 vector DB로 바뀌어도 대부분의 agent 코드는 변경하지 않아도 됩니다.
+
+## 왜 무한 Retry가 아니라 1회 Retry로 시작했는가
+
+초기 MVP에서는 debug 가능성과 안정성이 중요합니다. 무한 retry는 종료 조건, 비용, 실행 시간, memory schema를 복잡하게 만듭니다.
+
+1회 retry는 reflection 기반 개선이 실제 workflow에 반영되는지 검증하기에 충분하면서도, loop가 폭주하지 않도록 제어할 수 있습니다.
+
+## 왜 Orchestrator가 Retry Loop를 제어하는가
+
+`RetryAgent`는 정책 판단(policy decision)을 담당하고, `OrchestratorAgent`는 workflow state transition을 담당합니다. retry 실행까지 `RetryAgent`가 맡으면 agent 책임이 섞입니다.
+
+따라서 `RetryAgent.should_retry(score)`는 bool만 반환하고, second generation과 evaluation 실행은 orchestrator가 제어합니다.
+
+## 왜 Best Result를 저장하는가
+
+initial attempt와 retry attempt가 모두 존재할 때는 최종적으로 어떤 결과를 사용할지 명확해야 합니다. `best_score`, `best_prompt`, `best_output_image_path`를 저장하면 이후 UI, memory analysis, portfolio 설명에서 최종 선택 기준을 추적할 수 있습니다.

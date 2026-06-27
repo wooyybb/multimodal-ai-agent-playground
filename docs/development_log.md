@@ -71,3 +71,12 @@
 - `save_run(record: dict)` 형태로 Memory Interface를 정리했습니다.
 - 반환 dict에 `last_run`과 `memory_saved`를 추가했습니다.
 - 이번 작업은 working memory, episodic memory, state management, agent context를 코드와 문서에 연결하는 데 집중했습니다.
+
+### Sprint 8 One-Step Retry Loop
+
+- `OrchestratorAgent`에 1회 retry loop를 구현했습니다.
+- initial generation과 initial evaluation 이후 `ReflectionAgent`가 `suggested_prompt`를 생성합니다.
+- `RetryAgent`가 retry 여부만 판단하고, 실제 second attempt 실행은 `OrchestratorAgent`가 제어합니다.
+- retry가 필요한 경우 `suggested_prompt`로 `GenerationAgent`와 `EvaluationAgent`를 한 번 더 실행합니다.
+- initial result와 retry result 중 더 높은 score를 best result로 선택합니다.
+- `MemoryManager`는 initial, retry, best 정보를 포함한 full retry record를 저장합니다.

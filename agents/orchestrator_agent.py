@@ -23,18 +23,56 @@ class OrchestratorAgent:
 
         caption = self.vision_agent.run(image)
         final_prompt = self.prompt_agent.run(caption, user_prompt)
+        print("[OrchestratorAgent] Initial attempt started.")
         output_image_path = self.generation_agent.run(final_prompt)
         score = self.evaluation_agent.run(image, output_image_path, final_prompt)
         reflection_result = self.reflection_agent.run(caption, final_prompt, score)
         retry_needed = self.retry_agent.should_retry(score)
+
+        retry_output_image_path = None
+        retry_score = None
+
+        if retry_needed:
+            print("[OrchestratorAgent] Retry needed. Starting second attempt.")
+            retry_output_image_path = self.generation_agent.run(
+                reflection_result["suggested_prompt"]
+            )
+            retry_score = self.evaluation_agent.run(
+                image,
+                retry_output_image_path,
+                reflection_result["suggested_prompt"],
+            )
+        else:
+            print("[OrchestratorAgent] Retry skipped.")
+
+        if retry_score is not None and retry_score > score:
+            best_prompt = reflection_result["suggested_prompt"]
+            best_output_image_path = retry_output_image_path
+            best_score = retry_score
+        else:
+            best_prompt = final_prompt
+            best_output_image_path = output_image_path
+            best_score = score
+
+        print(f"[OrchestratorAgent] Best score selected: {best_score}")
         history_path = self.memory_manager.save_run(
             {
                 "caption": caption,
-                "prompt": final_prompt,
-                "score": score,
+                "initial_prompt": final_prompt,
+                "initial_score": score,
+                "initial_output_image_path": output_image_path,
                 "reflection": reflection_result["reflection"],
-                "retry": retry_needed,
-                "output_image_path": output_image_path,
+                "retry_needed": retry_needed,
+                "retry_prompt": (
+                    reflection_result["suggested_prompt"]
+                    if retry_needed
+                    else None
+                ),
+                "retry_score": retry_score,
+                "retry_output_image_path": retry_output_image_path,
+                "best_prompt": best_prompt,
+                "best_score": best_score,
+                "best_output_image_path": best_output_image_path,
             }
         )
 
@@ -45,8 +83,13 @@ class OrchestratorAgent:
             "output_image_path": output_image_path,
             "score": score,
             "retry_needed": retry_needed,
+            "retry_output_image_path": retry_output_image_path,
+            "retry_score": retry_score,
             "reflection": reflection_result["reflection"],
             "suggested_prompt": reflection_result["suggested_prompt"],
+            "best_prompt": best_prompt,
+            "best_output_image_path": best_output_image_path,
+            "best_score": best_score,
             "history_path": history_path,
             "last_run": last_run,
             "memory_saved": True,
@@ -58,6 +101,7 @@ class OrchestratorAgent:
                 "EvaluationAgent generated mock score",
                 "ReflectionAgent generated reflection",
                 "RetryAgent decided retry status",
+                "OrchestratorAgent selected best result",
                 "MemoryManager saved run history",
             ],
         }

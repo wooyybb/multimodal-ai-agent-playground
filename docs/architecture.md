@@ -36,3 +36,21 @@ User -> OrchestratorAgent -> VisionAgent -> PromptAgent -> GenerationAgent -> Ev
 - `ReflectionAgent`: 평가 score와 prompt를 바탕으로 개선 제안과 suggested prompt를 생성합니다. 현재는 rule-based mock reflection입니다.
 - `RetryAgent`: 평가 score가 threshold보다 낮은지 판단해 retry 여부를 반환합니다. 아직 실제 재생성 loop는 실행하지 않습니다.
 - `MemoryManager`: working memory와 episodic memory의 시작점입니다. `load_last_run()`, `save_run()`, `get_history()`, `clear_history()` interface를 제공합니다.
+
+## One-Step Retry Loop
+
+Sprint 8에서는 one-step retry loop를 추가했습니다. `EvaluationAgent`가 initial score를 만들고, `ReflectionAgent`가 suggested prompt를 제안한 뒤, `RetryAgent`가 retry 여부를 판단합니다.
+
+```text
+GenerationAgent(initial_prompt)
+-> EvaluationAgent(initial_score)
+-> ReflectionAgent(suggested_prompt)
+-> RetryAgent(should_retry)
+-> if retry_needed:
+     GenerationAgent(suggested_prompt)
+     EvaluationAgent(retry_score)
+-> best result selection
+-> MemoryManager(save)
+```
+
+무한 반복을 피하기 위해 retry는 최대 1회만 수행합니다. `OrchestratorAgent`가 loop를 제어하고, `RetryAgent`는 `should_retry(score)` 판단만 담당합니다.

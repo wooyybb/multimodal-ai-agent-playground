@@ -22,3 +22,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 - 종료 시 현재 실행을 save해야 합니다.
 - 전체 history 조회와 초기화가 가능한 interface가 필요합니다.
 - 향후 database나 vector store로 바꿔도 orchestrator 코드를 크게 바꾸지 않는 구조가 필요합니다.
+
+## 2026-06-27 Sprint 8 Retry Loop
+
+이번 논의에서는 retry loop를 도입하되 1회로 제한하기로 결정했습니다. 목적은 reflection 결과가 실제 second attempt로 이어지는 self-improving flow를 검증하는 것입니다.
+
+`RetryAgent`는 retry 여부만 판단하고, `OrchestratorAgent`가 generation/evaluation 재실행과 best result selection을 담당합니다.

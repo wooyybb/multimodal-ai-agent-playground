@@ -67,3 +67,9 @@ Done Definition
 - Requirements: class, method, schema, logging 요구사항
 - Documentation: 반드시 업데이트할 문서 목록
 - Done Definition: 실행 검증과 완료 기준
+
+## Sprint 8 Retry Loop Prompt
+
+Sprint 8 prompt는 무한 loop를 방지하기 위한 제약이 명확한 Architecture Prompt입니다. 핵심 제약은 `RetryAgent`가 판단만 하고, `OrchestratorAgent`가 loop를 제어한다는 점입니다.
+
+이 제약 덕분에 retry policy와 workflow execution 책임이 분리됩니다. 또한 one-step retry로 제한해 infinite loop, 과도한 파일 생성, 복잡한 state transition을 피할 수 있습니다.

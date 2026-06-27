@@ -53,3 +53,19 @@ Agent Context는 agent가 판단할 때 참고하는 입력 정보입니다. 예
 ## Memory Interface
 
 Memory Interface는 memory를 읽고 쓰는 표준 API입니다. 현재 `MemoryManager`는 `load_last_run()`, `save_run()`, `get_history()`, `clear_history()`를 제공합니다.
+
+## Evaluation Loop
+
+Evaluation Loop는 생성 결과를 평가하고, 평가 결과를 바탕으로 다음 행동을 결정하는 구조입니다. Sprint 8에서는 initial generation 이후 score가 낮으면 suggested prompt로 한 번 더 generation과 evaluation을 수행합니다.
+
+## Retry Policy
+
+Retry Policy는 언제 다시 시도할지 정하는 규칙입니다. 현재는 `RetryAgent`가 threshold `0.75` 기준으로 `should_retry(score)`만 판단합니다.
+
+## Self-Improving Agent
+
+Self-Improving Agent는 자신의 결과를 평가하고 개선 방향을 반영해 다음 행동을 조정하는 agent 구조입니다. 현재 프로젝트에서는 `Evaluation -> Reflection -> Retry -> Regeneration` 흐름으로 이를 구현합니다.
+
+## Best Result Selection
+
+Best Result Selection은 initial attempt와 retry attempt 중 더 높은 score를 가진 결과를 최종 결과로 선택하는 단계입니다. 이 선택 결과는 `best_prompt`, `best_score`, `best_output_image_path`로 memory에 저장됩니다.

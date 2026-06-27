@@ -31,3 +31,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `MemoryManager.save_run()`은 이제 `record: dict`를 받습니다. schema validation은 아직 없으므로 이후 필수 key 검증을 추가할 수 있습니다.
 - `memory_saved`는 save 성공 시 `True`로 반환됩니다. 예외 처리와 실패 시 `False` 반환은 다음 단계에서 보강할 수 있습니다.
 - Orchestrator만 memory에 접근하는 구조는 적절합니다. 다만 last run을 실제 prompt/reflection context로 활용하는 단계는 아직 남아 있습니다.
+
+## Sprint 8 Retry Loop Review
+
+### Findings
+
+- Retry는 1회로 제한되어 infinite loop 위험이 낮습니다.
+- `RetryAgent`는 `should_retry()`만 담당하고, second attempt 실행은 `OrchestratorAgent`가 담당해 책임 분리가 유지됩니다.
+- `GenerationAgent` mock은 같은 `outputs/output_mock.png` 경로를 반환하므로 initial/retry image path가 같을 수 있습니다. 실제 generation 도입 시 attempt별 파일명을 분리하는 것이 좋습니다.
+- best result selection은 score 비교 기반입니다. 동점에서는 initial result를 유지합니다.

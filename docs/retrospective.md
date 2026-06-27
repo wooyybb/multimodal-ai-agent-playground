@@ -36,3 +36,22 @@
 - last run context를 `PromptAgent` 또는 `ReflectionAgent`에 활용
 - retry loop 실행 시 memory에 attempt 단위 기록 저장
 - JSONL 또는 SQLite 전환 검토
+
+## Sprint 8 Retrospective
+
+### 잘된 점
+
+- one-step retry loop로 self-improving behavior가 코드에 반영됐습니다.
+- retry policy와 workflow control 책임이 분리됐습니다.
+- initial, retry, best 결과를 memory에 저장할 수 있게 됐습니다.
+
+### 아쉬운 점
+
+- mock generation이 같은 output path를 사용해 attempt별 이미지 구분은 아직 약합니다.
+- retry prompt가 실제 이미지 품질을 개선하는지는 mock score 환경이라 제한적으로만 확인됩니다.
+
+### 다음 Sprint
+
+- attempt별 output filename 분리
+- retry count와 stop condition을 설정 가능한 policy로 확장
+- memory history를 reflection context로 활용

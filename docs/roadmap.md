@@ -52,3 +52,10 @@
 - `BlipTool`에 실제 BLIP 연결
 - `FluxTool`에 실제 FLUX 또는 image generation API 연결
 - `ClipTool`에 실제 CLIP 기반 evaluation 연결
+
+## Sprint 8: One-Step Retry Loop - Done
+
+- initial generation/evaluation 이후 reflection 실행
+- retry가 필요한 경우 suggested prompt로 second attempt 실행
+- initial/retry 중 best score 선택
+- full retry record를 memory에 저장
