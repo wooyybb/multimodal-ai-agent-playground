@@ -81,3 +81,23 @@ Demo-driven Development는 내부 구조가 완성되기 전에 실행 가능한
 ## Agent Trace Visualization
 
 Agent Trace Visualization은 어떤 agent가 어떤 순서로 실행됐는지 사용자에게 보여주는 방식입니다. UI는 `agent_trace`를 표시해 Vision, Prompt, Generation, Evaluation, Reflection, Retry, Memory 흐름을 확인할 수 있게 합니다.
+
+## BLIP
+
+BLIP는 Bootstrapping Language-Image Pre-training의 약자로, 이미지와 언어를 함께 다루는 Vision-Language Model입니다. 이 프로젝트에서는 image captioning을 위해 `Salesforce/blip-image-captioning-base`를 사용합니다.
+
+## Image Captioning
+
+Image Captioning은 이미지를 입력받아 자연어 설명(caption)을 생성하는 작업입니다. `VisionAgent`는 업로드된 이미지를 caption으로 변환해 이후 prompt generation 단계에 전달합니다.
+
+## VLM Inference
+
+VLM Inference는 Vision-Language Model을 사용해 이미지와 텍스트 사이의 의미를 추론하는 과정입니다. Sprint 10에서는 BLIP processor와 model을 사용해 caption을 생성합니다.
+
+## Tool-Agent Separation
+
+Tool-Agent Separation은 agent가 역할과 의사결정 흐름을 담당하고, tool이 구체적인 외부 모델 또는 API 호출을 담당하게 나누는 설계입니다. `VisionAgent`는 `BlipTool`을 호출하지만 BLIP 내부 구현은 알지 않습니다.
+
+## Lazy Loading
+
+Lazy Loading은 실제로 필요해지는 시점까지 무거운 리소스 로딩을 미루는 방식입니다. `BlipTool`은 첫 `generate_caption()` 호출 시 `_load_model()`을 통해 BLIP를 로드합니다.

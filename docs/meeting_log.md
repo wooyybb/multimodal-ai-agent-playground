@@ -34,3 +34,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 multi-agent workflow를 Gradio UI에 연결하기로 결정했습니다. UI는 직접 agent를 호출하지 않고 `MultimodalPipeline`만 호출합니다.
 
 목표는 사용자가 image와 prompt를 입력하고, caption, prompt, output image, score, reflection, retry 결과, agent trace를 한 화면에서 확인할 수 있게 만드는 것입니다.
+
+## 2026-06-27 Sprint 10 Real BLIP
+
+이번 논의에서는 mock caption을 실제 BLIP 기반 captioning으로 전환하기로 결정했습니다. 단, `VisionAgent`는 model internals를 몰라야 하므로 실제 모델 로딩과 inference는 `BlipTool`이 담당합니다.
+
+모델 로딩 실패가 전체 workflow를 중단하지 않도록 fallback caption을 유지하기로 했습니다.

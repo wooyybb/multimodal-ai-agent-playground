@@ -59,3 +59,21 @@ UI가 개별 agent를 직접 호출하면 화면 코드가 workflow 순서와 re
 ## 왜 모델 통합 전에 UI를 먼저 연결하는가
 
 실제 BLIP, FLUX, CLIP을 붙이기 전에도 사용자가 workflow를 실행하고 결과 trace를 확인할 수 있어야 합니다. Gradio UI를 먼저 연결하면 demo-driven development가 가능해지고, 이후 실제 모델을 붙였을 때 사용자 흐름을 다시 설계하지 않아도 됩니다.
+
+## 왜 BLIP를 VisionAgent 내부가 아니라 BlipTool로 분리했는가
+
+`VisionAgent`는 image captioning이라는 agent responsibility만 가져야 합니다. model loading, processor, torch inference, image preprocessing은 implementation detail입니다.
+
+이를 `BlipTool`로 분리하면 VisionAgent interface를 유지하면서 BLIP, BLIP-2, LLaVA, external VLM API 등으로 tool implementation을 교체할 수 있습니다.
+
+## 왜 Lazy Loading을 사용하는가
+
+BLIP 모델은 무겁고 로딩 시간이 있습니다. 앱 시작이나 import 시점마다 모델을 로딩하면 UI 실행이 느려지고 테스트도 어려워집니다.
+
+lazy loading을 사용하면 첫 caption 요청 시점에만 model과 processor를 로드하고, 이후에는 재사용할 수 있습니다.
+
+## 왜 Fallback Caption이 필요한가
+
+실제 모델 통합은 dependency, network, model cache, device 문제로 실패할 수 있습니다. fallback caption을 두면 BLIP 실패가 전체 multi-agent workflow 중단으로 이어지지 않습니다.
+
+현재 fallback caption은 `"An uploaded image"`입니다.

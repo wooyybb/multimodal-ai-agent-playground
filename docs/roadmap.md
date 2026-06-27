@@ -66,3 +66,10 @@
 - image input과 user prompt 입력 연결
 - multi-agent workflow 결과 표시
 - agent trace 시각화
+
+## Sprint 10: Real BLIP Integration - Done
+
+- `BlipTool`에 `Salesforce/blip-image-captioning-base` 연결
+- lazy loading 기반 BLIP model/processor 로딩
+- fallback caption 처리
+- `VisionAgent` interface 유지

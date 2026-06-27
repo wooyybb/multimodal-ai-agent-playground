@@ -75,3 +75,22 @@
 - output image 파일명을 attempt별로 분리
 - UI에서 history 보기 기능 추가
 - 실제 BLIP/FLUX/CLIP 연동 전 demo 시나리오 정리
+
+## Sprint 10 Retrospective
+
+### 잘된 점
+
+- mock VisionAgent에서 실제 BLIP captioning tool로 전환했습니다.
+- Tool-Agent Separation을 유지했습니다.
+- lazy loading과 fallback caption으로 model integration 위험을 줄였습니다.
+
+### 아쉬운 점
+
+- BLIP 모델 다운로드가 필요한 환경에서는 첫 실행 시간이 길 수 있습니다.
+- 오프라인 환경에서는 실제 caption 대신 fallback caption이 반환됩니다.
+
+### 다음 Sprint
+
+- BLIP inference 결과를 UI에서 실제 이미지로 검증
+- model cache와 device 설정 문서화
+- 실제 FLUX 또는 CLIP 통합으로 확장

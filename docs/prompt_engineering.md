@@ -79,3 +79,9 @@ Sprint 8 prompt는 무한 loop를 방지하기 위한 제약이 명확한 Archit
 Sprint 9 prompt는 UI와 Agent 책임 분리를 명확히 하기 위한 Architecture Prompt입니다. 핵심 제약은 UI가 agent를 직접 호출하지 않고 `MultimodalPipeline`만 호출한다는 점입니다.
 
 또한 수정 가능한 파일과 금지 파일을 분리해 UI 작업이 agent implementation이나 model dependency를 건드리지 않도록 제한했습니다. 이 제약은 demo UI를 빠르게 연결하면서도 backend workflow의 책임 경계를 유지하게 합니다.
+
+## Sprint 10 Real BLIP Prompt
+
+Sprint 10 prompt는 실제 모델 통합의 위험을 줄이기 위해 제약을 명확히 둔 prompt입니다. 수정 가능한 파일을 `BlipTool`, `VisionAgent`, `requirements.txt`, docs로 제한해 UI, orchestrator, memory, generation/evaluation 코드를 건드리지 않도록 했습니다.
+
+또한 fallback caption과 lazy loading을 명시해 model dependency, network cache, device 문제로 전체 workflow가 깨지는 위험을 줄였습니다.

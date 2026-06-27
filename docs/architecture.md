@@ -75,3 +75,16 @@ User
 ```
 
 이 구조는 UI와 agent workflow 책임을 분리합니다. UI는 image input, user prompt, result visualization, agent trace display에 집중하고, 실행 순서와 retry loop는 `OrchestratorAgent`가 관리합니다.
+
+## Real BLIP Captioning
+
+Sprint 10에서는 mock caption을 실제 BLIP 기반 image captioning으로 교체했습니다.
+
+```text
+VisionAgent
+-> BlipTool
+-> Salesforce/blip-image-captioning-base
+-> Real BLIP Caption
+```
+
+`VisionAgent`는 model loading이나 inference details를 알지 않습니다. 실제 BLIP processor/model loading, PIL image 변환, torch inference, fallback caption 처리는 `BlipTool`이 담당합니다.

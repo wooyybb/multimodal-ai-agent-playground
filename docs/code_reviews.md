@@ -49,3 +49,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `image is None` 입력에 대한 사용자 안내가 있습니다.
 - workflow 예외는 UI message로 반환됩니다. 향후에는 traceback logging을 별도 파일이나 console에 남길 수 있습니다.
 - Gradio output image는 path 기반으로 처리합니다. output path가 `None`이면 image output도 `None`으로 유지됩니다.
+
+## Sprint 10 Real BLIP Review
+
+### Findings
+
+- `BlipTool`은 lazy loading을 사용하므로 import 시점에 heavy model을 로드하지 않습니다.
+- `transformers` 또는 model loading 실패 시 fallback caption을 반환합니다.
+- `VisionAgent`는 tool 호출만 유지해 Tool-Agent Separation이 지켜졌습니다.
+- 실제 BLIP inference는 모델 다운로드와 runtime dependency가 필요하므로, 오프라인 환경에서는 fallback path가 동작합니다.

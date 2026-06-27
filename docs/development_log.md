@@ -88,3 +88,12 @@
 - UI는 `MultimodalPipeline.run(image, user_prompt)`만 호출하도록 구성했습니다.
 - image input, user prompt, caption, final prompt, initial/retry/best image, score, reflection, retry status, agent trace를 표시합니다.
 - image가 비어 있거나 workflow 예외가 발생할 때 UI에 안내 메시지를 반환하도록 처리했습니다.
+
+### Sprint 10 Real BLIP Integration
+
+- `BlipTool`을 실제 BLIP captioning tool로 확장했습니다.
+- 모델은 `Salesforce/blip-image-captioning-base`를 사용합니다.
+- `VisionAgent` interface는 `run(image) -> str`로 유지했습니다.
+- BLIP model과 processor는 `_load_model()`에서 lazy loading합니다.
+- 이미지 입력은 PIL image, file path, Gradio image 입력을 처리할 수 있도록 RGB 변환을 수행합니다.
+- BLIP 로딩 또는 inference 실패 시 fallback caption `"An uploaded image"`를 반환합니다.
