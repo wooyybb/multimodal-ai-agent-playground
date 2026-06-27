@@ -80,3 +80,10 @@
 - `HF_TOKEN` 환경변수 기반 API 호출
 - API 실패 또는 token 부재 시 fallback mock image 생성
 - timestamp 기반 output file 저장
+
+## Sprint 12: Real CLIP Evaluation - Done
+
+- `ClipTool`에 `openai/clip-vit-base-patch32` 기반 evaluation 구조 추가
+- generated image와 final prompt의 image-text similarity 계산
+- cosine similarity를 0.0~1.0 score로 변환
+- CLIP 실패 시 fallback score `0.0` 반환

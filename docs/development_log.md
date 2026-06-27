@@ -106,3 +106,12 @@
 - `HF_TOKEN`이 없거나 API 호출이 실패하면 PIL 기반 fallback mock image를 생성합니다.
 - output file name은 timestamp 기반으로 생성해 중복 저장을 방지합니다.
 - `GenerationAgent.run(final_prompt) -> str` interface는 유지했습니다.
+
+### Sprint 12 Real CLIP Evaluation
+
+- `ClipTool`을 실제 CLIP image-text similarity evaluation tool로 확장했습니다.
+- 모델은 `openai/clip-vit-base-patch32`를 사용합니다.
+- CLIP model과 processor는 `_load_model()`에서 lazy loading합니다.
+- generated image와 final prompt를 같은 embedding space에서 비교합니다.
+- cosine similarity를 `(similarity + 1) / 2` 방식으로 0.0~1.0 범위 score로 변환합니다.
+- CLIP 로딩 또는 inference 실패 시 fallback score `0.0`을 반환합니다.

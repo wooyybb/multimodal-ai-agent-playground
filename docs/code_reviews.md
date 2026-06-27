@@ -67,3 +67,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - token이 없거나 API 호출이 실패하면 fallback image를 생성해 workflow가 멈추지 않습니다.
 - output filename은 timestamp 기반이라 이전 output을 덮어쓰지 않습니다.
 - API token은 `.env.example`에 placeholder만 제공하고 실제 secret은 저장하지 않습니다.
+
+## Sprint 12 Real CLIP Review
+
+### Findings
+
+- `ClipTool`은 lazy loading을 사용해 import 시점에 CLIP model을 로드하지 않습니다.
+- generated image path나 final prompt가 비어 있으면 fallback score `0.0`을 반환합니다.
+- reference image는 interface에 유지되지만 이번 Sprint에서는 사용하지 않습니다.
+- CLIP score는 prompt alignment signal이며, aesthetic quality를 완전히 대체하지는 않습니다.

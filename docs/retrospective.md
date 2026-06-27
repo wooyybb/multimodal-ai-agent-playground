@@ -113,3 +113,22 @@
 - 실제 API 호출 성공 케이스 검증
 - output metadata 저장
 - seed, width, height 같은 generation option 추가
+
+## Sprint 12 Retrospective
+
+### 잘된 점
+
+- mock evaluation에서 CLIP 기반 model-based evaluation 구조로 확장했습니다.
+- `EvaluationAgent` interface를 유지했습니다.
+- lazy loading과 fallback score로 실패 안전성을 확보했습니다.
+
+### 아쉬운 점
+
+- 실제 CLIP model 다운로드가 필요한 환경에서는 첫 평가 시간이 길 수 있습니다.
+- CLIP score는 prompt alignment 중심이라 이미지 품질 전체를 평가하지는 못합니다.
+
+### 다음 Sprint
+
+- reference image similarity 추가
+- DINO similarity 또는 aesthetic score 보강
+- UI에 evaluation explanation 추가

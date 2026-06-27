@@ -121,3 +121,23 @@ Fallback Strategy는 외부 모델 또는 API 실패 시 대체 결과를 반환
 ## Environment Variable
 
 Environment Variable은 API token 같은 설정 값을 코드 밖에서 주입하는 방식입니다. `HF_TOKEN`은 Hugging Face API 호출에 사용되며 `.env` 또는 시스템 환경변수로 설정할 수 있습니다.
+
+## CLIP
+
+CLIP은 이미지와 텍스트를 같은 embedding space로 매핑하는 multimodal model입니다. 이 프로젝트에서는 generated image와 final prompt의 alignment를 평가하는 데 사용합니다.
+
+## Multimodal Embedding
+
+Multimodal Embedding은 이미지와 텍스트처럼 서로 다른 modality를 같은 벡터 공간에 표현하는 방식입니다. CLIP은 image embedding과 text embedding을 비교할 수 있게 만듭니다.
+
+## Cosine Similarity
+
+Cosine Similarity는 두 벡터의 방향 유사도를 측정합니다. CLIP image embedding과 text embedding의 cosine similarity를 계산해 image-text alignment를 평가합니다.
+
+## Image-Text Similarity
+
+Image-Text Similarity는 이미지가 텍스트 설명과 얼마나 잘 맞는지 평가하는 기준입니다. Sprint 12에서는 `final_prompt`와 generated image 사이의 similarity를 0.0~1.0 score로 변환합니다.
+
+## Model-based Evaluation
+
+Model-based Evaluation은 사람이 직접 평가하지 않고 별도 모델을 사용해 결과 품질을 평가하는 방식입니다. CLIP score는 retry loop와 reflection 판단에 사용할 수 있는 자동 평가 signal입니다.

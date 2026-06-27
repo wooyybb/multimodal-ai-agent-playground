@@ -46,3 +46,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 mock generation을 실제 FLUX generation 구조로 확장하기로 결정했습니다. 단, 로컬 GPU 의존성을 줄이기 위해 Hugging Face Inference API 기반으로 먼저 통합합니다.
 
 `HF_TOKEN`이 없거나 API가 실패하면 fallback mock image를 생성해 demo와 workflow 검증이 계속 가능하도록 했습니다.
+
+## 2026-06-27 Sprint 12 Real CLIP
+
+이번 논의에서는 mock score를 실제 CLIP 기반 image-text similarity score로 전환하기로 결정했습니다.
+
+`EvaluationAgent`는 평가 흐름만 담당하고, CLIP model loading과 embedding similarity 계산은 `ClipTool`이 담당하도록 분리했습니다.

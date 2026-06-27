@@ -102,3 +102,17 @@ PromptAgent
 ```
 
 `GenerationAgent`는 Hugging Face API details를 알지 않습니다. `FluxTool`이 `HF_TOKEN`, `InferenceClient`, image saving, fallback generation을 담당합니다.
+
+## Real CLIP Evaluation
+
+Sprint 12에서는 mock score를 실제 CLIP 기반 image-text similarity score로 확장했습니다.
+
+```text
+GenerationAgent
+-> EvaluationAgent
+-> ClipTool
+-> openai/clip-vit-base-patch32
+-> image-text similarity score
+```
+
+`EvaluationAgent`는 CLIP model internals를 알지 않습니다. `ClipTool`이 processor/model lazy loading, generated image loading, text embedding, image embedding, cosine similarity calculation, fallback score를 담당합니다.
