@@ -36,3 +36,11 @@
 - 실제 FLUX API 또는 HuggingFace API는 연결하지 않았습니다.
 - `FluxTool`은 PIL을 사용해 `outputs/output_mock.png` mock image를 생성하고 저장 경로를 반환합니다.
 - `OrchestratorAgent` 실행 순서를 `VisionAgent -> PromptAgent -> GenerationAgent`로 확장했습니다.
+
+### EvaluationAgent Mock CLIP Evaluation
+
+- `EvaluationAgent`를 구현했습니다.
+- `EvaluationAgent`는 `ClipTool`을 호출하도록 구성했습니다.
+- 실제 CLIP 모델은 로드하지 않았습니다.
+- `ClipTool`은 generated image file 존재 여부와 final prompt 길이를 활용해 0.0~1.0 사이 deterministic mock score를 반환합니다.
+- `OrchestratorAgent` 실행 순서를 `VisionAgent -> PromptAgent -> GenerationAgent -> EvaluationAgent`로 확장했습니다.

@@ -30,7 +30,7 @@
 - final prompt를 받아 PIL mock image 생성
 - `outputs/output_mock.png` 저장 경로 반환
 
-## Sprint 5: EvaluationAgent Mock
+## Sprint 5: EvaluationAgent Mock - Done
 
 - `EvaluationAgent` mock 구현
 - 생성 결과와 prompt를 받아 mock score 반환
