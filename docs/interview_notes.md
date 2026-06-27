@@ -55,3 +55,19 @@ A: Codex는 sprint 요구사항을 코드와 문서로 빠르게 반영하는 pa
 ## Q: Prompt Engineering은 어떻게 했는가?
 
 A: 이번 prompt는 단순 구현 지시가 아니라 Architecture Prompt로 작성했습니다. Task, Architecture, Workspace, Allowed Files, Forbidden Files, Requirements, Documentation, Done Definition 순서로 구성해 구현 범위와 검증 기준을 명확히 했습니다.
+
+## Q: Memory와 Database의 차이는?
+
+A: Memory는 agent가 이전 context를 활용하기 위한 설계 개념이고, Database는 그 memory를 저장하는 구현 수단입니다. 현재 프로젝트에서는 JSON 파일을 database처럼 사용하지만, 핵심은 agent가 과거 실행을 다시 읽을 수 있는 memory interface를 갖는 것입니다.
+
+## Q: 왜 JSON으로 시작했나요?
+
+A: 초기 단계에서는 복잡한 database보다 파일 기반 JSON이 구조를 검증하기 쉽습니다. schema를 눈으로 확인할 수 있고, dependency가 없으며, portfolio 설명에도 memory record가 명확히 드러납니다.
+
+## Q: Memory는 왜 Agent가 아니고 Manager인가요?
+
+A: 현재 memory는 독립적으로 판단하거나 생성하지 않고, 실행 기록을 load/save하는 상태 관리 layer입니다. 그래서 `MemoryManager`가 더 정확합니다. 나중에 검색, 요약, 선호도 추론이 들어가면 Memory Agent로 확장할 수 있습니다.
+
+## Q: Working Memory와 Episodic Memory 차이는?
+
+A: Working Memory는 현재 실행 중 임시로 유지되는 context이고, Episodic Memory는 과거 실행 episode를 저장한 장기 기록입니다. 이 프로젝트에서는 orchestrator 내부의 실행 state가 working memory이고, `history.json`의 run records가 episodic memory입니다.

@@ -5,10 +5,18 @@
 ## Current Structure
 
 ```text
-User -> OrchestratorAgent -> VisionAgent -> PromptAgent -> GenerationAgent -> EvaluationAgent -> ReflectionAgent -> RetryAgent -> Memory
+User -> OrchestratorAgent
+├── MemoryManager(load)
+├── VisionAgent
+├── PromptAgent
+├── GenerationAgent
+├── EvaluationAgent
+├── ReflectionAgent
+├── RetryAgent
+└── MemoryManager(save)
 ```
 
-현재 버전은 사용자의 이미지 입력과 텍스트 요청을 받아 `OrchestratorAgent`가 전체 workflow를 조율합니다. `VisionAgent`는 이미지를 caption으로 변환하고, `PromptAgent`는 caption과 user prompt를 조합해 final prompt를 생성합니다. 이후 `GenerationAgent`가 final prompt를 받아 PIL 기반 mock image를 생성하고, `EvaluationAgent`가 mock CLIP similarity score를 반환합니다. `ReflectionAgent`는 평가 결과를 분석해 suggested prompt를 만들고, `RetryAgent`는 threshold 기반으로 retry 여부를 판단합니다. 마지막으로 `Memory`가 실행 기록을 `history.json`에 저장합니다.
+현재 버전은 사용자의 이미지 입력과 텍스트 요청을 받아 `OrchestratorAgent`가 전체 workflow를 조율합니다. 시작 시 `MemoryManager`가 마지막 실행 기록을 load하고, 이후 `VisionAgent`, `PromptAgent`, `GenerationAgent`, `EvaluationAgent`, `ReflectionAgent`, `RetryAgent`가 순서대로 실행됩니다. 마지막으로 `MemoryManager`가 현재 실행 기록을 `memory/history.json`에 save합니다. Memory 접근은 `OrchestratorAgent`로 제한해 개별 agent가 저장소 구조에 직접 의존하지 않도록 설계했습니다.
 
 ## Future Structure
 
@@ -27,4 +35,4 @@ User -> OrchestratorAgent -> VisionAgent -> PromptAgent -> GenerationAgent -> Ev
 - `EvaluationAgent`: 생성된 이미지와 prompt의 품질을 평가합니다. 현재는 실제 CLIP이 아니라 deterministic mock score를 반환합니다.
 - `ReflectionAgent`: 평가 score와 prompt를 바탕으로 개선 제안과 suggested prompt를 생성합니다. 현재는 rule-based mock reflection입니다.
 - `RetryAgent`: 평가 score가 threshold보다 낮은지 판단해 retry 여부를 반환합니다. 아직 실제 재생성 loop는 실행하지 않습니다.
-- `Memory`: caption, prompt, score, reflection, retry, timestamp를 `memory/history.json`에 저장합니다.
+- `MemoryManager`: working memory와 episodic memory의 시작점입니다. `load_last_run()`, `save_run()`, `get_history()`, `clear_history()` interface를 제공합니다.

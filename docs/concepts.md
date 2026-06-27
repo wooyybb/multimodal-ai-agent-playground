@@ -33,3 +33,23 @@
 `Memory`는 agent workflow의 실행 기록을 저장하는 layer입니다. 현재는 `memory/history.json`에 JSON 형태로 기록합니다.
 
 저장 항목은 `caption`, `prompt`, `score`, `reflection`, `retry`, `timestamp`입니다. 향후에는 이 기록을 분석해 prompt 개선, retry 정책, agent 성능 비교에 활용할 수 있습니다.
+
+## Working Memory
+
+Working Memory는 현재 실행 중인 agent context입니다. 이번 프로젝트에서는 orchestrator가 실행 중에 들고 있는 `caption`, `final_prompt`, `score`, `reflection`, `retry_needed` 같은 값이 working memory에 해당합니다.
+
+## Episodic Memory
+
+Episodic Memory는 과거 실행 episode의 기록입니다. `memory/history.json`에 저장되는 각 run record가 episodic memory입니다. 이 기록은 향후 prompt 개선이나 retry 정책 분석에 사용할 수 있습니다.
+
+## State Management
+
+State Management는 agent workflow가 현재 어떤 정보를 가지고 있고, 어떤 단계에서 업데이트되는지 관리하는 방식입니다. `OrchestratorAgent`는 각 agent의 결과를 받아 state를 업데이트하고, 마지막에 `MemoryManager.save_run()`으로 저장합니다.
+
+## Agent Context
+
+Agent Context는 agent가 판단할 때 참고하는 입력 정보입니다. 예를 들어 `ReflectionAgent`는 `caption`, `final_prompt`, `score`를 context로 받아 suggested prompt를 만듭니다.
+
+## Memory Interface
+
+Memory Interface는 memory를 읽고 쓰는 표준 API입니다. 현재 `MemoryManager`는 `load_last_run()`, `save_run()`, `get_history()`, `clear_history()`를 제공합니다.

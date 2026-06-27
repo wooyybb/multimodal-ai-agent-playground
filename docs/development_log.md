@@ -61,3 +61,13 @@
 - 실행 기록은 `memory/history.json`에 저장합니다.
 - 저장 항목은 `caption`, `prompt`, `score`, `reflection`, `retry`, `timestamp`입니다.
 - 이번 Sprint는 실제 regeneration loop가 아니라 self-improving agent architecture의 feedback loop contract를 만드는 데 집중했습니다.
+
+### Sprint 7 Memory Engineering
+
+- `History` 저장 유틸을 `MemoryManager` interface로 확장했습니다.
+- `load_last_run()`, `save_run()`, `get_history()`, `clear_history()` 메서드를 구현했습니다.
+- `OrchestratorAgent`는 시작 시 `load_last_run()`을 호출하고, 종료 시 `save_run()`을 호출합니다.
+- `history.json` 저장 항목에 `output_image_path`를 추가했습니다.
+- `save_run(record: dict)` 형태로 Memory Interface를 정리했습니다.
+- 반환 dict에 `last_run`과 `memory_saved`를 추가했습니다.
+- 이번 작업은 working memory, episodic memory, state management, agent context를 코드와 문서에 연결하는 데 집중했습니다.

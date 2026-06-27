@@ -42,8 +42,9 @@
 
 ## Sprint 7: Memory
 
-- 실행 기록 저장
-- caption, prompt, score, retry history 저장
+- `MemoryManager` 구현 - Done
+- `load_last_run()`, `save_run()`, `get_history()`, `clear_history()` 구현 - Done
+- caption, prompt, score, reflection, retry, output image path 저장 - Done
 - 향후 prompt 개선에 활용할 memory layer 설계
 
 ## Sprint 8: Real BLIP/FLUX/CLIP Integration

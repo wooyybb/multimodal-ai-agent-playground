@@ -11,3 +11,23 @@
 ### Summary
 
 Sprint 7에서는 architecture contract가 명확해졌습니다. `Evaluation -> Reflection -> Retry -> Memory` 흐름이 코드와 문서 모두에 반영되었습니다.
+
+## Sprint 7 Memory Engineering Review
+
+### Findings
+
+- `MemoryManager`는 JSON 전체를 읽고 다시 쓰는 구조입니다. 초기에는 단순하고 검증하기 좋지만, history가 커지면 JSONL 또는 SQLite가 더 적합합니다.
+- `load_last_run()`은 현재 반환값에 포함되지만 아직 agent decision에 직접 쓰이지 않습니다. 다음 단계에서 prompt generation 또는 reflection context로 연결할 수 있습니다.
+- `clear_history()`는 구현됐지만 orchestrator에서는 호출하지 않습니다. 테스트나 UI에서 명시적 초기화 기능으로 연결하는 것이 좋습니다.
+
+### Summary
+
+Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 이 변화로 향후 storage backend를 교체하거나 memory retrieval을 추가하기 쉬워졌습니다.
+
+## Sprint 7 Attachment Review
+
+### Findings
+
+- `MemoryManager.save_run()`은 이제 `record: dict`를 받습니다. schema validation은 아직 없으므로 이후 필수 key 검증을 추가할 수 있습니다.
+- `memory_saved`는 save 성공 시 `True`로 반환됩니다. 예외 처리와 실패 시 `False` 반환은 다음 단계에서 보강할 수 있습니다.
+- Orchestrator만 memory에 접근하는 구조는 적절합니다. 다만 last run을 실제 prompt/reflection context로 활용하는 단계는 아직 남아 있습니다.

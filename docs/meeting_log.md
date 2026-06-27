@@ -11,3 +11,14 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 ```
 
 이번 단계에서는 실제 regeneration loop는 만들지 않았습니다. 대신 reflection 결과, retry 판단, memory 저장까지 연결해 다음 Sprint에서 loop를 안전하게 붙일 수 있는 기반을 만들었습니다.
+
+## 2026-06-27 Memory Engineering Follow-up
+
+이번 논의에서는 memory를 단순 파일 저장이 아니라 `MemoryManager` interface로 분리하기로 했습니다.
+
+채택 이유:
+
+- Orchestrator가 시작 시 과거 실행을 load할 수 있어야 합니다.
+- 종료 시 현재 실행을 save해야 합니다.
+- 전체 history 조회와 초기화가 가능한 interface가 필요합니다.
+- 향후 database나 vector store로 바꿔도 orchestrator 코드를 크게 바꾸지 않는 구조가 필요합니다.
