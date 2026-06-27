@@ -88,3 +88,17 @@ VisionAgent
 ```
 
 `VisionAgent`는 model loading이나 inference details를 알지 않습니다. 실제 BLIP processor/model loading, PIL image 변환, torch inference, fallback caption 처리는 `BlipTool`이 담당합니다.
+
+## Real FLUX Generation
+
+Sprint 11에서는 `GenerationAgent`가 `FluxTool`을 통해 real FLUX generation을 시도하도록 확장했습니다.
+
+```text
+PromptAgent
+-> GenerationAgent
+-> FluxTool
+   -> Real FLUX generation if HF_TOKEN exists
+   -> Mock fallback image if token is missing or generation fails
+```
+
+`GenerationAgent`는 Hugging Face API details를 알지 않습니다. `FluxTool`이 `HF_TOKEN`, `InferenceClient`, image saving, fallback generation을 담당합니다.

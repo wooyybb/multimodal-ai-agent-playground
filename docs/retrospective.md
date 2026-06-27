@@ -94,3 +94,22 @@
 - BLIP inference 결과를 UI에서 실제 이미지로 검증
 - model cache와 device 설정 문서화
 - 실제 FLUX 또는 CLIP 통합으로 확장
+
+## Sprint 11 Retrospective
+
+### 잘된 점
+
+- mock generation에서 real FLUX API generation 구조로 확장했습니다.
+- `GenerationAgent` interface를 유지했습니다.
+- API 실패에도 fallback image로 workflow가 계속됩니다.
+
+### 아쉬운 점
+
+- 실제 FLUX API 성공 여부는 `HF_TOKEN`과 network 상태에 의존합니다.
+- fallback image는 실제 generation 품질을 반영하지 않습니다.
+
+### 다음 Sprint
+
+- 실제 API 호출 성공 케이스 검증
+- output metadata 저장
+- seed, width, height 같은 generation option 추가

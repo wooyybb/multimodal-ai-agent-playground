@@ -97,3 +97,12 @@
 - BLIP model과 processor는 `_load_model()`에서 lazy loading합니다.
 - 이미지 입력은 PIL image, file path, Gradio image 입력을 처리할 수 있도록 RGB 변환을 수행합니다.
 - BLIP 로딩 또는 inference 실패 시 fallback caption `"An uploaded image"`를 반환합니다.
+
+### Sprint 11 Real FLUX Integration
+
+- `FluxTool`을 Hugging Face `InferenceClient` 기반 FLUX generation 구조로 확장했습니다.
+- 모델은 `black-forest-labs/FLUX.1-schnell`을 사용합니다.
+- `HF_TOKEN`이 있으면 real FLUX generation을 시도합니다.
+- `HF_TOKEN`이 없거나 API 호출이 실패하면 PIL 기반 fallback mock image를 생성합니다.
+- output file name은 timestamp 기반으로 생성해 중복 저장을 방지합니다.
+- `GenerationAgent.run(final_prompt) -> str` interface는 유지했습니다.

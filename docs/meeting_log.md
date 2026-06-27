@@ -40,3 +40,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 mock caption을 실제 BLIP 기반 captioning으로 전환하기로 결정했습니다. 단, `VisionAgent`는 model internals를 몰라야 하므로 실제 모델 로딩과 inference는 `BlipTool`이 담당합니다.
 
 모델 로딩 실패가 전체 workflow를 중단하지 않도록 fallback caption을 유지하기로 했습니다.
+
+## 2026-06-27 Sprint 11 Real FLUX
+
+이번 논의에서는 mock generation을 실제 FLUX generation 구조로 확장하기로 결정했습니다. 단, 로컬 GPU 의존성을 줄이기 위해 Hugging Face Inference API 기반으로 먼저 통합합니다.
+
+`HF_TOKEN`이 없거나 API가 실패하면 fallback mock image를 생성해 demo와 workflow 검증이 계속 가능하도록 했습니다.

@@ -85,3 +85,9 @@ Sprint 9 prompt는 UI와 Agent 책임 분리를 명확히 하기 위한 Architec
 Sprint 10 prompt는 실제 모델 통합의 위험을 줄이기 위해 제약을 명확히 둔 prompt입니다. 수정 가능한 파일을 `BlipTool`, `VisionAgent`, `requirements.txt`, docs로 제한해 UI, orchestrator, memory, generation/evaluation 코드를 건드리지 않도록 했습니다.
 
 또한 fallback caption과 lazy loading을 명시해 model dependency, network cache, device 문제로 전체 workflow가 깨지는 위험을 줄였습니다.
+
+## Sprint 11 Real FLUX Prompt
+
+Sprint 11 prompt는 실제 API 통합의 실패 가능성을 줄이기 위해 fallback, environment variable, files forbidden을 명확히 둔 prompt입니다.
+
+`HF_TOKEN`을 환경변수로 사용하도록 제한해 보안 정보를 코드에 넣지 않게 했고, API 실패 시 fallback mock image를 생성하도록 요구해 workflow 안정성을 유지했습니다. 또한 UI, orchestrator, memory를 금지 파일로 지정해 generation backend 교체가 agent workflow를 흔들지 않게 했습니다.

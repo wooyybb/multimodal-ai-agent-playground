@@ -58,3 +58,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `transformers` 또는 model loading 실패 시 fallback caption을 반환합니다.
 - `VisionAgent`는 tool 호출만 유지해 Tool-Agent Separation이 지켜졌습니다.
 - 실제 BLIP inference는 모델 다운로드와 runtime dependency가 필요하므로, 오프라인 환경에서는 fallback path가 동작합니다.
+
+## Sprint 11 Real FLUX Review
+
+### Findings
+
+- `FluxTool`은 `HF_TOKEN`이 있을 때만 real API generation을 시도합니다.
+- token이 없거나 API 호출이 실패하면 fallback image를 생성해 workflow가 멈추지 않습니다.
+- output filename은 timestamp 기반이라 이전 output을 덮어쓰지 않습니다.
+- API token은 `.env.example`에 placeholder만 제공하고 실제 secret은 저장하지 않습니다.

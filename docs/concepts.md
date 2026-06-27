@@ -101,3 +101,23 @@ Tool-Agent Separation은 agent가 역할과 의사결정 흐름을 담당하고,
 ## Lazy Loading
 
 Lazy Loading은 실제로 필요해지는 시점까지 무거운 리소스 로딩을 미루는 방식입니다. `BlipTool`은 첫 `generate_caption()` 호출 시 `_load_model()`을 통해 BLIP를 로드합니다.
+
+## Text-to-Image Generation
+
+Text-to-Image Generation은 텍스트 prompt를 입력받아 이미지를 생성하는 작업입니다. 이 프로젝트에서는 `GenerationAgent`가 final prompt를 `FluxTool`에 전달해 image path를 반환받습니다.
+
+## Diffusion Inference
+
+Diffusion Inference는 diffusion model이 noise에서 이미지를 점진적으로 생성하는 추론 과정입니다. FLUX는 text-to-image generation을 수행하는 diffusion 계열 모델입니다.
+
+## API-based Model Serving
+
+API-based Model Serving은 로컬에서 모델을 직접 실행하지 않고 외부 API를 통해 inference를 요청하는 방식입니다. Sprint 11에서는 Hugging Face `InferenceClient`로 FLUX generation을 시도합니다.
+
+## Fallback Strategy
+
+Fallback Strategy는 외부 모델 또는 API 실패 시 대체 결과를 반환해 전체 workflow가 멈추지 않도록 하는 설계입니다. `FluxTool`은 token이 없거나 API 실패 시 PIL 기반 mock image를 생성합니다.
+
+## Environment Variable
+
+Environment Variable은 API token 같은 설정 값을 코드 밖에서 주입하는 방식입니다. `HF_TOKEN`은 Hugging Face API 호출에 사용되며 `.env` 또는 시스템 환경변수로 설정할 수 있습니다.

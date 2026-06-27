@@ -73,3 +73,10 @@
 - lazy loading 기반 BLIP model/processor 로딩
 - fallback caption 처리
 - `VisionAgent` interface 유지
+
+## Sprint 11: Real FLUX Integration - Done
+
+- `FluxTool`에 Hugging Face `InferenceClient` 기반 FLUX generation 구조 추가
+- `HF_TOKEN` 환경변수 기반 API 호출
+- API 실패 또는 token 부재 시 fallback mock image 생성
+- timestamp 기반 output file 저장
