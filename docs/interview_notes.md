@@ -23,3 +23,15 @@ A: 이미지 생성 결과를 사람이 매번 주관적으로 확인하면 retr
 ## Q: EvaluationAgent를 PromptAgent나 GenerationAgent 안에 넣지 않은 이유는 무엇인가요?
 
 A: `PromptAgent`는 prompt 생성, `GenerationAgent`는 image generation, `EvaluationAgent`는 result evaluation이라는 서로 다른 책임을 가집니다. 평가 로직을 다른 agent 안에 넣으면 역할이 섞이고 추후 평가 기준을 바꾸기 어려워집니다. 별도 agent로 분리하면 평가 방식만 독립적으로 교체하거나 확장할 수 있고, score를 `ReflectionAgent`와 `RetryAgent`에 명확히 전달할 수 있습니다.
+
+## Q: ReflectionAgent는 왜 필요한가요?
+
+A: `EvaluationAgent`가 score를 제공해도, score만으로는 무엇을 개선해야 하는지 알기 어렵습니다. `ReflectionAgent`는 평가 결과를 바탕으로 실패 원인을 분석하고, 다음 generation에 사용할 수 있는 `suggested_prompt`를 제안하는 역할을 합니다. 현재는 rule-based mock이지만, 향후 LLM 기반 reflection으로 확장할 수 있습니다.
+
+## Q: Retry threshold는 왜 필요한가요?
+
+A: retry 여부를 일관되게 판단하려면 기준점이 필요합니다. 현재는 `0.75`를 threshold로 두고, score가 이보다 낮으면 retry 후보로 표시합니다. 실제 재생성 loop는 아직 실행하지 않지만, 이 값은 feedback loop를 설계하기 위한 첫 번째 decision boundary입니다.
+
+## Q: 현재 Reflection은 실제 LLM인가요?
+
+A: 아닙니다. 현재 `ReflectionAgent`는 실제 LLM API를 호출하지 않는 rule-based mock reflection입니다. score가 낮으면 정해진 규칙에 따라 개선 제안과 suggested prompt를 반환하고, score가 충분하면 `"no major revision needed"`를 반환합니다.

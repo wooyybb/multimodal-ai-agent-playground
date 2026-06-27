@@ -44,3 +44,12 @@
 - 실제 CLIP 모델은 로드하지 않았습니다.
 - `ClipTool`은 generated image file 존재 여부와 final prompt 길이를 활용해 0.0~1.0 사이 deterministic mock score를 반환합니다.
 - `OrchestratorAgent` 실행 순서를 `VisionAgent -> PromptAgent -> GenerationAgent -> EvaluationAgent`로 확장했습니다.
+
+### ReflectionAgent And RetryAgent
+
+- `RetryAgent`를 구현했습니다.
+- 기본 threshold는 `0.75`로 설정했습니다.
+- score가 threshold보다 낮으면 retry 필요 여부를 `True`로 반환합니다.
+- `ReflectionAgent`를 rule-based mock reflection 구조로 확장했습니다.
+- score가 `0.75` 미만이면 개선 제안과 `suggested_prompt`를 반환하고, `0.75` 이상이면 `"no major revision needed"`를 반환합니다.
+- 실제 재생성 loop는 아직 구현하지 않았고, retry 여부와 suggested prompt까지만 반환합니다.

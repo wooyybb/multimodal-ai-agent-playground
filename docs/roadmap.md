@@ -35,7 +35,7 @@
 - `EvaluationAgent` mock 구현
 - 생성 결과와 prompt를 받아 mock score 반환
 
-## Sprint 6: Reflection + Retry Loop
+## Sprint 6: Reflection + Retry Loop - Done
 
 - `ReflectionAgent` 개선 제안 로직 확장
 - `RetryAgent`를 통해 낮은 score일 때 prompt 개선 및 재시도 흐름 구성
