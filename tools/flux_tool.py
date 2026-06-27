@@ -1,0 +1,2 @@
+class FluxTool:
+    """TODO"""
