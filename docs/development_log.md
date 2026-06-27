@@ -28,3 +28,11 @@
 - 기존 `MultimodalPipeline`이 직접 agent를 호출하던 구조에서, `OrchestratorAgent`가 `VisionAgent`와 `PromptAgent`를 조율하는 구조로 변경했습니다.
 - `ReflectionAgent`를 mock 형태로 추가했습니다.
 - 현재는 실제 model integration 없이 Python class 기반 multi-agent 구조를 만드는 단계입니다.
+
+### GenerationAgent Mock Image Generation
+
+- `GenerationAgent`를 구현했습니다.
+- `GenerationAgent`는 `FluxTool`을 호출하도록 구성했습니다.
+- 실제 FLUX API 또는 HuggingFace API는 연결하지 않았습니다.
+- `FluxTool`은 PIL을 사용해 `outputs/output_mock.png` mock image를 생성하고 저장 경로를 반환합니다.
+- `OrchestratorAgent` 실행 순서를 `VisionAgent -> PromptAgent -> GenerationAgent`로 확장했습니다.
