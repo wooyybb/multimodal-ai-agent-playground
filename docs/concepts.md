@@ -21,3 +21,15 @@
 현재 버전은 rule-based mock reflection입니다. 실제 LLM API를 호출하지 않고, score가 `0.75` 미만이면 개선 문구와 `suggested_prompt`를 반환합니다. score가 `0.75` 이상이면 `"no major revision needed"`를 반환합니다.
 
 향후에는 LLM 기반 reflection으로 확장할 수 있습니다. 예를 들어 generated image, reference image caption, final prompt, evaluation score, memory history를 함께 입력해 더 구체적인 실패 원인과 개선 prompt를 생성할 수 있습니다.
+
+## Retry
+
+`RetryAgent`는 retry decision을 담당하는 agent입니다. 현재는 threshold `0.75`를 기준으로 score가 낮으면 retry가 필요하다고 판단합니다.
+
+이번 Sprint에서는 실제 재생성 loop를 실행하지 않습니다. 대신 `retry_needed` 값을 반환해 다음 Sprint에서 retry loop를 연결할 수 있는 구조를 만듭니다.
+
+## Memory
+
+`Memory`는 agent workflow의 실행 기록을 저장하는 layer입니다. 현재는 `memory/history.json`에 JSON 형태로 기록합니다.
+
+저장 항목은 `caption`, `prompt`, `score`, `reflection`, `retry`, `timestamp`입니다. 향후에는 이 기록을 분석해 prompt 개선, retry 정책, agent 성능 비교에 활용할 수 있습니다.

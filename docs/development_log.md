@@ -53,3 +53,11 @@
 - `ReflectionAgent`를 rule-based mock reflection 구조로 확장했습니다.
 - score가 `0.75` 미만이면 개선 제안과 `suggested_prompt`를 반환하고, `0.75` 이상이면 `"no major revision needed"`를 반환합니다.
 - 실제 재생성 loop는 아직 구현하지 않았고, retry 여부와 suggested prompt까지만 반환합니다.
+
+### Sprint 7 Reflection Retry Memory
+
+- `OrchestratorAgent` 호출 순서를 `Evaluation -> Reflection -> Retry -> Memory`로 정리했습니다.
+- `Memory` layer를 `memory/history.py`에 구현했습니다.
+- 실행 기록은 `memory/history.json`에 저장합니다.
+- 저장 항목은 `caption`, `prompt`, `score`, `reflection`, `retry`, `timestamp`입니다.
+- 이번 Sprint는 실제 regeneration loop가 아니라 self-improving agent architecture의 feedback loop contract를 만드는 데 집중했습니다.

@@ -1,0 +1,15 @@
+# AI Usage
+
+## Sprint 7
+
+이번 Sprint에서 Codex는 Reflection 기반 Self-Improving AI Agent 구조를 구현하고 문서화하는 데 사용했습니다.
+
+활용 방식:
+
+- 허용 파일과 금지 파일 제약을 지키며 코드 수정
+- `ReflectionAgent`, `RetryAgent`, `Memory` 구현
+- `OrchestratorAgent` 호출 순서 정리
+- sprint 문서 작성 및 architecture 설명 보강
+- `compileall`과 pipeline 실행으로 동작 검증
+
+Codex는 구현 assistant로 사용했고, architecture 방향과 sprint 목표는 prompt에서 명확히 지정했습니다.
