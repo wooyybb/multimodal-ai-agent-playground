@@ -117,3 +117,13 @@ reference image similarity는 중요한 확장 포인트지만, 이번 Sprint에
 ## 왜 Fallback Score를 0.0으로 두는가
 
 CLIP loading 또는 inference 실패는 평가를 신뢰할 수 없다는 의미입니다. 이 경우 높은 점수를 주면 retry loop가 잘못된 판단을 할 수 있으므로 `0.0`을 반환합니다.
+
+## 왜 기능 추가 대신 Integration Test Sprint를 진행했는가
+
+BLIP, FLUX, CLIP, Reflection, Retry, Memory, UI가 모두 연결된 뒤에는 새 기능보다 End-to-End 안정성이 더 중요합니다. 검증 없이 기능만 추가하면 portfolio demo에서 실제 흐름을 설명하기 어려워집니다.
+
+Sprint 13은 전체 workflow가 이미지 입력부터 UI 출력과 memory 저장까지 이어지는지 확인하기 위한 안정화 Sprint입니다.
+
+## 왜 Demo Script와 Known Issues를 문서화했는가
+
+면접이나 portfolio demo에서는 완벽한 시스템보다 현재 가능한 것과 한계를 명확히 설명하는 능력이 중요합니다. `demo_script.md`는 시연 흐름을 정리하고, `known_issues.md`는 모델/API/fallback의 한계를 투명하게 기록합니다.

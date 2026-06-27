@@ -159,3 +159,19 @@ A: 향후 image-image similarity나 reference-guided evaluation을 추가하기 
 ## Q: CLIP score만으로 생성 품질을 평가할 수 있나요?
 
 A: CLIP score는 prompt alignment를 보는 데 유용하지만 이미지의 미적 품질, 디테일, 왜곡 여부까지 완벽히 평가하지는 못합니다. 향후 DINO similarity, aesthetic score, human preference evaluation과 함께 사용하는 것이 좋습니다.
+
+## Q: End-to-End 테스트는 어떻게 했나요?
+
+A: UI에서 image와 user prompt를 입력한 뒤 Pipeline, Orchestrator, 각 Agent, MemoryManager까지 결과가 이어지는지 확인합니다. 주요 확인 항목은 BLIP caption, final prompt, output image, CLIP score, reflection, retry decision, best result, memory 저장, agent trace입니다.
+
+## Q: Known Issues를 문서화한 이유는 무엇인가요?
+
+A: 실제 모델과 API를 사용하는 프로젝트는 token, network, model download, score 한계 같은 변수가 있습니다. Known Issues를 문서화하면 현재 시스템의 한계를 투명하게 설명하고, 다음 개선 방향도 명확히 제시할 수 있습니다.
+
+## Q: CLIP score의 한계는 무엇인가요?
+
+A: CLIP score는 image-text alignment를 평가하는 데 유용하지만 이미지의 미적 품질, 해상도, 세부 왜곡, 사용자 취향까지 평가하지는 못합니다.
+
+## Q: 면접 시연에서는 어떤 흐름으로 보여줄 건가요?
+
+A: 먼저 Gradio UI를 실행하고, 이미지를 업로드한 뒤 user prompt를 입력합니다. 이후 caption, final prompt, generated image, score, reflection, retry decision, best result, agent trace, memory 기록 순서로 설명합니다.

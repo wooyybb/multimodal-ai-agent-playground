@@ -132,3 +132,22 @@
 - reference image similarity 추가
 - DINO similarity 또는 aesthetic score 보강
 - UI에 evaluation explanation 추가
+
+## Sprint 13 Retrospective
+
+### 잘된 점
+
+- E2E validation 관점에서 전체 workflow를 정리했습니다.
+- UI 안정성과 memory save 방어 처리를 보강했습니다.
+- demo script와 known issues를 문서화했습니다.
+
+### 아쉬운 점
+
+- 아직 자동화된 integration test는 없습니다.
+- 실제 모델 다운로드와 API 호출 성공 여부는 환경에 따라 달라집니다.
+
+### 다음 Sprint
+
+- 자동화된 smoke test 추가
+- history viewer UI 추가
+- README와 demo video 정리

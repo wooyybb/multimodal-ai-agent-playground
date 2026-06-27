@@ -115,3 +115,12 @@
 - generated image와 final prompt를 같은 embedding space에서 비교합니다.
 - cosine similarity를 `(similarity + 1) / 2` 방식으로 0.0~1.0 범위 score로 변환합니다.
 - CLIP 로딩 또는 inference 실패 시 fallback score `0.0`을 반환합니다.
+
+### Sprint 13 Integration And Validation
+
+- 새 기능 추가보다 End-to-End validation과 demo readiness에 집중했습니다.
+- UI output이 `None` 값으로 깨지지 않도록 defensive formatting을 추가했습니다.
+- score는 UI 출력 전에 소수점 4자리 기준으로 정리합니다.
+- `agent_trace`는 항상 list 기반으로 받고 줄바꿈 문자열로 표시합니다.
+- memory 저장 실패가 전체 workflow를 중단하지 않도록 Orchestrator에서 방어 처리했습니다.
+- `docs/testing.md`, `docs/known_issues.md`, `docs/demo_script.md`를 추가했습니다.

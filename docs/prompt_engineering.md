@@ -97,3 +97,9 @@ Sprint 11 prompt는 실제 API 통합의 실패 가능성을 줄이기 위해 fa
 Sprint 12 prompt는 실제 model-based evaluation을 추가하면서도 interface 안정성을 유지하도록 설계했습니다.
 
 `EvaluationAgent.run(reference_image, generated_image_path, final_prompt)` interface를 유지하고, CLIP internals는 `ClipTool`로 제한했습니다. fallback score, lazy loading, files forbidden을 명시해 모델 로딩 실패나 inference 오류가 전체 workflow를 멈추지 않도록 했습니다.
+
+## Sprint 13 Validation Prompt
+
+Sprint 13 prompt는 기능 추가를 제한하고 validation, documentation, stability 개선을 명시한 prompt입니다.
+
+Allowed files와 forbidden files를 분리해 tools와 requirements를 건드리지 않도록 했고, testing docs, known issues, demo script를 Done Definition에 포함해 demo readiness를 높였습니다.

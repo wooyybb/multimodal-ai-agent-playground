@@ -116,3 +116,24 @@ GenerationAgent
 ```
 
 `EvaluationAgent`는 CLIP model internals를 알지 않습니다. `ClipTool`이 processor/model lazy loading, generated image loading, text embedding, image embedding, cosine similarity calculation, fallback score를 담당합니다.
+
+## Current E2E Workflow
+
+Sprint 13 기준 전체 End-to-End workflow는 다음과 같습니다.
+
+```text
+User
+-> Gradio UI
+-> MultimodalPipeline
+-> OrchestratorAgent
+-> VisionAgent / BLIP
+-> PromptAgent
+-> GenerationAgent / FLUX or fallback
+-> EvaluationAgent / CLIP
+-> ReflectionAgent
+-> RetryAgent
+-> MemoryManager
+-> UI Output
+```
+
+이번 Sprint에서는 새 agent를 추가하지 않고, UI output stability, agent trace formatting, memory save failure handling, testing documentation을 정리했습니다.

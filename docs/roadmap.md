@@ -87,3 +87,11 @@
 - generated image와 final prompt의 image-text similarity 계산
 - cosine similarity를 0.0~1.0 score로 변환
 - CLIP 실패 시 fallback score `0.0` 반환
+
+## Sprint 13: Integration & Validation - Done
+
+- E2E workflow validation 문서화
+- known issues 정리
+- demo script 작성
+- UI output stability 개선
+- memory save failure 방어 처리

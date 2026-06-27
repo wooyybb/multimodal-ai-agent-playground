@@ -55,26 +55,32 @@ class OrchestratorAgent:
             best_score = score
 
         print(f"[OrchestratorAgent] Best score selected: {best_score}")
-        history_path = self.memory_manager.save_run(
-            {
-                "caption": caption,
-                "initial_prompt": final_prompt,
-                "initial_score": score,
-                "initial_output_image_path": output_image_path,
-                "reflection": reflection_result["reflection"],
-                "retry_needed": retry_needed,
-                "retry_prompt": (
-                    reflection_result["suggested_prompt"]
-                    if retry_needed
-                    else None
-                ),
-                "retry_score": retry_score,
-                "retry_output_image_path": retry_output_image_path,
-                "best_prompt": best_prompt,
-                "best_score": best_score,
-                "best_output_image_path": best_output_image_path,
-            }
-        )
+        memory_saved = False
+        history_path = None
+        try:
+            history_path = self.memory_manager.save_run(
+                {
+                    "caption": caption,
+                    "initial_prompt": final_prompt,
+                    "initial_score": score,
+                    "initial_output_image_path": output_image_path,
+                    "reflection": reflection_result["reflection"],
+                    "retry_needed": retry_needed,
+                    "retry_prompt": (
+                        reflection_result["suggested_prompt"]
+                        if retry_needed
+                        else None
+                    ),
+                    "retry_score": retry_score,
+                    "retry_output_image_path": retry_output_image_path,
+                    "best_prompt": best_prompt,
+                    "best_score": best_score,
+                    "best_output_image_path": best_output_image_path,
+                }
+            )
+            memory_saved = True
+        except Exception as error:
+            print(f"[Memory] Save failed: {error}")
 
         print("[OrchestratorAgent] Multi-agent workflow finished.")
         return {
@@ -92,7 +98,7 @@ class OrchestratorAgent:
             "best_score": best_score,
             "history_path": history_path,
             "last_run": last_run,
-            "memory_saved": True,
+            "memory_saved": memory_saved,
             "agent_trace": [
                 "MemoryManager loaded last run",
                 "VisionAgent generated caption",
@@ -102,6 +108,10 @@ class OrchestratorAgent:
                 "ReflectionAgent generated reflection",
                 "RetryAgent decided retry status",
                 "OrchestratorAgent selected best result",
-                "MemoryManager saved run history",
+                (
+                    "MemoryManager saved run history"
+                    if memory_saved
+                    else "MemoryManager save skipped after error"
+                ),
             ],
         }

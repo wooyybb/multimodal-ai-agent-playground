@@ -76,3 +76,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - generated image path나 final prompt가 비어 있으면 fallback score `0.0`을 반환합니다.
 - reference image는 interface에 유지되지만 이번 Sprint에서는 사용하지 않습니다.
 - CLIP score는 prompt alignment signal이며, aesthetic quality를 완전히 대체하지는 않습니다.
+
+## Sprint 13 Integration Review
+
+### Findings
+
+- UI는 missing key와 `None` output에 대해 defensive formatting을 수행합니다.
+- `agent_trace`는 list가 아니어도 빈 list로 정리되어 UI가 깨지지 않습니다.
+- memory save 실패는 전체 workflow를 중단하지 않고 `memory_saved=False`로 반영됩니다.
+- E2E validation은 문서 기반 체크리스트로 정리됐지만, 아직 자동화된 test suite는 없습니다.

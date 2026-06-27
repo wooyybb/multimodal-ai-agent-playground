@@ -77,8 +77,16 @@ class MemoryManager:
         if not self.history_path.exists():
             return []
 
-        with self.history_path.open("r", encoding="utf-8") as file:
-            return json.load(file)
+        try:
+            with self.history_path.open("r", encoding="utf-8") as file:
+                history = json.load(file)
+        except (json.JSONDecodeError, OSError):
+            return []
+
+        if not isinstance(history, list):
+            return []
+
+        return history
 
     def clear_history(self):
         print("[Memory] Clearing history...")

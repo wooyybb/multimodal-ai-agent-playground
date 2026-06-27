@@ -19,6 +19,25 @@ def _empty_result(message):
     )
 
 
+def _score(value):
+    if value is None:
+        return None
+    try:
+        return round(float(value), 4)
+    except (TypeError, ValueError):
+        return None
+
+
+def _image_path(value):
+    return value or None
+
+
+def _agent_trace(value):
+    if not isinstance(value, list):
+        value = []
+    return "\n".join(str(item) for item in value)
+
+
 def run_workflow(image, user_prompt):
     print("[UI] Running multi-agent workflow...")
 
@@ -29,20 +48,20 @@ def run_workflow(image, user_prompt):
         pipeline = MultimodalPipeline()
         result = pipeline.run(image, user_prompt or "")
 
-        agent_trace = "\n".join(result.get("agent_trace", []))
+        agent_trace = _agent_trace(result.get("agent_trace", []))
         print("[UI] Workflow completed.")
 
         return (
             result.get("caption", ""),
             result.get("final_prompt", ""),
-            result.get("output_image_path"),
-            result.get("score"),
+            _image_path(result.get("output_image_path")),
+            _score(result.get("score")),
             result.get("reflection", ""),
-            result.get("retry_needed"),
-            result.get("retry_output_image_path"),
-            result.get("retry_score"),
-            result.get("best_output_image_path"),
-            result.get("best_score"),
+            bool(result.get("retry_needed", False)),
+            _image_path(result.get("retry_output_image_path")),
+            _score(result.get("retry_score")),
+            _image_path(result.get("best_output_image_path")),
+            _score(result.get("best_score")),
             agent_trace,
         )
     except Exception as error:

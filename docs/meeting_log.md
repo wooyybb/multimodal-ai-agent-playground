@@ -52,3 +52,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 mock score를 실제 CLIP 기반 image-text similarity score로 전환하기로 결정했습니다.
 
 `EvaluationAgent`는 평가 흐름만 담당하고, CLIP model loading과 embedding similarity 계산은 `ClipTool`이 담당하도록 분리했습니다.
+
+## 2026-06-27 Sprint 13 Integration & Validation
+
+이번 논의에서는 새 기능 추가보다 End-to-End 검증을 우선하기로 결정했습니다.
+
+이미 BLIP, FLUX, CLIP, Reflection, Retry, Memory, UI가 연결되어 있으므로 portfolio demo 준비를 위해 testing docs, known issues, demo script를 정리했습니다.
