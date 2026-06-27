@@ -40,3 +40,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `RetryAgent`는 `should_retry()`만 담당하고, second attempt 실행은 `OrchestratorAgent`가 담당해 책임 분리가 유지됩니다.
 - `GenerationAgent` mock은 같은 `outputs/output_mock.png` 경로를 반환하므로 initial/retry image path가 같을 수 있습니다. 실제 generation 도입 시 attempt별 파일명을 분리하는 것이 좋습니다.
 - best result selection은 score 비교 기반입니다. 동점에서는 initial result를 유지합니다.
+
+## Sprint 9 Gradio UI Review
+
+### Findings
+
+- UI가 `MultimodalPipeline`만 호출하므로 agent orchestration 책임이 UI로 섞이지 않습니다.
+- `image is None` 입력에 대한 사용자 안내가 있습니다.
+- workflow 예외는 UI message로 반환됩니다. 향후에는 traceback logging을 별도 파일이나 console에 남길 수 있습니다.
+- Gradio output image는 path 기반으로 처리합니다. output path가 `None`이면 image output도 `None`으로 유지됩니다.

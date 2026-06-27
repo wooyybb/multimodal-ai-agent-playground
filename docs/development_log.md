@@ -80,3 +80,11 @@
 - retry가 필요한 경우 `suggested_prompt`로 `GenerationAgent`와 `EvaluationAgent`를 한 번 더 실행합니다.
 - initial result와 retry result 중 더 높은 score를 best result로 선택합니다.
 - `MemoryManager`는 initial, retry, best 정보를 포함한 full retry record를 저장합니다.
+
+### Sprint 9 Gradio UI Integration
+
+- `main.py`를 Gradio app 실행 진입점으로 구성했습니다.
+- `ui/app.py`에 `create_app()`을 구현했습니다.
+- UI는 `MultimodalPipeline.run(image, user_prompt)`만 호출하도록 구성했습니다.
+- image input, user prompt, caption, final prompt, initial/retry/best image, score, reflection, retry status, agent trace를 표시합니다.
+- image가 비어 있거나 workflow 예외가 발생할 때 UI에 안내 메시지를 반환하도록 처리했습니다.

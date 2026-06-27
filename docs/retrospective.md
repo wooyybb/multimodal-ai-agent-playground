@@ -55,3 +55,23 @@
 - attempt별 output filename 분리
 - retry count와 stop condition을 설정 가능한 policy로 확장
 - memory history를 reflection context로 활용
+
+## Sprint 9 Retrospective
+
+### 잘된 점
+
+- UI와 workflow 책임을 분리했습니다.
+- Gradio Blocks로 image input, prompt input, workflow result를 빠르게 연결했습니다.
+- Agent trace를 UI에 노출해 multi-agent 실행 흐름을 설명할 수 있게 됐습니다.
+
+### 아쉬운 점
+
+- 아직 mock image와 mock score 기반 demo입니다.
+- UI styling은 최소 수준입니다.
+- `python main.py`는 Gradio server를 실행하므로 자동 테스트에서는 app 생성까지만 확인하는 편이 안전합니다.
+
+### 다음 Sprint
+
+- output image 파일명을 attempt별로 분리
+- UI에서 history 보기 기능 추가
+- 실제 BLIP/FLUX/CLIP 연동 전 demo 시나리오 정리

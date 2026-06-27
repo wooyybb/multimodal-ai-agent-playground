@@ -49,3 +49,13 @@ Self-improving AI Agent는 이전 실행 결과를 기억해야 개선 방향을
 ## 왜 Best Result를 저장하는가
 
 initial attempt와 retry attempt가 모두 존재할 때는 최종적으로 어떤 결과를 사용할지 명확해야 합니다. `best_score`, `best_prompt`, `best_output_image_path`를 저장하면 이후 UI, memory analysis, portfolio 설명에서 최종 선택 기준을 추적할 수 있습니다.
+
+## 왜 UI가 Agent를 직접 호출하지 않고 Pipeline을 호출하는가
+
+UI가 개별 agent를 직접 호출하면 화면 코드가 workflow 순서와 retry policy를 알게 됩니다. 그러면 agent 구조가 바뀔 때 UI도 함께 수정해야 합니다.
+
+`ui/app.py`는 `MultimodalPipeline`만 호출하고, pipeline은 `OrchestratorAgent`를 호출합니다. 이 구조는 UI를 result visualization layer로 유지하고, agent orchestration은 backend workflow에 남겨 둡니다.
+
+## 왜 모델 통합 전에 UI를 먼저 연결하는가
+
+실제 BLIP, FLUX, CLIP을 붙이기 전에도 사용자가 workflow를 실행하고 결과 trace를 확인할 수 있어야 합니다. Gradio UI를 먼저 연결하면 demo-driven development가 가능해지고, 이후 실제 모델을 붙였을 때 사용자 흐름을 다시 설계하지 않아도 됩니다.

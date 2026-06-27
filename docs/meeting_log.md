@@ -28,3 +28,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 retry loop를 도입하되 1회로 제한하기로 결정했습니다. 목적은 reflection 결과가 실제 second attempt로 이어지는 self-improving flow를 검증하는 것입니다.
 
 `RetryAgent`는 retry 여부만 판단하고, `OrchestratorAgent`가 generation/evaluation 재실행과 best result selection을 담당합니다.
+
+## 2026-06-27 Sprint 9 Gradio UI
+
+이번 논의에서는 multi-agent workflow를 Gradio UI에 연결하기로 결정했습니다. UI는 직접 agent를 호출하지 않고 `MultimodalPipeline`만 호출합니다.
+
+목표는 사용자가 image와 prompt를 입력하고, caption, prompt, output image, score, reflection, retry 결과, agent trace를 한 화면에서 확인할 수 있게 만드는 것입니다.

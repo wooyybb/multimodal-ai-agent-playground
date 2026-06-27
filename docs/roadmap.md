@@ -59,3 +59,10 @@
 - retry가 필요한 경우 suggested prompt로 second attempt 실행
 - initial/retry 중 best score 선택
 - full retry record를 memory에 저장
+
+## Sprint 9: Gradio UI Integration - Done
+
+- Gradio Blocks 기반 UI 구현
+- image input과 user prompt 입력 연결
+- multi-agent workflow 결과 표시
+- agent trace 시각화

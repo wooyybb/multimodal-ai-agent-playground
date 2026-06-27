@@ -6,6 +6,7 @@ class MultimodalPipeline:
         self.orchestrator_agent = OrchestratorAgent()
 
     def run(self, image, user_prompt):
+        print("[Pipeline] Running from UI...")
         print("[Pipeline] Starting multi-agent pipeline...")
         result = self.orchestrator_agent.run(image, user_prompt)
         print("[Pipeline] Finished pipeline.")

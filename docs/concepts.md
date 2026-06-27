@@ -69,3 +69,15 @@ Self-Improving Agent는 자신의 결과를 평가하고 개선 방향을 반영
 ## Best Result Selection
 
 Best Result Selection은 initial attempt와 retry attempt 중 더 높은 score를 가진 결과를 최종 결과로 선택하는 단계입니다. 이 선택 결과는 `best_prompt`, `best_score`, `best_output_image_path`로 memory에 저장됩니다.
+
+## Human-in-the-loop Interface
+
+Human-in-the-loop Interface는 사용자가 입력을 제공하고 agent workflow 결과를 직접 확인하는 접점입니다. Sprint 9에서는 Gradio UI가 image input과 user prompt를 받아 multi-agent workflow를 실행합니다.
+
+## Demo-driven Development
+
+Demo-driven Development는 내부 구조가 완성되기 전에 실행 가능한 demo를 먼저 만들어 피드백을 받는 방식입니다. 현재 mock model 상태에서도 UI를 통해 전체 workflow를 확인할 수 있습니다.
+
+## Agent Trace Visualization
+
+Agent Trace Visualization은 어떤 agent가 어떤 순서로 실행됐는지 사용자에게 보여주는 방식입니다. UI는 `agent_trace`를 표시해 Vision, Prompt, Generation, Evaluation, Reflection, Retry, Memory 흐름을 확인할 수 있게 합니다.

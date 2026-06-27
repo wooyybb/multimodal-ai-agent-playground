@@ -87,3 +87,15 @@ A: `RetryAgent`는 retry 여부를 판단하는 policy agent입니다. 실제 ge
 ## Q: best_score를 저장하는 이유는 무엇인가요?
 
 A: initial attempt와 retry attempt가 모두 있을 때 최종적으로 어떤 결과를 선택했는지 추적해야 합니다. `best_score`를 저장하면 성능 비교, UI 표시, memory 기반 분석에 사용할 수 있습니다.
+
+## Q: 왜 Gradio UI를 먼저 연결했나요?
+
+A: 실제 모델을 붙이기 전에도 사용자가 image와 prompt를 입력하고 전체 agent workflow를 확인할 수 있어야 합니다. Gradio UI는 빠르게 demo를 만들 수 있고, image input과 output visualization에 적합합니다.
+
+## Q: UI가 직접 Agent를 호출하지 않고 Pipeline을 호출하는 이유는 무엇인가요?
+
+A: UI가 agent 순서를 알면 orchestration 책임이 UI로 새어 나갑니다. UI는 `MultimodalPipeline`만 호출하고, agent 실행 순서는 `OrchestratorAgent`가 관리하게 해야 책임 분리가 유지됩니다.
+
+## Q: Agent Trace를 UI에 보여주는 이유는 무엇인가요?
+
+A: Multi-agent system은 결과뿐 아니라 어떤 agent들이 어떤 순서로 실행됐는지가 중요합니다. Agent trace를 보여주면 workflow가 실제로 Vision, Prompt, Generation, Evaluation, Reflection, Retry, Memory 단계를 거쳤는지 설명할 수 있습니다.

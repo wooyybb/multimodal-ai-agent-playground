@@ -54,3 +54,24 @@ GenerationAgent(initial_prompt)
 ```
 
 무한 반복을 피하기 위해 retry는 최대 1회만 수행합니다. `OrchestratorAgent`가 loop를 제어하고, `RetryAgent`는 `should_retry(score)` 판단만 담당합니다.
+
+## Gradio UI Integration
+
+Sprint 9에서는 Gradio UI를 `MultimodalPipeline`에 연결했습니다. UI는 agent를 직접 호출하지 않고 pipeline만 호출합니다.
+
+```text
+User
+-> Gradio UI
+-> MultimodalPipeline
+-> OrchestratorAgent
+-> VisionAgent
+-> PromptAgent
+-> GenerationAgent
+-> EvaluationAgent
+-> ReflectionAgent
+-> RetryAgent
+-> MemoryManager
+-> Gradio UI Output
+```
+
+이 구조는 UI와 agent workflow 책임을 분리합니다. UI는 image input, user prompt, result visualization, agent trace display에 집중하고, 실행 순서와 retry loop는 `OrchestratorAgent`가 관리합니다.

@@ -73,3 +73,9 @@ Done Definition
 Sprint 8 prompt는 무한 loop를 방지하기 위한 제약이 명확한 Architecture Prompt입니다. 핵심 제약은 `RetryAgent`가 판단만 하고, `OrchestratorAgent`가 loop를 제어한다는 점입니다.
 
 이 제약 덕분에 retry policy와 workflow execution 책임이 분리됩니다. 또한 one-step retry로 제한해 infinite loop, 과도한 파일 생성, 복잡한 state transition을 피할 수 있습니다.
+
+## Sprint 9 Gradio UI Prompt
+
+Sprint 9 prompt는 UI와 Agent 책임 분리를 명확히 하기 위한 Architecture Prompt입니다. 핵심 제약은 UI가 agent를 직접 호출하지 않고 `MultimodalPipeline`만 호출한다는 점입니다.
+
+또한 수정 가능한 파일과 금지 파일을 분리해 UI 작업이 agent implementation이나 model dependency를 건드리지 않도록 제한했습니다. 이 제약은 demo UI를 빠르게 연결하면서도 backend workflow의 책임 경계를 유지하게 합니다.
