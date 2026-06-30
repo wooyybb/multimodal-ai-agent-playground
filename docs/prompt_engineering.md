@@ -115,3 +115,9 @@ Sprint 15 prompt는 Planner와 Orchestrator의 책임 분리를 명확히 하기
 Sprint 16 prompt는 architecture-changing task에서 수정 가능한 파일과 금지 파일을 분리해 기존 E2E 동작을 보호했습니다.
 
 특히 Tool 이름과 Planner execution_plan 이름을 맞추도록 명시해 향후 dynamic execution engine으로 확장할 기반을 만들었습니다. 동시에 이번 Sprint에서는 완전한 dynamic engine을 금지해 registry 기반 호출 구조만 안전하게 도입했습니다.
+
+## Sprint 17 Context Engineering Prompt
+
+Sprint 17 prompt는 PromptAgent와 OrchestratorAgent의 책임 분리를 명확히 했습니다. PromptAgent가 MemoryManager나 PlannerAgent를 직접 호출하지 않고, Orchestrator가 context dict를 구성해 전달하도록 제한했습니다.
+
+또한 `context`를 선택 인자로 둬 기존 `run(caption, user_prompt)` 호출이 깨지지 않게 했습니다. 이는 backward compatibility를 유지하면서 context-aware prompt building으로 확장하기 위한 설계입니다.

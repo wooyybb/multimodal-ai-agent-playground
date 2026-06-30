@@ -172,3 +172,22 @@ PlannerAgent
 ```
 
 이번 Sprint의 목표는 완전한 dynamic execution engine이 아니라 registry 기반 호출 구조를 도입하는 것입니다. Orchestrator는 기존 workflow 순서를 유지하지만 각 단계 호출을 `registry.call(...)`로 감싸 Agent/Tool 호출 책임을 중앙화했습니다.
+
+## Context-aware PromptAgent
+
+Sprint 17에서는 `PromptAgent`가 caption과 user prompt뿐 아니라 context dict를 선택적으로 받을 수 있도록 확장했습니다.
+
+```text
+MemoryManager.load_last_run()
+-> last_run context
+PlannerAgent
+-> planner_result
+VisionAgent
+-> caption
+OrchestratorAgent
+-> context dict
+PromptAgent
+-> context-aware final_prompt
+```
+
+`PromptAgent`는 MemoryManager나 PlannerAgent를 직접 호출하지 않습니다. `OrchestratorAgent`가 `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 모아 context를 구성하고 `PromptAgent`에 전달합니다.

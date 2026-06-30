@@ -189,3 +189,22 @@
 - Context Engineering
 - execution_plan 기반 dynamic execution
 - tool argument schema와 validation 추가
+
+## Sprint 17 Retrospective
+
+### 잘된 점
+
+- PromptAgent를 context-aware prompt builder로 확장했습니다.
+- Orchestrator 중심 context composition으로 책임 분리를 유지했습니다.
+- 기존 호출과 E2E workflow를 깨지 않았습니다.
+
+### 아쉬운 점
+
+- context dict schema validation은 아직 없습니다.
+- previous best prompt 활용은 간단한 문자열 요약 수준입니다.
+
+### 다음 Sprint
+
+- RAG Style Library
+- Semantic Memory 검색
+- Prompt template selection

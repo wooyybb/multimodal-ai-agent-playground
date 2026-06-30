@@ -119,3 +119,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - 등록되지 않은 tool name은 `ValueError`를 발생시켜 실패 원인이 명확합니다.
 - Orchestrator는 기존 순서를 유지하되 registry 호출로 감싸 결합도를 낮췄습니다.
 - 아직 plan을 for-loop로 실행하지 않으므로 dynamic execution validation은 다음 Sprint 과제입니다.
+
+## Sprint 17 Context Engineering Review
+
+### Findings
+
+- `PromptAgent.run()`은 `context=None` 기본값을 가져 기존 호출과 호환됩니다.
+- PromptAgent가 MemoryManager나 PlannerAgent를 직접 호출하지 않아 책임 분리가 유지됩니다.
+- context 정보는 prompt에 짧게 반영되지만, 너무 많은 previous prompt가 들어가지 않도록 length limit을 적용했습니다.
+- context dict는 유연하지만 schema validation은 아직 없습니다.

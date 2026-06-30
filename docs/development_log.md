@@ -168,3 +168,10 @@
 - `OrchestratorAgent`가 기존 Agent와 MemoryManager 호출을 registry에 등록하도록 변경했습니다.
 - 기존 workflow 순서는 유지하되 각 단계 호출을 `registry.call(...)`로 감쌌습니다.
 - agent trace에 ToolRegistry 호출 단계를 기록하도록 수정했습니다.
+
+### Sprint 17 Context Engineering
+
+- `PromptAgent.run(caption, user_prompt, context=None)` 형태로 backward compatible하게 확장했습니다.
+- `OrchestratorAgent`가 `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 포함한 context dict를 구성합니다.
+- `PromptAgent`는 context를 참고하되 과도하게 복사하지 않고 짧은 context note만 final prompt에 반영합니다.
+- agent trace에 `OrchestratorAgent built prompt context`와 `PromptAgent generated context-aware prompt`를 추가했습니다.

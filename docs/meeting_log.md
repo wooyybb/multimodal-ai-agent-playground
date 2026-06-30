@@ -70,3 +70,9 @@ PlannerAgent는 user prompt와 image 제공 여부를 바탕으로 execution pla
 이번 논의에서는 Orchestrator가 Agent를 직접 호출하는 구조를 registry 기반 호출 구조로 확장하기로 결정했습니다.
 
 ToolRegistry는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save`를 이름으로 등록하고 호출합니다. 완전한 dynamic execution engine은 다음 단계로 미뤘습니다.
+
+## 2026-06-30 Sprint 17 Context Engineering
+
+이번 논의에서는 PromptAgent를 단순 caption/user prompt 결합기에서 context-aware prompt builder로 확장하기로 결정했습니다.
+
+PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 planner_result와 last_run을 모아 context dict로 전달합니다.

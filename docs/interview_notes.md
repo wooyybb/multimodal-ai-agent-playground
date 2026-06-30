@@ -224,6 +224,26 @@ A: 현재는 Python class 기반 local registry지만, 개념적으로는 tool n
 
 A: dynamic engine은 plan step별 argument mapping과 error recovery가 필요합니다. 이번 Sprint에서는 기존 E2E 안정성을 유지하면서 registry 기반 호출 구조만 먼저 도입했습니다.
 
+## Q: Context Engineering이란 무엇인가요?
+
+A: Context Engineering은 agent가 사용할 정보를 무작정 많이 넣는 것이 아니라, 필요한 정보를 선별해 의사결정이나 prompt 생성에 적합한 형태로 구성하는 작업입니다.
+
+## Q: PromptAgent가 Memory를 직접 읽지 않는 이유는 무엇인가요?
+
+A: PromptAgent가 MemoryManager를 직접 호출하면 prompt 생성 책임과 storage 접근 책임이 섞입니다. Orchestrator가 context를 구성하고 PromptAgent는 전달받은 context만 사용하는 것이 역할 분리에 더 적합합니다.
+
+## Q: Orchestrator가 context를 구성하는 이유는 무엇인가요?
+
+A: Orchestrator는 planner result, last run, caption, user prompt 등 workflow state를 모두 알고 있습니다. 따라서 context composition을 Orchestrator가 담당하면 각 agent가 자기 책임에 집중할 수 있습니다.
+
+## Q: 이전 best_prompt를 prompt에 반영할 때 주의할 점은 무엇인가요?
+
+A: 이전 prompt를 그대로 길게 복사하면 prompt가 장황해지고 불필요한 정보가 섞일 수 있습니다. 따라서 짧게 요약하거나 "inspired by previous successful prompt" 정도로 제한적으로 반영해야 합니다.
+
+## Q: 이 구조가 RAG와 어떻게 연결되나요?
+
+A: 현재는 JSON memory의 last run만 context로 사용하지만, 향후 semantic memory나 style library를 검색해 prompt context에 넣으면 RAG-style prompt building으로 확장할 수 있습니다.
+
 ## Q: Sprint Book은 왜 만들었나요?
 
 A: 프로젝트가 여러 Sprint를 거치며 agent, tool, memory, UI, planning으로 확장됐기 때문에 단순 로그만으로는 설계 의도를 설명하기 어렵습니다. Sprint Book은 각 Sprint마다 왜 설계했는지, 무엇을 배웠는지, 면접에서 어떻게 설명할지를 같은 형식으로 정리하기 위한 문서 시스템입니다.

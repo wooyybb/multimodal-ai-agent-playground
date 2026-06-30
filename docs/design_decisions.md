@@ -159,3 +159,21 @@ Planner의 execution plan을 for-loop로 실행하는 dynamic engine은 branch, 
 ## 왜 Tool 이름을 Planner execution_plan과 맞췄는가
 
 Planner가 생성한 plan step과 Registry에 등록된 tool name이 같아야 향후 dynamic execution engine으로 자연스럽게 확장할 수 있습니다. 이번 Sprint에서는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save` 이름을 맞췄습니다.
+
+## 왜 PromptAgent가 MemoryManager를 직접 호출하지 않는가
+
+PromptAgent가 MemoryManager를 직접 호출하면 prompt 생성 agent가 storage 구조에 결합됩니다. 이는 Tool-Agent Separation과 Single Responsibility Principle을 흐립니다.
+
+따라서 OrchestratorAgent가 memory와 planner 결과를 모아 context를 구성하고, PromptAgent는 전달받은 context만 사용합니다.
+
+## 왜 OrchestratorAgent가 Context를 구성하는가
+
+OrchestratorAgent는 workflow state를 가장 잘 알고 있습니다. planner result, last run, caption, user prompt 같은 runtime context를 한 곳에서 조합하면 PromptAgent는 순수 prompt builder 역할에 집중할 수 있습니다.
+
+## 왜 Context를 Dict 기반으로 시작했는가
+
+초기 단계에서는 schema class보다 dict가 빠르고 유연합니다. `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 실험하면서 어떤 context가 유용한지 학습하기 좋습니다.
+
+## 왜 Context 정보를 Prompt에 과도하게 넣지 않는가
+
+이전 prompt나 score를 그대로 길게 복사하면 final prompt가 장황해지고 민감하거나 불필요한 정보가 섞일 수 있습니다. 이번 Sprint에서는 짧은 planning note와 previous best prompt summary만 반영하도록 제한했습니다.

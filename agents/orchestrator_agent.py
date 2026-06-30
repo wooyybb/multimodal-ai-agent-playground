@@ -41,7 +41,24 @@ class OrchestratorAgent:
         last_run = self.registry.call("memory_load")
 
         caption = self.registry.call("vision", image)
-        final_prompt = self.registry.call("prompt", caption, user_prompt)
+        context = {
+            "planner_result": planner_result,
+            "last_run": last_run,
+            "retry_history": [],
+            "style_preferences": None,
+            "previous_best_prompt": (
+                last_run.get("best_prompt") if isinstance(last_run, dict) else None
+            ),
+            "previous_best_score": (
+                last_run.get("best_score") if isinstance(last_run, dict) else None
+            ),
+        }
+        final_prompt = self.registry.call(
+            "prompt",
+            caption,
+            user_prompt,
+            context=context,
+        )
         print("[OrchestratorAgent] Initial attempt started.")
         output_image_path = self.registry.call("generation", final_prompt)
         score = self.registry.call("evaluation", image, output_image_path, final_prompt)
@@ -126,7 +143,9 @@ class OrchestratorAgent:
                 "PlannerAgent generated execution plan",
                 "ToolRegistry called memory_load",
                 "ToolRegistry called vision",
+                "OrchestratorAgent built prompt context",
                 "ToolRegistry called prompt",
+                "PromptAgent generated context-aware prompt",
                 "ToolRegistry called generation",
                 "ToolRegistry called evaluation",
                 "ToolRegistry called reflection",

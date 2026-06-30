@@ -131,3 +131,16 @@
 - Context Engineering
 - Dynamic Execution Engine
 - LLM-based tool selection
+
+## Sprint 17: Context Engineering - Done
+
+- PromptAgent에 optional context 인자 추가
+- OrchestratorAgent가 planner/memory 기반 context 구성
+- previous best prompt와 score를 제한적으로 prompt에 반영
+- 기존 E2E workflow와 backward compatibility 유지
+
+## Next Sprint Proposal
+
+- RAG Style Library
+- Semantic Memory
+- Context schema validation
