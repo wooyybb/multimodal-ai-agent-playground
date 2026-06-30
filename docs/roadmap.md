@@ -193,3 +193,24 @@
 - ChromaDB 기반 Semantic Memory
 - LLM Planner
 - typed state schema
+## Sprint 22: Multi-Agent Prompt Orchestration Framework - Done
+
+- CharacterAgent 추가
+- StyleAgent 추가
+- LayoutAgent 추가
+- LightingAgent 추가
+- NegativePromptAgent 추가
+- PromptAssembler 추가
+- ExecutionEngine prompt orchestration step 지원
+
+## Next Sprint Proposal
+
+- PromptRouter
+- typed prompt fragment schema
+- LLM-based prompt specialist agents
+## Sprint22 Detailed Update - Done
+
+- PoseAgent added
+- ExpressionAgent added
+- PromptAssembler returns `generation_prompt`, `negative_prompt`, `prompt_sections`
+- Negative prompt stored separately in state

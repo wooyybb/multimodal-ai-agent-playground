@@ -167,3 +167,16 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `memory_retrieval`은 `vision` 이후 자동 삽입되어 PlannerAgent 수정 없이 실행됩니다.
 - PromptCompressor는 similar run 전체를 prompt에 넣지 않고 짧은 memory hint만 반영합니다.
 - 남은 리스크: keyword overlap은 semantic nuance를 잘 포착하지 못하므로 향후 embedding search가 필요합니다.
+## Sprint 22 Code Review
+
+- Prompt 생성 책임이 Character/Style/Layout/Lighting/Negative/Assembler로 분리되었습니다.
+- PromptAssembler는 agent context 전체가 아니라 fragment만 사용해 generation prompt를 만듭니다.
+- Generation/Evaluation/Retry agent interface는 변경하지 않았습니다.
+- 남은 리스크: role agent output이 아직 dict/list 기반이라 향후 typed schema validation이 필요합니다.
+## Sprint22 Detailed Code Review
+
+- Added PoseAgent and ExpressionAgent.
+- Updated section agents to return dict sections.
+- PromptAssembler now returns a structured dict with generation and negative prompts separated.
+- ExecutionEngine keeps backward compatibility by leaving the old prompt step handler intact.
+- GenerationAgent interface remains unchanged.

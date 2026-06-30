@@ -258,3 +258,37 @@ VisionAgent
 `memory_retrieval` step은 `vision` 이후에 실행됩니다. caption이 생성된 뒤에야 현재 이미지 내용과 user prompt를 결합한 query를 만들 수 있기 때문입니다. 검색 결과는 full history가 아니라 `memory_hint`, `memory_score`, `best_run` 요약 신호로 `PromptCompressor`에 전달됩니다.
 
 현재는 Vector DB 없이 JSON history 기반 keyword similarity를 사용합니다. 향후 ChromaDB, FAISS, embedding search로 교체할 수 있도록 `MemoryManager.get_memory_context()` interface를 별도로 유지합니다.
+## Prompt Orchestration Framework
+
+Sprint 22에서는 단일 `PromptAgent` 중심 구조를 여러 전문 prompt agent가 협업하는 Prompt Orchestration Framework로 확장했습니다.
+
+```text
+Planner
+-> ExecutionEngine
+-> ToolRegistry
+-> CharacterAgent
+-> StyleAgent
+-> LayoutAgent
+-> LightingAgent
+-> NegativePromptAgent
+-> PromptAssembler
+-> GenerationAgent
+```
+
+각 agent는 prompt의 한 영역만 담당합니다. `CharacterAgent`는 캐릭터 특징, `StyleAgent`는 style keyword, `LayoutAgent`는 layout, `LightingAgent`는 lighting, `NegativePromptAgent`는 negative prompt를 생성합니다. `PromptAssembler`는 이 fragment를 받아 generation prompt만 조립합니다.
+## Sprint22 Detailed Prompt Orchestration Update
+
+Sprint22 detailed version adds `PoseAgent` and `ExpressionAgent` in addition to Character, Style, Layout, Lighting, NegativePrompt, and PromptAssembler.
+
+```text
+CharacterAgent
+-> StyleAgent
+-> LayoutAgent
+-> PoseAgent
+-> ExpressionAgent
+-> LightingAgent
+-> NegativePromptAgent
+-> PromptAssembler
+```
+
+`PromptAssembler` returns `generation_prompt`, `negative_prompt`, and `prompt_sections`. Agent context, planner debug, memory debug, and retrieval debug are not copied directly into the generation prompt.

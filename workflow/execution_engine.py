@@ -3,10 +3,17 @@ class DynamicExecutionEngine:
         "memory_load",
         "vision",
         "memory_retrieval",
-        "retrieval",
-        "prompt_compressor",
-        "prompt",
-        "generation",
+            "retrieval",
+            "prompt_compressor",
+            "character",
+            "style",
+            "layout",
+            "pose",
+            "expression",
+            "lighting",
+            "negative_prompt",
+            "prompt_assembler",
+            "generation",
         "evaluation",
         "reflection",
         "retry",
@@ -112,6 +119,84 @@ class DynamicExecutionEngine:
             label="evaluation",
         )
 
+    def _run_character(self, registry, state):
+        state["character_section"] = registry.call(
+            "character",
+            state.get("caption", ""),
+            state.get("user_prompt", ""),
+            context=state,
+        )
+
+    def _run_style(self, registry, state):
+        state["style_section"] = registry.call(
+            "style",
+            state.get("user_prompt", ""),
+            retrieved_context=state.get("retrieved_context", {}),
+        )
+
+    def _run_layout(self, registry, state):
+        state["layout_section"] = registry.call(
+            "layout",
+            state.get("user_prompt", ""),
+            planner_result=state.get("planner_result", {}),
+        )
+
+    def _run_pose(self, registry, state):
+        state["pose_section"] = registry.call(
+            "pose",
+            state.get("user_prompt", ""),
+            character_section=state.get("character_section", {}),
+        )
+
+    def _run_expression(self, registry, state):
+        state["expression_section"] = registry.call(
+            "expression",
+            state.get("user_prompt", ""),
+        )
+
+    def _run_lighting(self, registry, state):
+        state["lighting_section"] = registry.call(
+            "lighting",
+            state.get("user_prompt", ""),
+            retrieved_context=state.get("retrieved_context", {}),
+        )
+
+    def _run_negative_prompt(self, registry, state):
+        state["negative_section"] = registry.call(
+            "negative_prompt",
+            state.get("user_prompt", ""),
+            retrieved_context=state.get("retrieved_context", {}),
+        )
+
+    def _run_prompt_assembler(self, registry, state):
+        assembler_result = registry.call(
+            "prompt_assembler",
+            state.get("caption", ""),
+            state.get("user_prompt", ""),
+            state.get("character_section", {}),
+            state.get("style_section", {}),
+            state.get("layout_section", {}),
+            state.get("pose_section", {}),
+            state.get("expression_section", {}),
+            state.get("negative_section", {}),
+            compressed_context=state.get("compressed_context", {}),
+        )
+        state["final_prompt"] = self._compress_prompt(
+            registry,
+            assembler_result.get("generation_prompt", ""),
+            max_words=120,
+            label="generation",
+        )
+        state["negative_prompt"] = assembler_result.get("negative_prompt")
+        state["prompt_sections"] = assembler_result.get("prompt_sections", {})
+        state["evaluation_prompt"] = self._make_evaluation_prompt(
+            registry,
+            state.get("caption", ""),
+            state.get("user_prompt", ""),
+            state["final_prompt"],
+            label="evaluation",
+        )
+
     def _run_generation(self, registry, state):
         print("[ExecutionEngine] Initial attempt started.")
         state["output_image_path"] = registry.call(
@@ -204,6 +289,7 @@ class DynamicExecutionEngine:
                     "initial_score": state.get("score"),
                     "initial_output_image_path": state.get("output_image_path"),
                     "evaluation_prompt": state.get("evaluation_prompt"),
+                    "negative_prompt": state.get("negative_prompt"),
                     "reflection": state.get("reflection"),
                     "retry_needed": state.get("retry_needed"),
                     "retry_prompt": (

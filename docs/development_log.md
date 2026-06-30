@@ -217,3 +217,17 @@
 - `OrchestratorAgent`가 `memory_retrieval` tool을 registry에 등록하도록 변경했습니다.
 - `PromptCompressor`가 `memory_context`를 짧은 memory hint로 압축하도록 업데이트했습니다.
 - `PromptAgent`가 memory hint를 final prompt에 반영하도록 업데이트했습니다.
+## Sprint 22: Multi-Agent Prompt Orchestration Framework
+
+- `CharacterAgent`, `StyleAgent`, `LayoutAgent`, `LightingAgent`, `NegativePromptAgent`를 추가했습니다.
+- `PromptAssembler`를 추가해 role-based prompt fragment를 generation prompt로 조립하도록 했습니다.
+- Planner execution plan에 prompt orchestration steps를 추가했습니다.
+- OrchestratorAgent ToolRegistry에 새 prompt agents를 등록했습니다.
+- ExecutionEngine에 character/style/layout/lighting/negative_prompt/prompt_assembler step을 추가했습니다.
+## Sprint22 Detailed Prompt Orchestration Update
+
+- Added `PoseAgent` and `ExpressionAgent`.
+- Updated role agents to return section dicts instead of loose lists.
+- Updated `PromptAssembler` to return `generation_prompt`, `negative_prompt`, and `prompt_sections`.
+- Updated `ExecutionEngine` to store `character_section`, `style_section`, `layout_section`, `pose_section`, `expression_section`, and `negative_section`.
+- Kept GenerationAgent, EvaluationAgent, ReflectionAgent, RetryAgent, VisionAgent unchanged.

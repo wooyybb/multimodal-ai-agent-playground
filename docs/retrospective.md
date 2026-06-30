@@ -268,3 +268,31 @@
 ### 다음 Sprint
 
 - ChromaDB 또는 embedding 기반 semantic memory로 확장합니다.
+## Sprint 22 Retrospective
+
+### 잘된 점
+
+- Prompt engineering 책임을 role-based agent로 분리했습니다.
+- 기존 generation/evaluation/retry workflow를 유지했습니다.
+- PromptAssembler로 final prompt assembly 책임을 명확히 했습니다.
+
+### 아쉬운 점
+
+- 각 role agent는 아직 rule-based skeleton입니다.
+
+### 다음 Sprint
+
+- PromptRouter 또는 typed prompt fragment schema를 도입합니다.
+## Sprint22 Detailed Retrospective
+
+### 잘된 점
+
+- Prompt section responsibility became clearer.
+- Negative prompt is now separated in state.
+- Existing BLIP/FLUX/CLIP workflow remains intact.
+
+### 다음 Sprint
+
+- Character reference handling
+- Negative prompt routing
+- Provider-specific prompt adapters

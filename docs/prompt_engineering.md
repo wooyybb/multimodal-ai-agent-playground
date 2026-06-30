@@ -139,3 +139,9 @@ Vector DB를 금지한 제약은 오히려 RAG의 본질인 retrieval responsibi
 ## Sprint 21 Prompt Engineering
 
 이번 Sprint prompt는 memory retrieval의 위치와 prompt budget 제한을 명확히 지정했습니다. `memory_retrieval`은 caption을 활용하기 위해 `vision` 이후에 배치했고, 검색 결과 전체가 아니라 짧은 hint만 PromptCompressor에 전달하도록 설계했습니다.
+## Sprint 22 Prompt Engineering
+
+이번 Sprint는 prompt engineering을 하나의 함수가 아니라 여러 역할 기반 agent의 협업으로 설계했습니다. Character, Style, Layout, Lighting, Negative Prompt를 분리하고 PromptAssembler가 final generation prompt를 만들도록 했습니다.
+## Sprint22 Detailed Prompt Engineering
+
+Long manual prompt programs are decomposed into section prompts: character, style, layout, pose, expression, lighting, and negative prompt. This turns prompt writing into prompt orchestration.

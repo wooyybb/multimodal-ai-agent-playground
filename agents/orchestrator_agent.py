@@ -1,12 +1,20 @@
+from agents.character_agent import CharacterAgent
 from agents.evaluation_agent import EvaluationAgent
 from agents.generation_agent import GenerationAgent
+from agents.layout_agent import LayoutAgent
+from agents.lighting_agent import LightingAgent
+from agents.negative_prompt_agent import NegativePromptAgent
 from agents.planner_agent import PlannerAgent
+from agents.pose_agent import PoseAgent
+from agents.expression_agent import ExpressionAgent
+from agents.prompt_assembler import PromptAssembler
 from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
 from agents.retrieval_agent import RetrievalAgent
 from agents.retry_agent import RetryAgent
 from agents.vision_agent import VisionAgent
+from agents.style_agent import StyleAgent
 from memory.history import MemoryManager
 from registry import ToolRegistry
 from workflow.execution_engine import DynamicExecutionEngine
@@ -15,6 +23,14 @@ from workflow.execution_engine import DynamicExecutionEngine
 class OrchestratorAgent:
     def __init__(self):
         self.planner_agent = PlannerAgent()
+        self.character_agent = CharacterAgent()
+        self.style_agent = StyleAgent()
+        self.layout_agent = LayoutAgent()
+        self.pose_agent = PoseAgent()
+        self.expression_agent = ExpressionAgent()
+        self.lighting_agent = LightingAgent()
+        self.negative_prompt_agent = NegativePromptAgent()
+        self.prompt_assembler = PromptAssembler()
         self.prompt_compressor = PromptCompressor()
         self.retrieval_agent = RetrievalAgent()
         self.vision_agent = VisionAgent()
@@ -37,6 +53,14 @@ class OrchestratorAgent:
         self.registry.register("vision", self.vision_agent)
         self.registry.register("retrieval", self.retrieval_agent)
         self.registry.register("prompt_compressor", self.prompt_compressor)
+        self.registry.register("character", self.character_agent)
+        self.registry.register("style", self.style_agent)
+        self.registry.register("layout", self.layout_agent)
+        self.registry.register("pose", self.pose_agent)
+        self.registry.register("expression", self.expression_agent)
+        self.registry.register("lighting", self.lighting_agent)
+        self.registry.register("negative_prompt", self.negative_prompt_agent)
+        self.registry.register("prompt_assembler", self.prompt_assembler)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
         self.registry.register("evaluation", self.evaluation_agent)
@@ -85,5 +109,13 @@ class OrchestratorAgent:
             "prompt_context": final_state.get("prompt_context"),
             "retrieved_context": final_state.get("retrieved_context"),
             "compressed_context": final_state.get("compressed_context"),
+            "character_section": final_state.get("character_section"),
+            "style_section": final_state.get("style_section"),
+            "layout_section": final_state.get("layout_section"),
+            "pose_section": final_state.get("pose_section"),
+            "expression_section": final_state.get("expression_section"),
+            "lighting_section": final_state.get("lighting_section"),
+            "negative_prompt": final_state.get("negative_prompt"),
+            "prompt_sections": final_state.get("prompt_sections"),
             "agent_trace": final_state.get("agent_trace", []),
         }

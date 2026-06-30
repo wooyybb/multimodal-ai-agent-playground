@@ -88,3 +88,9 @@ PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 p
 ## Sprint 21 Meeting Log
 
 이번 Sprint에서는 MemoryManager를 단순 저장소에서 검색 가능한 memory layer로 확장하기로 결정했습니다. Vector DB는 도입하지 않고 JSON 기반 keyword similarity로 먼저 interface와 workflow 위치를 검증했습니다.
+## Sprint 22 Meeting Log
+
+이번 Sprint에서는 PromptAgent 하나가 모든 prompt engineering을 담당하는 구조에서 벗어나, 역할별 prompt agent가 협업하는 Prompt Orchestration Framework를 도입하기로 결정했습니다.
+## Sprint22 Detailed Meeting Log
+
+The project generalized a long photobooth-style user request into a Prompt Orchestration Framework. The decision was to split prompt generation into section agents and keep PromptAssembler responsible only for final image prompt assembly.
