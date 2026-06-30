@@ -152,3 +152,11 @@
 - `OrchestratorAgent`는 workflow 시작 시 `PlannerAgent`를 호출하고 `planner_result`를 반환 dict에 포함합니다.
 - agent trace에 `PlannerAgent generated execution plan` 단계를 추가했습니다.
 - 이번 Sprint에서는 dynamic execution engine을 만들지 않고 기존 fixed workflow를 유지했습니다.
+
+### Sprint Book Generator v2
+
+- `docs/templates/`에 Sprint, Interview, Retrospective, Design History, Prompt Archive, Code Review 템플릿을 추가했습니다.
+- `docs/sprint_book/`에 Sprint00부터 Sprint14까지의 Sprint Book 문서를 생성했습니다.
+- 각 Sprint 문서는 Objective, Background, Problem, Design Decision, Architecture, Implementation Summary, AI Agent Concept, Prompt Engineering Note, Codex Usage, Debugging Experience, Interview Talking Points, Lessons Learned, Future Work 형식을 따릅니다.
+- Sprint Book README에 project vision, phase, sprint index, architecture evolution, learning journey, interview usage를 정리했습니다.
+- 앞으로 Sprint -> Code -> Documentation -> Interview Notes -> Retrospective -> Prompt Archive -> Commit 흐름을 반복 가능한 문서화 프로세스로 관리할 수 있게 했습니다.

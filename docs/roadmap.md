@@ -111,3 +111,10 @@
 - OrchestratorAgent 시작 단계에서 planner 호출
 - result dict에 planner_result 포함
 - 기존 E2E workflow 유지
+
+## Sprint Book System - Done
+
+- `docs/templates/`에 Sprint 문서 템플릿 생성
+- `docs/sprint_book/`에 Sprint00~Sprint14 문서 생성
+- Sprint Book README에 project vision, phase, sprint index, architecture evolution 정리
+- 향후 모든 Sprint를 같은 형식으로 문서화하는 기반 마련
