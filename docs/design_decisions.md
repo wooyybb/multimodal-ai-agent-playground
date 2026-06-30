@@ -203,3 +203,16 @@ LLM planner는 강력하지만 초기 MVP에서는 예측 가능성과 디버깅
 ### Decision: state dict 기반으로 시작한 이유
 
 state dict는 간단하고 직관적이며, agent 간 입출력 흐름을 빠르게 관찰할 수 있다. 향후 필요하면 dataclass나 typed state schema로 확장할 수 있다.
+## Sprint 20 Decisions
+
+### Decision: JSON Knowledge Store부터 시작한 이유
+
+초기 단계에서는 Vector DB보다 knowledge schema와 retrieval 책임 분리가 더 중요합니다. JSON은 구조가 단순하고 디버깅이 쉬워 Rule-based RAG skeleton을 검증하기에 적합합니다.
+
+### Decision: RetrievalAgent와 PromptAgent를 분리한 이유
+
+RetrievalAgent는 필요한 지식을 찾고, PromptAgent는 최종 prompt를 작성합니다. 두 책임을 분리하면 향후 semantic search나 hybrid retrieval을 추가해도 PromptAgent interface를 크게 바꾸지 않을 수 있습니다.
+
+### Decision: KnowledgeManager를 만든 이유
+
+KnowledgeManager는 storage access layer입니다. RetrievalAgent가 JSON 파일 경로나 parsing details를 직접 알지 않게 만들어, 나중에 ChromaDB나 FAISS로 교체하기 쉽게 했습니다.

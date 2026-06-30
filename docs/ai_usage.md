@@ -120,3 +120,6 @@ Codex는 Sprint18 prompt를 기반으로 허용된 파일 범위 안에서 Promp
 ## Sprint 19 AI Usage
 
 Codex에는 Dynamic Execution Engine의 역할, state schema, step behavior를 구체적으로 명시했습니다. 이를 통해 Codex가 기존 agent interface를 유지하면서 OrchestratorAgent의 직접 실행 로직을 ExecutionEngine으로 이동하도록 활용했습니다.
+## Sprint 20 AI Usage
+
+Codex에는 Vector DB를 사용하지 말고 KnowledgeManager와 RetrievalAgent를 먼저 만들라는 제약을 주었습니다. 이를 통해 Codex가 과도한 의존성을 추가하지 않고, JSON 기반 Knowledge Layer와 rule-based retrieval 구조를 구현하도록 활용했습니다.

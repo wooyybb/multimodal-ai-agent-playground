@@ -223,3 +223,22 @@ User
 `OrchestratorAgent`는 더 이상 각 step을 직접 실행하지 않습니다. 대신 초기 `state`를 만들고 `DynamicExecutionEngine.run(execution_plan, registry, state)`를 호출합니다. ExecutionEngine은 step별로 필요한 입력을 state에서 꺼내고, 실행 결과를 다시 state에 저장합니다.
 
 지원 step은 `memory_load`, `vision`, `prompt_compressor`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save`입니다. 이 구조는 향후 caption-only mode, generation-only mode, RAG branch, semantic memory branch 같은 조건부 workflow로 확장하기 위한 기반입니다.
+## Knowledge Layer
+
+Sprint 20에서는 Prompt 생성 과정에 rule-based knowledge retrieval을 추가했습니다.
+
+```text
+PlannerAgent
+-> ExecutionEngine
+-> ToolRegistry
+-> RetrievalAgent
+-> KnowledgeManager
+-> knowledge/*.json
+-> PromptCompressor
+-> PromptAgent
+-> GenerationAgent
+```
+
+`KnowledgeManager`는 JSON Knowledge Store를 로드하는 interface입니다. `RetrievalAgent`는 caption과 user prompt를 분석해 style, lighting, composition, quality, negative prompt rule을 검색합니다. 검색된 결과는 `retrieved_context`로 state에 저장되고, `PromptCompressor`가 중요한 keyword만 `compressed_context`에 병합합니다.
+
+이번 Sprint에서는 Vector DB를 사용하지 않습니다. RAG의 핵심인 Retrieval과 Augmentation 책임 분리를 먼저 구현하고, 향후 ChromaDB, FAISS, Milvus 같은 storage layer로 확장할 수 있게 설계했습니다.

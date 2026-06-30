@@ -1,0 +1,5 @@
+{
+  "default": {
+    "prompt_rules": ["blurry", "low quality", "bad anatomy", "duplicate"]
+  }
+}

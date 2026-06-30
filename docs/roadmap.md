@@ -168,3 +168,16 @@
 - RAG Style Library
 - Semantic Memory
 - conditional workflow branch
+## Sprint 20: Knowledge Manager & Retrieval Agent - Done
+
+- JSON Knowledge Store 추가
+- `KnowledgeManager` 추가
+- `RetrievalAgent` 추가
+- Planner/ExecutionEngine에 `retrieval` step 추가
+- PromptCompressor가 retrieved context를 compressed hint로 반영
+
+## Next Sprint Proposal
+
+- Semantic Memory
+- RAG Style Library expansion
+- Vector DB adapter design

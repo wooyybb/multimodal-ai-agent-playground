@@ -1,0 +1,18 @@
+{
+  "cinematic": {
+    "keywords": ["cinematic", "film", "movie"],
+    "prompt_rules": ["cinematic lighting", "balanced contrast"]
+  },
+  "soft": {
+    "keywords": ["soft", "gentle", "diffused"],
+    "prompt_rules": ["soft light", "diffused shadows"]
+  },
+  "dramatic": {
+    "keywords": ["dramatic", "contrast", "intense"],
+    "prompt_rules": ["dramatic lighting", "strong shadow contrast"]
+  },
+  "golden hour": {
+    "keywords": ["golden hour", "sunset", "warm sunlight"],
+    "prompt_rules": ["golden hour glow", "warm backlight"]
+  }
+}

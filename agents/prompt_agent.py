@@ -51,10 +51,18 @@ class PromptAgent:
             "style_hint",
             "history_hint",
             "retry_hint",
+            "retrieved_style_hint",
+            "retrieved_lighting_hint",
+            "retrieved_composition_hint",
+            "retrieved_quality_hint",
+            "negative_prompt_hint",
         ):
             value = compressed_context.get(key)
             if value:
-                notes.append(str(value))
+                if key == "negative_prompt_hint":
+                    notes.append(f"avoid {value}")
+                else:
+                    notes.append(str(value))
 
         return ", ".join(notes)
 

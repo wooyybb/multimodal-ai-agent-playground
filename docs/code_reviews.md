@@ -141,3 +141,22 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - unknown step은 trace에 기록하고 skip합니다.
 - memory_save 실패는 workflow 전체를 중단하지 않도록 처리했습니다.
 - 남은 리스크: state dict key가 문자열 기반이라 typo에 취약하므로 향후 typed schema 도입을 검토해야 합니다.
+## Sprint 20 Code Review
+
+- RetrievalAgent가 JSON을 직접 읽지 않고 KnowledgeManager를 통해 접근하도록 구현되었습니다.
+- knowledge load 실패 시 빈 dict를 반환해 workflow가 계속 진행되도록 했습니다.
+- PromptCompressor는 retrieved context 전체가 아니라 제한된 keyword만 compressed context에 병합합니다.
+- 남은 리스크: keyword matching은 표현 다양성에 약하므로 향후 semantic retrieval이 필요합니다.
+## CLIP-Safe Evaluation Prompt Review
+
+- 원인: word count를 55로 제한해도 CLIP tokenizer에서는 subword token이 더 많이 생성되어 77 token 제한을 초과할 수 있었습니다.
+- 해결: Generation prompt와 Evaluation prompt를 분리했습니다. Generation은 풍부한 prompt를 유지하고, CLIP evaluation에는 caption/user/style/quality 핵심만 담은 짧은 `evaluation_prompt`를 전달합니다.
+- retry evaluation도 `retry_prompt` 전체가 아니라 `retry_evaluation_prompt`를 사용하도록 변경했습니다.
+- 교훈: model별 입력 제약이 다르므로, 하나의 prompt를 모든 agent/tool에 재사용하지 말고 목적별 prompt contract를 설계해야 합니다.
+
+## Retry Prompt Compression Review
+
+- 원인: `ReflectionAgent`가 만든 `suggested_prompt`가 PromptCompressor budget을 거치지 않고 retry generation/evaluation에 직접 전달되었습니다.
+- 해결: `DynamicExecutionEngine._run_retry()`에서 `raw_suggested_prompt`를 저장한 뒤 `PromptCompressor.compress_prompt()`로 55 words 이하의 `retry_prompt`를 생성하도록 변경했습니다.
+- 교훈: initial prompt뿐 아니라 retry, reflection, memory에서 재사용되는 모든 prompt 경로에도 동일한 token budget policy가 적용되어야 합니다.
+- 남은 리스크: 현재 제한은 word count 기반이므로, 향후 CLIP tokenizer 기반 token budget manager로 개선할 수 있습니다.

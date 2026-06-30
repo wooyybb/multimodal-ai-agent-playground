@@ -2,6 +2,7 @@ class DynamicExecutionEngine:
     DEFAULT_PLAN = [
         "memory_load",
         "vision",
+        "retrieval",
         "prompt_compressor",
         "prompt",
         "generation",
@@ -46,11 +47,19 @@ class DynamicExecutionEngine:
     def _run_vision(self, registry, state):
         state["caption"] = registry.call("vision", state.get("image"))
 
+    def _run_retrieval(self, registry, state):
+        state["retrieved_context"] = registry.call(
+            "retrieval",
+            state.get("caption", ""),
+            state.get("user_prompt", ""),
+        )
+
     def _run_prompt_compressor(self, registry, state):
         last_run = state.get("last_run")
         prompt_context = {
             "planner_result": state.get("planner_result"),
             "last_run": last_run,
+            "retrieved_context": state.get("retrieved_context", {}),
             "retry_history": state.get("retry_history", []),
             "style_preferences": state.get("style_preferences"),
             "previous_best_prompt": (
@@ -67,11 +76,24 @@ class DynamicExecutionEngine:
         )
 
     def _run_prompt(self, registry, state):
-        state["final_prompt"] = registry.call(
+        final_prompt = registry.call(
             "prompt",
             state.get("caption", ""),
             state.get("user_prompt", ""),
             compressed_context=state.get("compressed_context", {}),
+        )
+        state["final_prompt"] = self._compress_prompt(
+            registry,
+            final_prompt,
+            max_words=60,
+            label="initial",
+        )
+        state["evaluation_prompt"] = self._make_evaluation_prompt(
+            registry,
+            state.get("caption", ""),
+            state.get("user_prompt", ""),
+            state["final_prompt"],
+            label="evaluation",
         )
 
     def _run_generation(self, registry, state):
@@ -86,7 +108,7 @@ class DynamicExecutionEngine:
             "evaluation",
             state.get("image"),
             state.get("output_image_path"),
-            state.get("final_prompt", ""),
+            state.get("evaluation_prompt", ""),
         )
 
     def _run_reflection(self, registry, state):
@@ -97,10 +119,12 @@ class DynamicExecutionEngine:
             state.get("score", 0.0),
         )
         state["reflection"] = reflection_result.get("reflection")
-        state["suggested_prompt"] = reflection_result.get(
+        raw_suggested_prompt = reflection_result.get(
             "suggested_prompt",
             state.get("final_prompt", ""),
         )
+        state["raw_suggested_prompt"] = raw_suggested_prompt
+        state["suggested_prompt"] = raw_suggested_prompt
         state["reflection_needs_retry"] = reflection_result.get(
             "needs_retry",
             False,
@@ -115,22 +139,39 @@ class DynamicExecutionEngine:
 
         if retry_needed:
             print("[ExecutionEngine] Retry needed. Starting second attempt.")
-            retry_prompt = state.get("suggested_prompt") or state.get(
+            raw_suggested_prompt = state.get("raw_suggested_prompt") or state.get(
                 "final_prompt",
                 "",
             )
+            state["retry_prompt"] = self._compress_prompt(
+                registry,
+                raw_suggested_prompt,
+                max_words=55,
+                label="retry",
+            )
+            state["retry_evaluation_prompt"] = self._make_evaluation_prompt(
+                registry,
+                state.get("caption", ""),
+                state.get("user_prompt", ""),
+                state["retry_prompt"],
+                label="retry evaluation",
+            )
+            print("[ExecutionEngine] Using compressed retry prompt.")
             state["retry_output_image_path"] = registry.call(
                 "generation",
-                retry_prompt,
+                state["retry_prompt"],
             )
             state["retry_score"] = registry.call(
                 "evaluation",
                 state.get("image"),
                 state.get("retry_output_image_path"),
-                retry_prompt,
+                state["retry_evaluation_prompt"],
             )
         else:
             print("[ExecutionEngine] Retry skipped.")
+            state["raw_suggested_prompt"] = state.get("raw_suggested_prompt")
+            state["retry_prompt"] = None
+            state["retry_evaluation_prompt"] = None
 
         self._select_best_result(state)
 
@@ -146,13 +187,18 @@ class DynamicExecutionEngine:
                     "initial_prompt": state.get("final_prompt"),
                     "initial_score": state.get("score"),
                     "initial_output_image_path": state.get("output_image_path"),
+                    "evaluation_prompt": state.get("evaluation_prompt"),
                     "reflection": state.get("reflection"),
                     "retry_needed": state.get("retry_needed"),
                     "retry_prompt": (
-                        state.get("suggested_prompt")
+                        state.get("retry_prompt")
                         if state.get("retry_needed")
                         else None
                     ),
+                    "retry_evaluation_prompt": state.get(
+                        "retry_evaluation_prompt"
+                    ),
+                    "raw_suggested_prompt": state.get("raw_suggested_prompt"),
                     "retry_score": state.get("retry_score"),
                     "retry_output_image_path": state.get("retry_output_image_path"),
                     "best_prompt": state.get("best_prompt"),
@@ -170,7 +216,7 @@ class DynamicExecutionEngine:
         retry_score = state.get("retry_score")
 
         if retry_score is not None and score is not None and retry_score > score:
-            state["best_prompt"] = state.get("suggested_prompt")
+            state["best_prompt"] = state.get("retry_prompt")
             state["best_output_image_path"] = state.get("retry_output_image_path")
             state["best_score"] = retry_score
         else:
@@ -179,3 +225,40 @@ class DynamicExecutionEngine:
             state["best_score"] = score
 
         print(f"[ExecutionEngine] Best score selected: {state.get('best_score')}")
+
+    def _compress_prompt(self, registry, prompt, max_words, label):
+        compressor = getattr(registry, "_tools", {}).get("prompt_compressor")
+        if compressor and hasattr(compressor, "compress_prompt"):
+            compressed_prompt = compressor.compress_prompt(
+                prompt,
+                max_words=max_words,
+                label=label,
+            )
+        else:
+            words = str(prompt or "").replace("\n", " ").strip().split()
+            compressed_prompt = " ".join(words[:max_words])
+
+        word_count = len(compressed_prompt.split())
+        print(f"[ExecutionEngine] {label} prompt word count: {word_count}")
+        return compressed_prompt
+
+    def _make_evaluation_prompt(self, registry, caption, user_prompt, prompt, label):
+        compressor = getattr(registry, "_tools", {}).get("prompt_compressor")
+        if compressor and hasattr(compressor, "make_evaluation_prompt"):
+            evaluation_prompt = compressor.make_evaluation_prompt(
+                caption,
+                user_prompt,
+                prompt,
+            )
+        else:
+            fallback = f"{caption or ''} {user_prompt or ''}".strip()
+            evaluation_prompt = self._compress_prompt(
+                registry,
+                fallback,
+                max_words=40,
+                label=label,
+            )
+
+        word_count = len(evaluation_prompt.split())
+        print(f"[ExecutionEngine] {label} prompt word count: {word_count}")
+        return evaluation_prompt

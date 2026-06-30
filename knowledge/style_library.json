@@ -1,0 +1,22 @@
+{
+  "anime": {
+    "keywords": ["anime", "manga", "cel shading"],
+    "prompt_rules": ["anime style", "clean line art", "expressive eyes"]
+  },
+  "realistic": {
+    "keywords": ["realistic", "photo", "photorealistic"],
+    "prompt_rules": ["realistic detail", "natural texture", "true-to-life lighting"]
+  },
+  "ghibli": {
+    "keywords": ["ghibli", "storybook", "whimsical"],
+    "prompt_rules": ["warm hand-painted feel", "gentle fantasy mood", "soft environment detail"]
+  },
+  "pixel art": {
+    "keywords": ["pixel", "pixel art", "8-bit"],
+    "prompt_rules": ["pixel art", "crisp small-scale detail", "limited color palette"]
+  },
+  "oil painting": {
+    "keywords": ["oil", "oil painting", "painterly"],
+    "prompt_rules": ["oil painting texture", "visible brush strokes", "rich color depth"]
+  }
+}

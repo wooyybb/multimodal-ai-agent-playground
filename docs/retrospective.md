@@ -238,3 +238,18 @@
 ### 다음 Sprint
 
 - RAG Style Library 또는 Semantic Memory를 연결해 dynamic workflow의 분기 가능성을 높입니다.
+## Sprint 20 Retrospective
+
+### 잘된 점
+
+- Vector DB 없이도 RAG의 핵심 구조를 구현했습니다.
+- KnowledgeManager와 RetrievalAgent의 책임을 분리했습니다.
+- DynamicExecutionEngine에 retrieval step을 자연스럽게 추가했습니다.
+
+### 아쉬운 점
+
+- 현재 retrieval은 keyword matching 기반이라 semantic search는 아직 지원하지 않습니다.
+
+### 다음 Sprint
+
+- Semantic Memory 또는 Vector DB adapter를 검토합니다.

@@ -1,3 +1,17 @@
+## Fixed: CLIP Evaluation Prompt Token Overflow
+
+- 55 words 이하로 retry prompt를 줄였더라도 CLIP tokenizer 기준으로는 79 tokens가 되어 77 token 제한을 넘을 수 있었습니다.
+- word count와 CLIP token count는 다를 수 있으므로 generation prompt를 그대로 evaluation에 사용하는 것은 안전하지 않습니다.
+- 수정: generation prompt와 evaluation prompt를 분리했습니다. `PromptCompressor.make_evaluation_prompt()`가 caption 핵심, user prompt 핵심, style keyword, quality keyword만 포함한 35~40 words 이하의 CLIP-safe prompt를 생성합니다.
+- 현재 initial evaluation은 `evaluation_prompt`, retry evaluation은 `retry_evaluation_prompt`를 사용합니다.
+
+## Fixed: Retry Prompt CLIP Token Overflow
+
+- Sprint20 RAG Style Library 이후 initial prompt는 압축되었지만, retry 단계의 `suggested_prompt`가 prompt budget을 거치지 않고 generation/evaluation에 사용되는 문제가 있었습니다.
+- 이로 인해 retry CLIP evaluation에서 `Sequence length must be less than max_position_embeddings (91 > 77)` 오류가 발생할 수 있었습니다.
+- 수정: `PromptCompressor.compress_prompt(prompt, max_words=55)`를 추가하고, `DynamicExecutionEngine` retry 단계에서 raw suggested prompt와 compressed retry prompt를 분리했습니다.
+- 현재 retry generation/evaluation은 `retry_prompt`만 사용하며, memory record에는 `raw_suggested_prompt`와 `retry_prompt`를 구분해 저장합니다.
+
 # Known Issues
 
 - Hugging Face token 환경변수가 없으면 FLUX는 fallback image를 사용합니다.

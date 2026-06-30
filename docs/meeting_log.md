@@ -82,3 +82,6 @@ PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 p
 ## Sprint 19 Meeting Log
 
 이번 Sprint에서는 PlannerAgent가 만든 plan이 실제 실행을 이끌도록 Dynamic Execution Engine을 도입하기로 결정했습니다. OrchestratorAgent는 coordination에 집중하고, step execution은 별도 engine으로 분리하는 방향을 채택했습니다.
+## Sprint 20 Meeting Log
+
+이번 Sprint에서는 Prompt 생성 과정에 내부 지식을 연결하기 위해 Knowledge Layer를 도입하기로 결정했습니다. Vector DB를 바로 붙이기보다 JSON Store와 KnowledgeManager를 먼저 만들고, RetrievalAgent가 이를 사용하는 구조를 채택했습니다.

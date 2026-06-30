@@ -4,6 +4,7 @@ from agents.planner_agent import PlannerAgent
 from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
+from agents.retrieval_agent import RetrievalAgent
 from agents.retry_agent import RetryAgent
 from agents.vision_agent import VisionAgent
 from memory.history import MemoryManager
@@ -15,6 +16,7 @@ class OrchestratorAgent:
     def __init__(self):
         self.planner_agent = PlannerAgent()
         self.prompt_compressor = PromptCompressor()
+        self.retrieval_agent = RetrievalAgent()
         self.vision_agent = VisionAgent()
         self.prompt_agent = PromptAgent()
         self.generation_agent = GenerationAgent()
@@ -29,6 +31,7 @@ class OrchestratorAgent:
     def _register_tools(self):
         self.registry.register("memory_load", self.memory_manager.load_last_run)
         self.registry.register("vision", self.vision_agent)
+        self.registry.register("retrieval", self.retrieval_agent)
         self.registry.register("prompt_compressor", self.prompt_compressor)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
@@ -75,6 +78,7 @@ class OrchestratorAgent:
             "memory_saved": final_state.get("memory_saved", False),
             "planner_result": planner_result,
             "prompt_context": final_state.get("prompt_context"),
+            "retrieved_context": final_state.get("retrieved_context"),
             "compressed_context": final_state.get("compressed_context"),
             "agent_trace": final_state.get("agent_trace", []),
         }

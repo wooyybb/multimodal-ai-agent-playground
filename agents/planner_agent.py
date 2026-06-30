@@ -5,6 +5,7 @@ class PlannerAgent:
         execution_plan = [
             "memory_load",
             "vision",
+            "retrieval",
             "prompt_compressor",
             "prompt",
             "generation",

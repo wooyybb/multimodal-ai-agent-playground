@@ -239,3 +239,28 @@ Planner-driven Workflow는 PlannerAgent가 만든 `execution_plan`이 실제 wor
 ### Agent State
 
 Agent State는 caption, final_prompt, score, reflection, retry result처럼 여러 agent가 공유하는 실행 중간 결과입니다.
+## Sprint 20 Concepts
+
+### Knowledge Store
+
+Knowledge Store는 style, lighting, composition, quality, negative prompt rule 같은 domain knowledge를 저장하는 계층입니다.
+
+### Knowledge Layer
+
+Knowledge Layer는 agent가 외부 지식에 접근하는 interface입니다. 이번 Sprint에서는 `KnowledgeManager`가 이 역할을 합니다.
+
+### Retriever
+
+Retriever는 query와 관련된 knowledge를 찾는 component입니다. `RetrievalAgent`는 caption과 user prompt를 기반으로 rule을 검색합니다.
+
+### Rule-based RAG
+
+Rule-based RAG는 embedding이나 Vector DB 없이 keyword matching과 rule selection으로 retrieval-augmented prompt를 만드는 방식입니다.
+
+### Prompt Augmentation
+
+Prompt Augmentation은 검색된 지식을 final prompt 생성에 반영하는 과정입니다. 이번 구조에서는 PromptCompressor가 retrieved context를 짧게 압축해 PromptAgent에 전달합니다.
+
+### Hybrid Retrieval
+
+Hybrid Retrieval은 keyword rule, metadata, vector similarity를 함께 사용하는 retrieval 전략입니다. 향후 확장 방향입니다.

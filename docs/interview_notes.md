@@ -284,3 +284,19 @@ A. Orchestrator의 책임을 coordination으로 제한하고, step execution과 
 
 Q. 이 구조가 LangGraph와 어떤 점에서 유사하고 다른가요?
 A. plan, state, node execution이라는 아이디어는 유사하지만, 현재 구현은 외부 framework 없이 Python class와 dict 기반으로 만든 MVP입니다.
+## Sprint 20 Interview Notes
+
+Q. 왜 처음부터 ChromaDB를 쓰지 않았나요?
+A. 먼저 RAG의 핵심인 Retrieval과 Augmentation 책임 분리를 검증하기 위해 JSON 기반으로 시작했습니다.
+
+Q. KnowledgeManager는 왜 필요한가요?
+A. RetrievalAgent가 JSON 파일 구조를 직접 알지 않도록 storage access layer를 분리하기 위해 필요합니다.
+
+Q. RetrievalAgent는 무엇을 검색하나요?
+A. caption과 user prompt를 기반으로 style, lighting, composition, quality, negative prompt rule을 검색합니다.
+
+Q. PromptAgent와 RetrievalAgent의 차이는 무엇인가요?
+A. RetrievalAgent는 지식을 찾고, PromptAgent는 압축된 context와 user input을 바탕으로 final prompt를 생성합니다.
+
+Q. 나중에 Vector DB로 어떻게 확장할 계획인가요?
+A. KnowledgeManager의 내부 구현을 JSON loader에서 ChromaDB, FAISS, Milvus adapter로 교체하고 RetrievalAgent interface는 유지할 수 있습니다.

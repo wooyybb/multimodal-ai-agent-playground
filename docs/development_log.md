@@ -188,3 +188,24 @@
 - OrchestratorAgent의 고정 step 실행 로직을 제거하고 ExecutionEngine에 위임했습니다.
 - Runtime state dict를 통해 각 step의 입력과 출력을 관리하도록 변경했습니다.
 - 기존 one-step retry와 memory save 흐름은 유지했습니다.
+## Sprint 20: Knowledge Manager & Retrieval Agent
+
+- JSON 기반 Knowledge Store를 `knowledge/` 폴더에 추가했습니다.
+- `KnowledgeManager`를 통해 style, lighting, composition, quality, negative prompt rule을 로드하도록 했습니다.
+- `RetrievalAgent`를 추가해 caption과 user prompt 기반 rule-based retrieval을 수행했습니다.
+- PlannerAgent execution plan에 `retrieval` step을 추가했습니다.
+- ExecutionEngine이 retrieval 결과를 `retrieved_context`로 state에 저장하도록 했습니다.
+- PromptCompressor가 retrieved context를 compressed hint로 병합하도록 업데이트했습니다.
+## CLIP-Safe Evaluation Prompt Separation
+
+- retry prompt를 55 words로 줄여도 CLIP tokenizer 기준 77 token 제한을 넘을 수 있는 문제가 확인되었습니다.
+- `PromptCompressor.make_evaluation_prompt()`를 추가해 CLIP evaluation 전용 prompt를 별도로 생성하도록 했습니다.
+- `DynamicExecutionEngine`은 generation에는 `final_prompt`/`retry_prompt`를 사용하고, evaluation에는 `evaluation_prompt`/`retry_evaluation_prompt`를 사용하도록 분리했습니다.
+- state에 `evaluation_prompt`와 `retry_evaluation_prompt`를 저장하도록 변경했습니다.
+
+## Retry Prompt Compression Bug Fix
+
+- Sprint20 이후 retrieved context가 prompt에 반영되면서 retry reflection prompt가 길어지는 문제가 발견되었습니다.
+- `PromptCompressor.compress_prompt()`를 추가해 retry prompt를 55 words 이하로 제한했습니다.
+- `DynamicExecutionEngine`은 `raw_suggested_prompt`를 보존하고, generation/evaluation에는 compressed `retry_prompt`를 사용하도록 수정했습니다.
+- memory save record에 raw suggested prompt와 compressed retry prompt를 구분해 저장하도록 업데이트했습니다.

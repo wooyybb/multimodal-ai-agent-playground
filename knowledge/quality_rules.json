@@ -1,0 +1,5 @@
+{
+  "default": {
+    "prompt_rules": ["masterpiece", "best quality", "ultra detailed", "8k"]
+  }
+}
