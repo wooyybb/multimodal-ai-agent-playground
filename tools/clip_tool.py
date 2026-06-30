@@ -39,32 +39,37 @@ class ClipTool:
 
         try:
             self._load_model()
+
+            import torch
+            import torch.nn.functional as F
+
             image = Image.open(generated_image_path).convert("RGB")
+
             inputs = self.processor(
                 text=[final_prompt],
                 images=image,
                 return_tensors="pt",
                 padding=True,
-            ).to(self.device)
+            )
+            inputs = {key: value.to(self.device) for key, value in inputs.items()}
 
-            with self.torch.no_grad():
-                image_features = self.model.get_image_features(
-                    pixel_values=inputs["pixel_values"]
-                )
-                text_features = self.model.get_text_features(
-                    input_ids=inputs["input_ids"],
-                    attention_mask=inputs["attention_mask"],
-                )
+            with torch.no_grad():
+                outputs = self.model(**inputs)
 
-                cosine_similarity = self.torch.nn.functional.cosine_similarity(
-                    image_features,
-                    text_features,
-                ).item()
+                image_features = outputs.image_embeds
+                text_features = outputs.text_embeds
 
-            score = (cosine_similarity + 1) / 2
-            score = round(max(0.0, min(score, 1.0)), 3)
-            print(f"[CLIP] Score: {score}")
+                image_features = F.normalize(image_features, p=2, dim=-1)
+                text_features = F.normalize(text_features, p=2, dim=-1)
+
+                cosine = torch.sum(image_features * text_features, dim=-1).item()
+
+            score = (cosine + 1.0) / 2.0
+            score = max(0.0, min(1.0, float(score)))
+
+            print(f"[CLIP] Score: {score:.4f}")
             return score
-        except Exception as error:
-            print(f"[CLIP] Error: {error}")
-            return self.fallback_score
+
+        except Exception as e:
+            print("[CLIP] Error:", e)
+            return 0.0

@@ -85,3 +85,19 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `agent_trace`는 list가 아니어도 빈 list로 정리되어 UI가 깨지지 않습니다.
 - memory save 실패는 전체 workflow를 중단하지 않고 `memory_saved=False`로 반영됩니다.
 - E2E validation은 문서 기반 체크리스트로 정리됐지만, 아직 자동화된 test suite는 없습니다.
+
+## CLIP Similarity Bug Fix Review
+
+### Findings
+
+- 원인: CLIP evaluation에서 `BaseModelOutputWithPooling` 같은 model output 객체를 tensor처럼 cosine similarity에 전달하면 `cosine_similarity(): argument 'x1' must be Tensor` 오류가 발생할 수 있습니다.
+- 수정: `get_image_features()`와 `get_text_features()`를 사용해 tensor feature를 추출하고, 두 feature를 `F.normalize(..., dim=-1)` 방식으로 정규화한 뒤 cosine similarity를 계산했습니다.
+- fallback: CLIP loading 또는 inference 중 예외가 발생하면 기존처럼 fallback score `0.0`을 반환합니다.
+
+## CLIP BaseModelOutputWithPooling Bug Review
+
+### Findings
+
+- 원인: CLIP model output 객체인 `BaseModelOutputWithPooling`을 feature Tensor처럼 다루면 `.norm` attribute 오류가 발생합니다.
+- 수정: `self.model(**inputs)` 결과나 `outputs.image_embeds`/`outputs.text_embeds`를 사용하지 않고, `get_image_features()`와 `get_text_features()`의 반환 Tensor만 사용하도록 고정했습니다.
+- 계산: image/text feature를 `F.normalize(..., p=2, dim=-1)`로 정규화하고 `torch.sum(image_features * text_features, dim=-1).item()`으로 cosine 값을 구합니다.

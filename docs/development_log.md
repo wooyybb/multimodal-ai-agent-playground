@@ -124,3 +124,16 @@
 - `agent_trace`는 항상 list 기반으로 받고 줄바꿈 문자열로 표시합니다.
 - memory 저장 실패가 전체 workflow를 중단하지 않도록 Orchestrator에서 방어 처리했습니다.
 - `docs/testing.md`, `docs/known_issues.md`, `docs/demo_script.md`를 추가했습니다.
+
+### CLIP Similarity Tensor Extraction Bug Fix
+
+- CLIP evaluation에서 model output 객체를 cosine similarity에 직접 전달할 수 있는 위험을 수정했습니다.
+- `CLIPModel.get_image_features()`와 `CLIPModel.get_text_features()`로 tensor feature를 추출하도록 명확히 했습니다.
+- image/text feature를 `torch.nn.functional.normalize(..., dim=-1)`로 정규화한 뒤 cosine similarity를 계산합니다.
+- similarity는 `(similarity + 1.0) / 2.0`으로 0.0~1.0 범위 score로 변환합니다.
+
+### CLIP Feature Extraction Fix
+
+- `BaseModelOutputWithPooling` 객체에 normalize/norm 연산이 적용되는 문제를 방지했습니다.
+- `self.model(**inputs)`, `outputs.image_embeds`, `outputs.text_embeds`를 사용하지 않고 `get_image_features()`와 `get_text_features()`만 사용하도록 정리했습니다.
+- feature Tensor를 `F.normalize(..., p=2, dim=-1)`로 정규화한 뒤 `torch.sum(image_features * text_features, dim=-1).item()`으로 cosine 값을 계산합니다.
