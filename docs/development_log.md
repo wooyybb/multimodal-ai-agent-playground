@@ -102,8 +102,8 @@
 
 - `FluxTool`을 Hugging Face `InferenceClient` 기반 FLUX generation 구조로 확장했습니다.
 - 모델은 `black-forest-labs/FLUX.1-schnell`을 사용합니다.
-- `HF_TOKEN`이 있으면 real FLUX generation을 시도합니다.
-- `HF_TOKEN`이 없거나 API 호출이 실패하면 PIL 기반 fallback mock image를 생성합니다.
+- Hugging Face token 환경변수가 있으면 real FLUX generation을 시도합니다.
+- Hugging Face token 환경변수가 없거나 API 호출이 실패하면 PIL 기반 fallback mock image를 생성합니다.
 - output file name은 timestamp 기반으로 생성해 중복 저장을 방지합니다.
 - `GenerationAgent.run(final_prompt) -> str` interface는 유지했습니다.
 
@@ -137,3 +137,10 @@
 - `BaseModelOutputWithPooling` 객체에 normalize/norm 연산이 적용되는 문제를 방지했습니다.
 - `self.model(**inputs)`, `outputs.image_embeds`, `outputs.text_embeds`를 사용하지 않고 `get_image_features()`와 `get_text_features()`만 사용하도록 정리했습니다.
 - feature Tensor를 `F.normalize(..., p=2, dim=-1)`로 정규화한 뒤 `torch.sum(image_features * text_features, dim=-1).item()`으로 cosine 값을 계산합니다.
+
+### README And Demo Documentation
+
+- README를 현재 End-to-End multi-agent workflow 기준으로 정리했습니다.
+- setup, `.env` 설정, `python main.py` 실행 방법을 추가했습니다.
+- demo screenshots/images는 `assets/demo/`에 선별 보관하고, `outputs/` 전체를 Git에 올리지 않는 방향을 명시했습니다.
+- demo script와 interview notes를 최신 BLIP/FLUX/CLIP/Memory 구조에 맞춰 보강했습니다.

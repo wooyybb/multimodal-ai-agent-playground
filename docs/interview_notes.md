@@ -130,9 +130,9 @@ A: `GenerationAgent`는 generation 단계의 agent 역할만 담당하고, Huggi
 
 ## Q: 실제 모델 연동 실패 시 어떻게 처리했나요?
 
-A: `HF_TOKEN`이 없거나 API 호출이 실패하면 `FluxTool`이 PIL 기반 fallback mock image를 생성합니다. 따라서 외부 API 실패가 전체 workflow 중단으로 이어지지 않습니다.
+A: Hugging Face token 환경변수가 없거나 API 호출이 실패하면 `FluxTool`이 PIL 기반 fallback mock image를 생성합니다. 따라서 외부 API 실패가 전체 workflow 중단으로 이어지지 않습니다.
 
-## Q: 왜 환경변수로 HF_TOKEN을 관리했나요?
+## Q: 왜 환경변수로 Hugging Face token을 관리했나요?
 
 A: Hugging Face token은 보안 정보이므로 코드나 문서에 직접 저장하면 안 됩니다. 환경변수로 관리하면 local 개발과 배포 환경에서 안전하게 분리할 수 있습니다.
 
@@ -175,3 +175,15 @@ A: CLIP score는 image-text alignment를 평가하는 데 유용하지만 이미
 ## Q: 면접 시연에서는 어떤 흐름으로 보여줄 건가요?
 
 A: 먼저 Gradio UI를 실행하고, 이미지를 업로드한 뒤 user prompt를 입력합니다. 이후 caption, final prompt, generated image, score, reflection, retry decision, best result, agent trace, memory 기록 순서로 설명합니다.
+
+## Q: 이 프로젝트에서 실제로 구현된 모델은 무엇인가요?
+
+A: Vision 단계에는 BLIP image captioning 구조를 구현했고, Generation 단계에는 Hugging Face FLUX API 연동 구조를 구현했으며, Evaluation 단계에는 CLIP image-text similarity 평가 구조를 구현했습니다. 단, FLUX는 Hugging Face token 환경변수가 없거나 API 호출이 실패하면 fallback image를 사용합니다.
+
+## Q: FLUX 연동은 어떻게 했나요?
+
+A: `GenerationAgent`가 직접 API를 호출하지 않고 `FluxTool`을 호출합니다. `FluxTool`은 로컬 Hugging Face token 환경변수가 있으면 Hugging Face `InferenceClient`로 `black-forest-labs/FLUX.1-schnell` 생성을 시도하고, 실패하거나 token이 없으면 PIL 기반 fallback image를 생성합니다.
+
+## Q: 생성 결과와 테스트 기록은 어떻게 관리했나요?
+
+A: runtime output은 `outputs/`에 저장하지만 전체 폴더를 Git에 올리는 방식은 권장하지 않습니다. 선별된 demo 이미지는 `assets/demo/`에 따로 보관하는 방식으로 관리합니다. 실행 기록은 `MemoryManager`가 `memory/history.json`에 caption, prompt, score, retry, best result 등을 저장합니다.

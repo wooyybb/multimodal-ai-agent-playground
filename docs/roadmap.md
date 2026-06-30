@@ -77,7 +77,7 @@
 ## Sprint 11: Real FLUX Integration - Done
 
 - `FluxTool`에 Hugging Face `InferenceClient` 기반 FLUX generation 구조 추가
-- `HF_TOKEN` 환경변수 기반 API 호출
+- Hugging Face token 환경변수 기반 API 호출
 - API 실패 또는 token 부재 시 fallback mock image 생성
 - timestamp 기반 output file 저장
 
@@ -95,3 +95,11 @@
 - demo script 작성
 - UI output stability 개선
 - memory save failure 방어 처리
+
+## Demo Documentation - Done
+
+- README project overview 정리
+- current workflow와 setup/run 방법 문서화
+- `.env` 설정 방법 안내
+- demo assets는 `assets/demo/`에 선별 보관하는 방향 정리
+- future work 업데이트
