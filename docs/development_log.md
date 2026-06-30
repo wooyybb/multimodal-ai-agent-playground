@@ -175,3 +175,9 @@
 - `OrchestratorAgent`가 `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 포함한 context dict를 구성합니다.
 - `PromptAgent`는 context를 참고하되 과도하게 복사하지 않고 짧은 context note만 final prompt에 반영합니다.
 - agent trace에 `OrchestratorAgent built prompt context`와 `PromptAgent generated context-aware prompt`를 추가했습니다.
+## Sprint 18: Prompt Compression & Context Budget Management
+
+- `PromptCompressor`를 추가해 Planner와 Memory에서 온 raw context를 짧은 `compressed_context`로 변환했습니다.
+- `PromptAgent`는 raw context 대신 압축된 hint만 사용하도록 변경했습니다.
+- Prompt 길이를 40~60 words 수준으로 유지하도록 제한해 CLIP 77 token 문제를 완화했습니다.
+- Orchestrator 흐름을 Planner -> Context Builder -> PromptCompressor -> PromptAgent 순서로 정리했습니다.

@@ -177,3 +177,12 @@ OrchestratorAgent는 workflow state를 가장 잘 알고 있습니다. planner r
 ## 왜 Context 정보를 Prompt에 과도하게 넣지 않는가
 
 이전 prompt나 score를 그대로 길게 복사하면 final prompt가 장황해지고 민감하거나 불필요한 정보가 섞일 수 있습니다. 이번 Sprint에서는 짧은 planning note와 previous best prompt summary만 반영하도록 제한했습니다.
+## Sprint 18 Decisions
+
+### Decision: Prompt Compression이 필요한 이유
+
+Context-aware Agent는 Planner, Memory, Retry History 등 많은 정보를 사용할 수 있지만 모든 정보를 prompt에 직접 넣으면 token budget을 초과할 수 있습니다. 따라서 필요한 정보만 선택하고 짧은 hint로 압축하는 `PromptCompressor`를 분리했습니다.
+
+### Decision: Context Budget을 고려해야 하는 이유
+
+CLIP text encoder처럼 입력 길이가 제한된 모델은 긴 prompt를 처리하지 못할 수 있습니다. Context Budget은 agent가 사용할 수 있는 정보량을 제한하고, 중요한 정보만 남기는 engineering 기준입니다.

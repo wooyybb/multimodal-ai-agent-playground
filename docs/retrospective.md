@@ -208,3 +208,17 @@
 - RAG Style Library
 - Semantic Memory 검색
 - Prompt template selection
+## Sprint 18 Retrospective
+
+### 잘된 점
+
+- PromptAgent의 책임을 prompt composition으로 좁히고 compression 책임을 분리했습니다.
+- CLIP token limit 문제를 architecture 수준에서 다뤘습니다.
+
+### 아쉬운 점
+
+- 아직 실제 tokenizer 기반 token counting은 구현하지 않았습니다.
+
+### 다음 Sprint
+
+- RAG Style Library 또는 Semantic Memory를 통해 압축 context의 품질을 높입니다.

@@ -128,3 +128,9 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - PromptAgent가 MemoryManager나 PlannerAgent를 직접 호출하지 않아 책임 분리가 유지됩니다.
 - context 정보는 prompt에 짧게 반영되지만, 너무 많은 previous prompt가 들어가지 않도록 length limit을 적용했습니다.
 - context dict는 유연하지만 schema validation은 아직 없습니다.
+## Sprint 18 Code Review
+
+- `PromptCompressor`는 planner reason과 previous best prompt 전체를 prompt에 넣지 않고 짧은 hint만 반환합니다.
+- `PromptAgent`는 `compressed_context`만 사용하도록 변경되어 context leakage 위험이 줄었습니다.
+- `OrchestratorAgent`는 기존 workflow를 유지하면서 PromptCompressor 호출을 PromptAgent 앞에 추가했습니다.
+- 남은 리스크: 실제 tokenizer 기준 token count가 아니라 word/character 기반 제한이므로, 향후 tokenizer-aware budget 관리가 필요합니다.

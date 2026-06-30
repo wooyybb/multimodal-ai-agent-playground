@@ -1,6 +1,7 @@
 from agents.evaluation_agent import EvaluationAgent
 from agents.generation_agent import GenerationAgent
 from agents.planner_agent import PlannerAgent
+from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
 from agents.retry_agent import RetryAgent
@@ -12,6 +13,7 @@ from registry import ToolRegistry
 class OrchestratorAgent:
     def __init__(self):
         self.planner_agent = PlannerAgent()
+        self.prompt_compressor = PromptCompressor()
         self.vision_agent = VisionAgent()
         self.prompt_agent = PromptAgent()
         self.generation_agent = GenerationAgent()
@@ -25,6 +27,7 @@ class OrchestratorAgent:
     def _register_tools(self):
         self.registry.register("memory_load", self.memory_manager.load_last_run)
         self.registry.register("vision", self.vision_agent)
+        self.registry.register("prompt_compressor", self.prompt_compressor)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
         self.registry.register("evaluation", self.evaluation_agent)
@@ -53,11 +56,12 @@ class OrchestratorAgent:
                 last_run.get("best_score") if isinstance(last_run, dict) else None
             ),
         }
+        compressed_context = self.registry.call("prompt_compressor", context)
         final_prompt = self.registry.call(
             "prompt",
             caption,
             user_prompt,
-            context=context,
+            compressed_context=compressed_context,
         )
         print("[OrchestratorAgent] Initial attempt started.")
         output_image_path = self.registry.call("generation", final_prompt)
@@ -139,13 +143,16 @@ class OrchestratorAgent:
             "last_run": last_run,
             "memory_saved": memory_saved,
             "planner_result": planner_result,
+            "compressed_context": compressed_context,
             "agent_trace": [
                 "PlannerAgent generated execution plan",
                 "ToolRegistry called memory_load",
                 "ToolRegistry called vision",
                 "OrchestratorAgent built prompt context",
+                "ToolRegistry called prompt_compressor",
+                "PromptCompressor compressed context",
                 "ToolRegistry called prompt",
-                "PromptAgent generated context-aware prompt",
+                "PromptAgent generated compressed-context prompt",
                 "ToolRegistry called generation",
                 "ToolRegistry called evaluation",
                 "ToolRegistry called reflection",

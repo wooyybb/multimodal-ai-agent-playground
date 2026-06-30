@@ -191,3 +191,18 @@ PromptAgent
 ```
 
 `PromptAgent`는 MemoryManager나 PlannerAgent를 직접 호출하지 않습니다. `OrchestratorAgent`가 `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 모아 context를 구성하고 `PromptAgent`에 전달합니다.
+## Prompt Compression
+
+Sprint 18에서는 Context-aware PromptAgent 앞에 `PromptCompressor`를 추가했습니다.
+
+```text
+PlannerAgent
+-> Context Builder
+-> PromptCompressor
+-> Compressed Context
+-> PromptAgent
+-> GenerationAgent
+-> EvaluationAgent
+```
+
+`Context Builder`는 Planner와 Memory에서 raw context를 수집하고, `PromptCompressor`는 이 context를 짧은 hint로 압축합니다. `PromptAgent`는 raw planner result, full history, previous best prompt 전체를 직접 사용하지 않고 `compressed_context`만 사용합니다. 이 구조는 CLIP 77 token 제한과 같은 context budget 문제를 줄이고, 향후 RAG Style Library나 Semantic Memory가 추가되어도 prompt 길이를 제어할 수 있게 합니다.

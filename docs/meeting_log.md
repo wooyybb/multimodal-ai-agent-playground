@@ -76,3 +76,6 @@ ToolRegistry는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `
 이번 논의에서는 PromptAgent를 단순 caption/user prompt 결합기에서 context-aware prompt builder로 확장하기로 결정했습니다.
 
 PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 planner_result와 last_run을 모아 context dict로 전달합니다.
+## Sprint 18 Meeting Log
+
+이번 Sprint에서는 context를 많이 넣는 방식에서 필요한 context만 선택하고 압축하는 방식으로 설계를 변경했습니다. Reflection과 Memory가 확장될수록 prompt가 길어지므로, PromptCompressor를 별도 책임으로 분리하는 방향을 채택했습니다.

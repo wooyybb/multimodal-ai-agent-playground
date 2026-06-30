@@ -144,3 +144,15 @@
 - RAG Style Library
 - Semantic Memory
 - Context schema validation
+## Sprint 18: Prompt Compression & Context Budget Management - Done
+
+- `PromptCompressor` 추가
+- raw context를 compressed hint로 변환
+- `PromptAgent`가 `compressed_context`만 사용하도록 변경
+- prompt length budget을 적용해 CLIP 77 token 문제를 완화
+
+## Next Sprint Proposal
+
+- RAG Style Library
+- Semantic Memory
+- tokenizer-aware Prompt Budget Manager

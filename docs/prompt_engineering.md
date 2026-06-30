@@ -121,3 +121,8 @@ Sprint 16 prompt는 architecture-changing task에서 수정 가능한 파일과 
 Sprint 17 prompt는 PromptAgent와 OrchestratorAgent의 책임 분리를 명확히 했습니다. PromptAgent가 MemoryManager나 PlannerAgent를 직접 호출하지 않고, Orchestrator가 context dict를 구성해 전달하도록 제한했습니다.
 
 또한 `context`를 선택 인자로 둬 기존 `run(caption, user_prompt)` 호출이 깨지지 않게 했습니다. 이는 backward compatibility를 유지하면서 context-aware prompt building으로 확장하기 위한 설계입니다.
+## Sprint 18 Prompt Compression Strategy
+
+이번 Sprint의 prompt는 Architecture Prompt입니다. Task, Architecture, Workspace, Allowed Files, Forbidden Files, Requirements, Documentation, Done Definition 순서로 구성되어 Codex가 구현 범위와 설계 의도를 동시에 이해하도록 했습니다.
+
+핵심 전략은 raw context를 prompt에 붙이지 않고, `PromptCompressor`를 통해 `task`, `planner_hint`, `style_hint`, `history_hint` 같은 짧은 hint로 변환하는 것입니다.

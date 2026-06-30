@@ -197,3 +197,20 @@ Prompt Context Composition은 caption, user request, planner reason, previous be
 ## Context-aware Prompting
 
 Context-aware Prompting은 현재 입력뿐 아니라 이전 실행 결과와 계획 정보를 반영해 prompt를 만드는 방식입니다. 이 프로젝트에서는 `PromptAgent`가 선택적 context dict를 받아 final prompt에 짧게 반영합니다.
+## Sprint 18 Concepts
+
+### Prompt Compression
+
+Prompt Compression은 raw context를 그대로 prompt에 넣지 않고, 필요한 의미만 짧은 hint로 바꾸는 과정입니다.
+
+### Context Budget
+
+Context Budget은 agent가 모델에 전달할 수 있는 context의 양을 제한하는 설계 기준입니다. 모든 memory를 넣는 대신 현재 task에 필요한 정보만 선택합니다.
+
+### Token Budget
+
+Token Budget은 모델이 한 번에 처리할 수 있는 입력 길이의 한계입니다. CLIP의 text encoder처럼 짧은 sequence limit을 가진 모델에서는 특히 중요합니다.
+
+### Information Selection
+
+Information Selection은 planner result, memory, retry history 중 final prompt에 실제로 도움이 되는 정보만 고르는 과정입니다.
