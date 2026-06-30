@@ -151,3 +151,22 @@
 - 자동화된 smoke test 추가
 - history viewer UI 추가
 - README와 demo video 정리
+
+## Sprint 15 Retrospective
+
+### 잘된 점
+
+- PlannerAgent를 추가해 fixed workflow에서 agentic planning 구조로 확장할 기반을 만들었습니다.
+- Planner와 Orchestrator의 책임을 분리했습니다.
+- 기존 E2E workflow를 깨지 않고 planner_result를 기록했습니다.
+
+### 아쉬운 점
+
+- execution_plan은 아직 실제 dynamic execution engine에 사용되지 않습니다.
+- Planner는 rule-based라 복잡한 사용자 의도를 해석하지는 못합니다.
+
+### 다음 Sprint
+
+- execution_plan 기반 conditional execution 검토
+- LLM-based planning 실험
+- plan과 실제 agent_trace를 비교하는 validation 추가

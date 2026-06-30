@@ -1,5 +1,6 @@
 from agents.evaluation_agent import EvaluationAgent
 from agents.generation_agent import GenerationAgent
+from agents.planner_agent import PlannerAgent
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
 from agents.retry_agent import RetryAgent
@@ -9,6 +10,7 @@ from memory.history import MemoryManager
 
 class OrchestratorAgent:
     def __init__(self):
+        self.planner_agent = PlannerAgent()
         self.vision_agent = VisionAgent()
         self.prompt_agent = PromptAgent()
         self.generation_agent = GenerationAgent()
@@ -19,6 +21,10 @@ class OrchestratorAgent:
 
     def run(self, image, user_prompt):
         print("[OrchestratorAgent] Starting multi-agent workflow...")
+        planner_result = self.planner_agent.run(
+            user_prompt=user_prompt,
+            image_provided=image is not None,
+        )
         last_run = self.memory_manager.load_last_run()
 
         caption = self.vision_agent.run(image)
@@ -99,7 +105,9 @@ class OrchestratorAgent:
             "history_path": history_path,
             "last_run": last_run,
             "memory_saved": memory_saved,
+            "planner_result": planner_result,
             "agent_trace": [
+                "PlannerAgent generated execution plan",
                 "MemoryManager loaded last run",
                 "VisionAgent generated caption",
                 "PromptAgent generated final prompt",

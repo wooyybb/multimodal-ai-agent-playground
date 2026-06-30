@@ -137,3 +137,17 @@ User
 ```
 
 이번 Sprint에서는 새 agent를 추가하지 않고, UI output stability, agent trace formatting, memory save failure handling, testing documentation을 정리했습니다.
+
+## PlannerAgent
+
+Sprint 15에서는 `OrchestratorAgent` 시작 단계에 `PlannerAgent`를 추가했습니다.
+
+```text
+User
+-> OrchestratorAgent
+-> PlannerAgent
+-> Execution Plan
+-> Existing Fixed Workflow
+```
+
+현재 `PlannerAgent`는 rule-based planner입니다. `image_provided`와 `user_prompt`를 기준으로 `execution_plan`, `task_type`, `reason`을 생성합니다. 이번 Sprint에서는 계획을 실제 dynamic execution engine으로 실행하지 않고, 기존 workflow를 유지하면서 plan을 기록합니다.

@@ -103,3 +103,11 @@
 - `.env` 설정 방법 안내
 - demo assets는 `assets/demo/`에 선별 보관하는 방향 정리
 - future work 업데이트
+
+## Sprint 15: PlannerAgent - Done
+
+- rule-based PlannerAgent 구현
+- execution plan 생성
+- OrchestratorAgent 시작 단계에서 planner 호출
+- result dict에 planner_result 포함
+- 기존 E2E workflow 유지

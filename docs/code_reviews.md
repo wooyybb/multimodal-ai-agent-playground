@@ -101,3 +101,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - 원인: CLIP model output 객체인 `BaseModelOutputWithPooling`을 feature Tensor처럼 다루면 `.norm` attribute 오류가 발생합니다.
 - 수정: `self.model(**inputs)` 결과나 `outputs.image_embeds`/`outputs.text_embeds`를 사용하지 않고, `get_image_features()`와 `get_text_features()`의 반환 Tensor만 사용하도록 고정했습니다.
 - 계산: image/text feature를 `F.normalize(..., p=2, dim=-1)`로 정규화하고 `torch.sum(image_features * text_features, dim=-1).item()`으로 cosine 값을 구합니다.
+
+## Sprint 15 PlannerAgent Review
+
+### Findings
+
+- PlannerAgent는 execution plan만 생성하고 직접 실행하지 않아 책임 분리가 유지됩니다.
+- OrchestratorAgent는 기존 fixed workflow를 유지하면서 planner_result를 기록합니다.
+- 현재 plan은 dynamic execution에 사용되지 않으므로, plan과 실제 실행 흐름이 어긋나지 않도록 향후 validation이 필요합니다.
+- LLM planner 도입 전 rule-based planner로 시작한 점은 디버깅과 설명 가능성 측면에서 적절합니다.

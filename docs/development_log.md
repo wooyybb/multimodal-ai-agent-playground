@@ -144,3 +144,11 @@
 - setup, `.env` 설정, `python main.py` 실행 방법을 추가했습니다.
 - demo screenshots/images는 `assets/demo/`에 선별 보관하고, `outputs/` 전체를 Git에 올리지 않는 방향을 명시했습니다.
 - demo script와 interview notes를 최신 BLIP/FLUX/CLIP/Memory 구조에 맞춰 보강했습니다.
+
+### Sprint 15 PlannerAgent
+
+- rule-based `PlannerAgent`를 추가했습니다.
+- `PlannerAgent.run(user_prompt, image_provided)`는 task type, requirement flags, execution plan, reason을 반환합니다.
+- `OrchestratorAgent`는 workflow 시작 시 `PlannerAgent`를 호출하고 `planner_result`를 반환 dict에 포함합니다.
+- agent trace에 `PlannerAgent generated execution plan` 단계를 추가했습니다.
+- 이번 Sprint에서는 dynamic execution engine을 만들지 않고 기존 fixed workflow를 유지했습니다.

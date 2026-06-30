@@ -103,3 +103,9 @@ Sprint 12 prompt는 실제 model-based evaluation을 추가하면서도 interfac
 Sprint 13 prompt는 기능 추가를 제한하고 validation, documentation, stability 개선을 명시한 prompt입니다.
 
 Allowed files와 forbidden files를 분리해 tools와 requirements를 건드리지 않도록 했고, testing docs, known issues, demo script를 Done Definition에 포함해 demo readiness를 높였습니다.
+
+## Sprint 15 PlannerAgent Prompt
+
+Sprint 15 prompt는 Planner와 Orchestrator의 책임 분리를 명확히 하기 위한 Architecture Prompt입니다.
+
+핵심 제약은 `PlannerAgent`가 계획만 만들고, `OrchestratorAgent`가 기존 workflow를 계속 실행한다는 점입니다. 또한 dynamic execution engine을 이번 Sprint 범위에서 제외해 E2E 안정성을 유지했습니다.
