@@ -2,21 +2,17 @@ class PlannerAgent:
     def run(self, user_prompt: str, image_provided: bool) -> dict:
         print("[PlannerAgent] Running...")
 
-        execution_plan = ["memory_load"]
-        if image_provided:
-            execution_plan.append("vision")
-        if user_prompt and user_prompt.strip():
-            execution_plan.append("prompt")
-
-        execution_plan.extend(
-            [
-                "generation",
-                "evaluation",
-                "reflection",
-                "retry",
-                "memory_save",
-            ]
-        )
+        execution_plan = [
+            "memory_load",
+            "vision",
+            "prompt_compressor",
+            "prompt",
+            "generation",
+            "evaluation",
+            "reflection",
+            "retry",
+            "memory_save",
+        ]
 
         result = {
             "task_type": "image_generation",

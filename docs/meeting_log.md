@@ -79,3 +79,6 @@ PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 p
 ## Sprint 18 Meeting Log
 
 이번 Sprint에서는 context를 많이 넣는 방식에서 필요한 context만 선택하고 압축하는 방식으로 설계를 변경했습니다. Reflection과 Memory가 확장될수록 prompt가 길어지므로, PromptCompressor를 별도 책임으로 분리하는 방향을 채택했습니다.
+## Sprint 19 Meeting Log
+
+이번 Sprint에서는 PlannerAgent가 만든 plan이 실제 실행을 이끌도록 Dynamic Execution Engine을 도입하기로 결정했습니다. OrchestratorAgent는 coordination에 집중하고, step execution은 별도 engine으로 분리하는 방향을 채택했습니다.

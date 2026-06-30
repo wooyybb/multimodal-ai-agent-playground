@@ -134,3 +134,10 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - `PromptAgent`는 `compressed_context`만 사용하도록 변경되어 context leakage 위험이 줄었습니다.
 - `OrchestratorAgent`는 기존 workflow를 유지하면서 PromptCompressor 호출을 PromptAgent 앞에 추가했습니다.
 - 남은 리스크: 실제 tokenizer 기준 token count가 아니라 word/character 기반 제한이므로, 향후 tokenizer-aware budget 관리가 필요합니다.
+## Sprint 19 Code Review
+
+- OrchestratorAgent가 직접 step을 실행하지 않고 DynamicExecutionEngine에 위임하도록 변경되었습니다.
+- ExecutionEngine은 step별 handler를 통해 state transition을 관리합니다.
+- unknown step은 trace에 기록하고 skip합니다.
+- memory_save 실패는 workflow 전체를 중단하지 않도록 처리했습니다.
+- 남은 리스크: state dict key가 문자열 기반이라 typo에 취약하므로 향후 typed schema 도입을 검토해야 합니다.

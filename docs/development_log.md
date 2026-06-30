@@ -181,3 +181,10 @@
 - `PromptAgent`는 raw context 대신 압축된 hint만 사용하도록 변경했습니다.
 - Prompt 길이를 40~60 words 수준으로 유지하도록 제한해 CLIP 77 token 문제를 완화했습니다.
 - Orchestrator 흐름을 Planner -> Context Builder -> PromptCompressor -> PromptAgent 순서로 정리했습니다.
+## Sprint 19: Dynamic Execution Engine
+
+- `workflow/execution_engine.py`에 `DynamicExecutionEngine`을 추가했습니다.
+- PlannerAgent의 `execution_plan`에 `prompt_compressor` step을 포함했습니다.
+- OrchestratorAgent의 고정 step 실행 로직을 제거하고 ExecutionEngine에 위임했습니다.
+- Runtime state dict를 통해 각 step의 입력과 출력을 관리하도록 변경했습니다.
+- 기존 one-step retry와 memory save 흐름은 유지했습니다.

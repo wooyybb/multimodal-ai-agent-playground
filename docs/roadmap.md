@@ -156,3 +156,15 @@
 - RAG Style Library
 - Semantic Memory
 - tokenizer-aware Prompt Budget Manager
+## Sprint 19: Dynamic Execution Engine - Done
+
+- `DynamicExecutionEngine` 추가
+- PlannerAgent `execution_plan` 기반 runtime dispatch 구현
+- OrchestratorAgent 직접 실행 로직 분리
+- state dict 기반 agent state management 도입
+
+## Next Sprint Proposal
+
+- RAG Style Library
+- Semantic Memory
+- conditional workflow branch

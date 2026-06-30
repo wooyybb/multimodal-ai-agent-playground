@@ -206,3 +206,20 @@ PlannerAgent
 ```
 
 `Context Builder`는 Planner와 Memory에서 raw context를 수집하고, `PromptCompressor`는 이 context를 짧은 hint로 압축합니다. `PromptAgent`는 raw planner result, full history, previous best prompt 전체를 직접 사용하지 않고 `compressed_context`만 사용합니다. 이 구조는 CLIP 77 token 제한과 같은 context budget 문제를 줄이고, 향후 RAG Style Library나 Semantic Memory가 추가되어도 prompt 길이를 제어할 수 있게 합니다.
+## Dynamic Execution Engine
+
+Sprint 19에서는 PlannerAgent가 만든 `execution_plan`을 실제 실행에 반영하기 위해 `DynamicExecutionEngine`을 추가했습니다.
+
+```text
+User
+-> PlannerAgent
+-> execution_plan
+-> OrchestratorAgent
+-> DynamicExecutionEngine
+-> ToolRegistry.call(step)
+-> Agent / Tool execution
+```
+
+`OrchestratorAgent`는 더 이상 각 step을 직접 실행하지 않습니다. 대신 초기 `state`를 만들고 `DynamicExecutionEngine.run(execution_plan, registry, state)`를 호출합니다. ExecutionEngine은 step별로 필요한 입력을 state에서 꺼내고, 실행 결과를 다시 state에 저장합니다.
+
+지원 step은 `memory_load`, `vision`, `prompt_compressor`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save`입니다. 이 구조는 향후 caption-only mode, generation-only mode, RAG branch, semantic memory branch 같은 조건부 workflow로 확장하기 위한 기반입니다.

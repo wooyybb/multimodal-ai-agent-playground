@@ -222,3 +222,19 @@
 ### 다음 Sprint
 
 - RAG Style Library 또는 Semantic Memory를 통해 압축 context의 품질을 높입니다.
+## Sprint 19 Retrospective
+
+### 잘된 점
+
+- Planner-driven workflow의 첫 구조를 만들었습니다.
+- OrchestratorAgent의 책임이 줄고 실행 로직이 분리되었습니다.
+- 기존 one-step retry와 memory save 흐름을 유지했습니다.
+
+### 아쉬운 점
+
+- 아직 conditional branch나 parallel execution은 구현하지 않았습니다.
+- state dict는 빠르게 구현하기 좋지만 type safety는 부족합니다.
+
+### 다음 Sprint
+
+- RAG Style Library 또는 Semantic Memory를 연결해 dynamic workflow의 분기 가능성을 높입니다.
