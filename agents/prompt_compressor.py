@@ -10,6 +10,7 @@ class PromptCompressor:
             retry_history = context.get("retry_history") or []
             style_preferences = context.get("style_preferences")
             retrieved_context = context.get("retrieved_context") or {}
+            memory_context = context.get("memory_context") or {}
 
             compressed_context = {
                 "task": planner_result.get("task_type", "image_generation"),
@@ -36,6 +37,8 @@ class PromptCompressor:
 
             retrieved_hints = self._compress_retrieved_context(retrieved_context)
             compressed_context.update(retrieved_hints)
+            memory_hints = self._compress_memory_context(memory_context)
+            compressed_context.update(memory_hints)
 
             print(
                 "[PromptCompressor] Compressed context keys: "
@@ -122,6 +125,45 @@ class PromptCompressor:
         if not keywords:
             return None
         return ", ".join(keywords)
+
+    def _compress_memory_context(self, memory_context):
+        if not isinstance(memory_context, dict):
+            return {}
+
+        hints = {}
+        memory_hint = memory_context.get("memory_hint")
+        memory_score = memory_context.get("memory_score") or 0.0
+        best_run = memory_context.get("best_run") or {}
+
+        if memory_hint and memory_hint != "no memory found":
+            hints["memory_hint"] = memory_hint
+
+        try:
+            memory_score = float(memory_score)
+        except (TypeError, ValueError):
+            memory_score = 0.0
+
+        if memory_score > 0:
+            hints["memory_similarity_hint"] = f"memory match {memory_score:.2f}"
+
+        best_score = self._extract_best_score(best_run)
+        if best_score is not None and best_score >= 0.75:
+            hints["memory_style_hint"] = "reuse successful visual style"
+
+        return hints
+
+    def _extract_best_score(self, run):
+        if not isinstance(run, dict):
+            return None
+        for key in ("best_score", "retry_score", "initial_score", "score"):
+            value = run.get(key)
+            if value is None:
+                continue
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+        return None
 
     def compress_prompt(
         self,

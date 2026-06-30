@@ -209,3 +209,11 @@
 - `PromptCompressor.compress_prompt()`를 추가해 retry prompt를 55 words 이하로 제한했습니다.
 - `DynamicExecutionEngine`은 `raw_suggested_prompt`를 보존하고, generation/evaluation에는 compressed `retry_prompt`를 사용하도록 수정했습니다.
 - memory save record에 raw suggested prompt와 compressed retry prompt를 구분해 저장하도록 업데이트했습니다.
+## Sprint 21: Semantic-like Memory Retrieval
+
+- `MemoryManager.search_similar_runs()`를 추가했습니다.
+- `MemoryManager.get_best_run()`과 `get_memory_context()`를 추가했습니다.
+- `DynamicExecutionEngine`이 `vision` 이후 `memory_retrieval` step을 자동 삽입하도록 변경했습니다.
+- `OrchestratorAgent`가 `memory_retrieval` tool을 registry에 등록하도록 변경했습니다.
+- `PromptCompressor`가 `memory_context`를 짧은 memory hint로 압축하도록 업데이트했습니다.
+- `PromptAgent`가 memory hint를 final prompt에 반영하도록 업데이트했습니다.

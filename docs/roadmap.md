@@ -181,3 +181,15 @@
 - Semantic Memory
 - RAG Style Library expansion
 - Vector DB adapter design
+## Sprint 21: Semantic-like Memory Retrieval - Done
+
+- JSON history 기반 keyword similarity search 추가
+- `memory_retrieval` step 추가
+- `memory_context`를 compressed prompt hint로 반영
+- Vector DB migration을 위한 MemoryManager interface 확장
+
+## Next Sprint Proposal
+
+- ChromaDB 기반 Semantic Memory
+- LLM Planner
+- typed state schema

@@ -30,6 +30,10 @@ class OrchestratorAgent:
 
     def _register_tools(self):
         self.registry.register("memory_load", self.memory_manager.load_last_run)
+        self.registry.register(
+            "memory_retrieval",
+            self.memory_manager.get_memory_context,
+        )
         self.registry.register("vision", self.vision_agent)
         self.registry.register("retrieval", self.retrieval_agent)
         self.registry.register("prompt_compressor", self.prompt_compressor)
@@ -75,6 +79,7 @@ class OrchestratorAgent:
             "best_score": final_state.get("best_score"),
             "history_path": final_state.get("history_path"),
             "last_run": final_state.get("last_run"),
+            "memory_context": final_state.get("memory_context"),
             "memory_saved": final_state.get("memory_saved", False),
             "planner_result": planner_result,
             "prompt_context": final_state.get("prompt_context"),

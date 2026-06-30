@@ -14,6 +14,101 @@ class MemoryManager:
             return None
         return history[-1]
 
+    def search_similar_runs(self, query: str, top_k: int = 1) -> list[dict]:
+        print("[Memory] Searching similar runs...")
+        history = self.get_history()
+        if not history:
+            return []
+
+        query_tokens = self._tokenize(query)
+        if not query_tokens:
+            return []
+
+        scored_runs = []
+        for run in history:
+            if not isinstance(run, dict):
+                continue
+
+            run_text = " ".join(
+                str(run.get(key) or "")
+                for key in (
+                    "caption",
+                    "initial_prompt",
+                    "best_prompt",
+                    "retry_prompt",
+                    "prompt",
+                )
+            )
+            run_tokens = self._tokenize(run_text)
+            similarity = self._jaccard_similarity(query_tokens, run_tokens)
+            if similarity <= 0:
+                continue
+
+            result = dict(run)
+            result["memory_similarity"] = similarity
+            scored_runs.append(result)
+
+        scored_runs.sort(key=lambda item: item.get("memory_similarity", 0), reverse=True)
+        matches = scored_runs[: max(1, top_k)]
+
+        for match in matches:
+            print(f"[Memory] Similar run score: {match.get('memory_similarity', 0):.2f}")
+
+        return matches
+
+    def get_best_run(self) -> dict | None:
+        history = self.get_history()
+        best_run = None
+        best_score = None
+
+        for run in history:
+            if not isinstance(run, dict):
+                continue
+
+            score = self._get_run_score(run)
+            if score is None:
+                continue
+
+            if best_score is None or score > best_score:
+                best_score = score
+                best_run = run
+
+        if best_score is not None:
+            print(f"[Memory] Best run score: {best_score:.2f}")
+        return dict(best_run) if best_run else None
+
+    def get_memory_context(self, query: str) -> dict:
+        try:
+            similar_runs = self.search_similar_runs(query, top_k=1)
+            best_run = self.get_best_run()
+            memory_score = (
+                similar_runs[0].get("memory_similarity", 0.0)
+                if similar_runs
+                else 0.0
+            )
+
+            if similar_runs:
+                memory_hint = "similar previous run found"
+            elif best_run:
+                memory_hint = "best previous run available"
+            else:
+                memory_hint = "no memory found"
+
+            return {
+                "similar_runs": similar_runs,
+                "best_run": best_run,
+                "memory_hint": memory_hint,
+                "memory_score": memory_score,
+            }
+        except Exception as error:
+            print(f"[Memory] Search failed: {error}")
+            return {
+                "similar_runs": [],
+                "best_run": None,
+                "memory_hint": "memory unavailable",
+                "memory_score": 0.0,
+            }
+
     def save_run(self, record: dict):
         if "initial_prompt" in record or "retry_prompt" in record:
             print("[Memory] Saving full retry record...")
@@ -52,6 +147,9 @@ class MemoryManager:
                 "reflection": record.get("reflection"),
                 "retry_needed": record.get("retry_needed"),
                 "retry_prompt": record.get("retry_prompt"),
+                "raw_suggested_prompt": record.get("raw_suggested_prompt"),
+                "evaluation_prompt": record.get("evaluation_prompt"),
+                "retry_evaluation_prompt": record.get("retry_evaluation_prompt"),
                 "retry_score": record.get("retry_score"),
                 "retry_output_image_path": record.get(
                     "retry_output_image_path"
@@ -95,6 +193,58 @@ class MemoryManager:
             json.dump([], file, ensure_ascii=False, indent=2)
         print("[Memory] History updated.")
         return str(self.history_path)
+
+    def _tokenize(self, text):
+        stopwords = {
+            "a",
+            "an",
+            "and",
+            "are",
+            "as",
+            "at",
+            "in",
+            "is",
+            "of",
+            "on",
+            "or",
+            "the",
+            "to",
+            "with",
+            "image",
+            "prompt",
+            "high",
+            "quality",
+            "detailed",
+            "user",
+            "request",
+        }
+        cleaned = []
+        for char in str(text or "").lower():
+            cleaned.append(char if char.isalnum() else " ")
+        return {
+            token
+            for token in "".join(cleaned).split()
+            if token and token not in stopwords
+        }
+
+    def _jaccard_similarity(self, left, right):
+        if not left or not right:
+            return 0.0
+        union = left | right
+        if not union:
+            return 0.0
+        return len(left & right) / len(union)
+
+    def _get_run_score(self, run):
+        for key in ("best_score", "retry_score", "initial_score", "score"):
+            value = run.get(key)
+            if value is None:
+                continue
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+        return None
 
 
 History = MemoryManager

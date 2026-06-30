@@ -300,3 +300,19 @@ A. RetrievalAgent는 지식을 찾고, PromptAgent는 압축된 context와 user 
 
 Q. 나중에 Vector DB로 어떻게 확장할 계획인가요?
 A. KnowledgeManager의 내부 구현을 JSON loader에서 ChromaDB, FAISS, Milvus adapter로 교체하고 RetrievalAgent interface는 유지할 수 있습니다.
+## Sprint 21 Interview Notes
+
+Q. Semantic Memory와 Episodic Memory의 차이는 무엇인가요?
+A. Episodic Memory는 실행 기록 자체이고, Semantic Memory는 현재 요청과 관련 있는 과거 지식을 검색해 활용하는 구조입니다.
+
+Q. 왜 memory_retrieval을 vision 이후에 실행하나요?
+A. caption이 있어야 이미지 내용과 user prompt를 결합한 더 좋은 검색 query를 만들 수 있기 때문입니다.
+
+Q. 왜 Vector DB를 바로 쓰지 않았나요?
+A. 먼저 memory retrieval interface와 workflow 위치를 검증하기 위해 JSON keyword similarity로 시작했습니다.
+
+Q. Memory 검색 결과를 prompt에 그대로 넣지 않는 이유는 무엇인가요?
+A. full history는 길고 noise가 많기 때문에 prompt budget을 초과할 수 있습니다. 그래서 짧은 memory hint만 사용합니다.
+
+Q. 이 구조를 ChromaDB로 어떻게 확장할 수 있나요?
+A. `MemoryManager.get_memory_context()` 내부 구현을 embedding search로 바꾸고 외부 interface는 유지하면 됩니다.

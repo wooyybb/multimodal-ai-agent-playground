@@ -85,3 +85,6 @@ PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 p
 ## Sprint 20 Meeting Log
 
 이번 Sprint에서는 Prompt 생성 과정에 내부 지식을 연결하기 위해 Knowledge Layer를 도입하기로 결정했습니다. Vector DB를 바로 붙이기보다 JSON Store와 KnowledgeManager를 먼저 만들고, RetrievalAgent가 이를 사용하는 구조를 채택했습니다.
+## Sprint 21 Meeting Log
+
+이번 Sprint에서는 MemoryManager를 단순 저장소에서 검색 가능한 memory layer로 확장하기로 결정했습니다. Vector DB는 도입하지 않고 JSON 기반 keyword similarity로 먼저 interface와 workflow 위치를 검증했습니다.

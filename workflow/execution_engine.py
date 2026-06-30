@@ -2,6 +2,7 @@ class DynamicExecutionEngine:
     DEFAULT_PLAN = [
         "memory_load",
         "vision",
+        "memory_retrieval",
         "retrieval",
         "prompt_compressor",
         "prompt",
@@ -17,7 +18,7 @@ class DynamicExecutionEngine:
 
         state = state or {}
         state.setdefault("agent_trace", [])
-        plan = execution_plan or self.DEFAULT_PLAN
+        plan = self._normalize_plan(execution_plan or self.DEFAULT_PLAN)
 
         for step in plan:
             print(f"[ExecutionEngine] Running step: {step}")
@@ -47,6 +48,20 @@ class DynamicExecutionEngine:
     def _run_vision(self, registry, state):
         state["caption"] = registry.call("vision", state.get("image"))
 
+    def _run_memory_retrieval(self, registry, state):
+        query = f"{state.get('caption', '')} {state.get('user_prompt', '')}".strip()
+        try:
+            state["memory_context"] = registry.call("memory_retrieval", query)
+            print("[ExecutionEngine] Memory context added.")
+        except Exception as error:
+            print(f"[ExecutionEngine] Memory retrieval failed: {error}")
+            state["memory_context"] = {
+                "similar_runs": [],
+                "best_run": None,
+                "memory_hint": "memory unavailable",
+                "memory_score": 0.0,
+            }
+
     def _run_retrieval(self, registry, state):
         state["retrieved_context"] = registry.call(
             "retrieval",
@@ -60,6 +75,7 @@ class DynamicExecutionEngine:
             "planner_result": state.get("planner_result"),
             "last_run": last_run,
             "retrieved_context": state.get("retrieved_context", {}),
+            "memory_context": state.get("memory_context", {}),
             "retry_history": state.get("retry_history", []),
             "style_preferences": state.get("style_preferences"),
             "previous_best_prompt": (
@@ -262,3 +278,13 @@ class DynamicExecutionEngine:
         word_count = len(evaluation_prompt.split())
         print(f"[ExecutionEngine] {label} prompt word count: {word_count}")
         return evaluation_prompt
+
+    def _normalize_plan(self, plan):
+        normalized = list(plan)
+        if "memory_retrieval" in normalized:
+            return normalized
+
+        if "vision" in normalized:
+            insert_at = normalized.index("vision") + 1
+            normalized.insert(insert_at, "memory_retrieval")
+        return normalized

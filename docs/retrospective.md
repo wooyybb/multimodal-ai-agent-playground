@@ -253,3 +253,18 @@
 ### 다음 Sprint
 
 - Semantic Memory 또는 Vector DB adapter를 검토합니다.
+## Sprint 21 Retrospective
+
+### 잘된 점
+
+- Memory retrieval interface를 만들었습니다.
+- PlannerAgent를 수정하지 않고 ExecutionEngine에서 step을 자동 삽입했습니다.
+- full history를 prompt에 넣지 않고 짧은 hint만 사용했습니다.
+
+### 아쉬운 점
+
+- keyword similarity는 의미적 유사도를 충분히 반영하지 못합니다.
+
+### 다음 Sprint
+
+- ChromaDB 또는 embedding 기반 semantic memory로 확장합니다.

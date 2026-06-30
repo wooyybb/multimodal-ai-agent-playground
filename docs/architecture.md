@@ -242,3 +242,19 @@ PlannerAgent
 `KnowledgeManager`는 JSON Knowledge Store를 로드하는 interface입니다. `RetrievalAgent`는 caption과 user prompt를 분석해 style, lighting, composition, quality, negative prompt rule을 검색합니다. 검색된 결과는 `retrieved_context`로 state에 저장되고, `PromptCompressor`가 중요한 keyword만 `compressed_context`에 병합합니다.
 
 이번 Sprint에서는 Vector DB를 사용하지 않습니다. RAG의 핵심인 Retrieval과 Augmentation 책임 분리를 먼저 구현하고, 향후 ChromaDB, FAISS, Milvus 같은 storage layer로 확장할 수 있게 설계했습니다.
+## Semantic-like Memory Retrieval
+
+Sprint 21에서는 `MemoryManager`를 단순 저장소에서 검색 가능한 memory layer로 확장했습니다.
+
+```text
+VisionAgent
+-> caption
+-> MemoryManager.search_similar_runs(caption + user_prompt)
+-> memory_context
+-> PromptCompressor
+-> PromptAgent
+```
+
+`memory_retrieval` step은 `vision` 이후에 실행됩니다. caption이 생성된 뒤에야 현재 이미지 내용과 user prompt를 결합한 query를 만들 수 있기 때문입니다. 검색 결과는 full history가 아니라 `memory_hint`, `memory_score`, `best_run` 요약 신호로 `PromptCompressor`에 전달됩니다.
+
+현재는 Vector DB 없이 JSON history 기반 keyword similarity를 사용합니다. 향후 ChromaDB, FAISS, embedding search로 교체할 수 있도록 `MemoryManager.get_memory_context()` interface를 별도로 유지합니다.

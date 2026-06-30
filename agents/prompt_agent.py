@@ -56,6 +56,9 @@ class PromptAgent:
             "retrieved_composition_hint",
             "retrieved_quality_hint",
             "negative_prompt_hint",
+            "memory_hint",
+            "memory_similarity_hint",
+            "memory_style_hint",
         ):
             value = compressed_context.get(key)
             if value:

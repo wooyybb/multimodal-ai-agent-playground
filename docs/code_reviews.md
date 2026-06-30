@@ -160,3 +160,10 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - 해결: `DynamicExecutionEngine._run_retry()`에서 `raw_suggested_prompt`를 저장한 뒤 `PromptCompressor.compress_prompt()`로 55 words 이하의 `retry_prompt`를 생성하도록 변경했습니다.
 - 교훈: initial prompt뿐 아니라 retry, reflection, memory에서 재사용되는 모든 prompt 경로에도 동일한 token budget policy가 적용되어야 합니다.
 - 남은 리스크: 현재 제한은 word count 기반이므로, 향후 CLIP tokenizer 기반 token budget manager로 개선할 수 있습니다.
+## Sprint 21 Code Review
+
+- MemoryManager가 저장뿐 아니라 검색 interface를 제공합니다.
+- keyword similarity는 stopword removal과 Jaccard similarity로 단순하게 구현되었습니다.
+- `memory_retrieval`은 `vision` 이후 자동 삽입되어 PlannerAgent 수정 없이 실행됩니다.
+- PromptCompressor는 similar run 전체를 prompt에 넣지 않고 짧은 memory hint만 반영합니다.
+- 남은 리스크: keyword overlap은 semantic nuance를 잘 포착하지 못하므로 향후 embedding search가 필요합니다.
