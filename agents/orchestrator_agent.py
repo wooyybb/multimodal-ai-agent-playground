@@ -6,6 +6,7 @@ from agents.reflection_agent import ReflectionAgent
 from agents.retry_agent import RetryAgent
 from agents.vision_agent import VisionAgent
 from memory.history import MemoryManager
+from registry import ToolRegistry
 
 
 class OrchestratorAgent:
@@ -18,6 +19,18 @@ class OrchestratorAgent:
         self.reflection_agent = ReflectionAgent()
         self.retry_agent = RetryAgent()
         self.memory_manager = MemoryManager()
+        self.registry = ToolRegistry()
+        self._register_tools()
+
+    def _register_tools(self):
+        self.registry.register("memory_load", self.memory_manager.load_last_run)
+        self.registry.register("vision", self.vision_agent)
+        self.registry.register("prompt", self.prompt_agent)
+        self.registry.register("generation", self.generation_agent)
+        self.registry.register("evaluation", self.evaluation_agent)
+        self.registry.register("reflection", self.reflection_agent)
+        self.registry.register("retry", self.retry_agent.should_retry)
+        self.registry.register("memory_save", self.memory_manager.save_run)
 
     def run(self, image, user_prompt):
         print("[OrchestratorAgent] Starting multi-agent workflow...")
@@ -25,25 +38,27 @@ class OrchestratorAgent:
             user_prompt=user_prompt,
             image_provided=image is not None,
         )
-        last_run = self.memory_manager.load_last_run()
+        last_run = self.registry.call("memory_load")
 
-        caption = self.vision_agent.run(image)
-        final_prompt = self.prompt_agent.run(caption, user_prompt)
+        caption = self.registry.call("vision", image)
+        final_prompt = self.registry.call("prompt", caption, user_prompt)
         print("[OrchestratorAgent] Initial attempt started.")
-        output_image_path = self.generation_agent.run(final_prompt)
-        score = self.evaluation_agent.run(image, output_image_path, final_prompt)
-        reflection_result = self.reflection_agent.run(caption, final_prompt, score)
-        retry_needed = self.retry_agent.should_retry(score)
+        output_image_path = self.registry.call("generation", final_prompt)
+        score = self.registry.call("evaluation", image, output_image_path, final_prompt)
+        reflection_result = self.registry.call("reflection", caption, final_prompt, score)
+        retry_needed = self.registry.call("retry", score)
 
         retry_output_image_path = None
         retry_score = None
 
         if retry_needed:
             print("[OrchestratorAgent] Retry needed. Starting second attempt.")
-            retry_output_image_path = self.generation_agent.run(
+            retry_output_image_path = self.registry.call(
+                "generation",
                 reflection_result["suggested_prompt"]
             )
-            retry_score = self.evaluation_agent.run(
+            retry_score = self.registry.call(
+                "evaluation",
                 image,
                 retry_output_image_path,
                 reflection_result["suggested_prompt"],
@@ -64,7 +79,8 @@ class OrchestratorAgent:
         memory_saved = False
         history_path = None
         try:
-            history_path = self.memory_manager.save_run(
+            history_path = self.registry.call(
+                "memory_save",
                 {
                     "caption": caption,
                     "initial_prompt": final_prompt,
@@ -108,18 +124,18 @@ class OrchestratorAgent:
             "planner_result": planner_result,
             "agent_trace": [
                 "PlannerAgent generated execution plan",
-                "MemoryManager loaded last run",
-                "VisionAgent generated caption",
-                "PromptAgent generated final prompt",
-                "GenerationAgent generated mock image",
-                "EvaluationAgent generated mock score",
-                "ReflectionAgent generated reflection",
-                "RetryAgent decided retry status",
+                "ToolRegistry called memory_load",
+                "ToolRegistry called vision",
+                "ToolRegistry called prompt",
+                "ToolRegistry called generation",
+                "ToolRegistry called evaluation",
+                "ToolRegistry called reflection",
+                "ToolRegistry called retry",
                 "OrchestratorAgent selected best result",
                 (
-                    "MemoryManager saved run history"
+                    "ToolRegistry called memory_save"
                     if memory_saved
-                    else "MemoryManager save skipped after error"
+                    else "ToolRegistry memory_save skipped after error"
                 ),
             ],
         }

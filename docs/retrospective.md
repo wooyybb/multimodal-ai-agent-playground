@@ -170,3 +170,22 @@
 - execution_plan 기반 conditional execution 검토
 - LLM-based planning 실험
 - plan과 실제 agent_trace를 비교하는 validation 추가
+
+## Sprint 16 Retrospective
+
+### 잘된 점
+
+- ToolRegistry를 도입해 Orchestrator와 Agent 호출 사이의 결합도를 낮췄습니다.
+- Planner execution plan 이름과 registry tool 이름을 맞춰 future dynamic engine 기반을 만들었습니다.
+- 기존 E2E workflow를 유지했습니다.
+
+### 아쉬운 점
+
+- 아직 execution_plan을 loop로 실행하지는 않습니다.
+- 각 tool의 argument schema는 명시적으로 관리하지 않습니다.
+
+### 다음 Sprint
+
+- Context Engineering
+- execution_plan 기반 dynamic execution
+- tool argument schema와 validation 추가

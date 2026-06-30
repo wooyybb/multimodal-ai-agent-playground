@@ -64,3 +64,9 @@ Evaluation -> Reflection -> Retry Decision -> Memory
 이번 논의에서는 fixed workflow 위에 planning layer를 추가하기로 결정했습니다.
 
 PlannerAgent는 user prompt와 image 제공 여부를 바탕으로 execution plan을 만들고, OrchestratorAgent는 기존 workflow를 유지하면서 planner_result를 기록합니다. dynamic execution engine은 다음 단계로 미뤘습니다.
+
+## 2026-06-30 Sprint 16 ToolRegistry
+
+이번 논의에서는 Orchestrator가 Agent를 직접 호출하는 구조를 registry 기반 호출 구조로 확장하기로 결정했습니다.
+
+ToolRegistry는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save`를 이름으로 등록하고 호출합니다. 완전한 dynamic execution engine은 다음 단계로 미뤘습니다.

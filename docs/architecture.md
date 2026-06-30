@@ -151,3 +151,24 @@ User
 ```
 
 현재 `PlannerAgent`는 rule-based planner입니다. `image_provided`와 `user_prompt`를 기준으로 `execution_plan`, `task_type`, `reason`을 생성합니다. 이번 Sprint에서는 계획을 실제 dynamic execution engine으로 실행하지 않고, 기존 workflow를 유지하면서 plan을 기록합니다.
+
+## ToolRegistry
+
+Sprint 16에서는 `OrchestratorAgent`와 각 Agent 호출 사이에 `ToolRegistry`를 추가했습니다.
+
+```text
+PlannerAgent
+-> Execution Plan
+-> OrchestratorAgent
+-> ToolRegistry
+   -> memory_load
+   -> vision
+   -> prompt
+   -> generation
+   -> evaluation
+   -> reflection
+   -> retry
+   -> memory_save
+```
+
+이번 Sprint의 목표는 완전한 dynamic execution engine이 아니라 registry 기반 호출 구조를 도입하는 것입니다. Orchestrator는 기존 workflow 순서를 유지하지만 각 단계 호출을 `registry.call(...)`로 감싸 Agent/Tool 호출 책임을 중앙화했습니다.

@@ -110,3 +110,12 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - OrchestratorAgent는 기존 fixed workflow를 유지하면서 planner_result를 기록합니다.
 - 현재 plan은 dynamic execution에 사용되지 않으므로, plan과 실제 실행 흐름이 어긋나지 않도록 향후 validation이 필요합니다.
 - LLM planner 도입 전 rule-based planner로 시작한 점은 디버깅과 설명 가능성 측면에서 적절합니다.
+
+## Sprint 16 ToolRegistry Review
+
+### Findings
+
+- `ToolRegistry.call()`은 run method가 있으면 `run()`을 호출하고, callable이면 직접 호출합니다.
+- 등록되지 않은 tool name은 `ValueError`를 발생시켜 실패 원인이 명확합니다.
+- Orchestrator는 기존 순서를 유지하되 registry 호출로 감싸 결합도를 낮췄습니다.
+- 아직 plan을 for-loop로 실행하지 않으므로 dynamic execution validation은 다음 Sprint 과제입니다.

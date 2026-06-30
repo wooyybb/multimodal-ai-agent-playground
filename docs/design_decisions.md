@@ -145,3 +145,17 @@ PlannerAgent는 "무엇을 할지"를 계획하고, OrchestratorAgent는 "어떻
 동적 실행 엔진은 conditional branch, skipped step, dependency management, failure handling을 함께 설계해야 합니다. 한 번에 도입하면 기존 E2E 안정성이 흔들릴 수 있습니다.
 
 이번 Sprint는 plan 생성과 기록을 먼저 도입하고, 다음 단계에서 execution plan 기반 동적 실행으로 확장할 수 있게 준비하는 단계입니다.
+
+## 왜 Orchestrator가 Agent를 직접 호출하지 않고 ToolRegistry를 사용하게 했는가
+
+Agent와 Tool이 늘어날수록 Orchestrator가 모든 구현 객체를 직접 알고 호출하는 구조는 결합도가 높아집니다. `ToolRegistry`를 두면 Orchestrator는 이름 기반 호출을 사용하고, 실제 callable 관리 책임은 Registry가 담당합니다.
+
+이 구조는 Dependency Inversion과 Open-Closed Principle을 학습하기에 적합합니다. 새 tool을 추가할 때 Orchestrator 내부 로직을 크게 바꾸지 않고 registry 등록을 확장할 수 있습니다.
+
+## 왜 이번 Sprint에서 완전한 Dynamic Execution Engine까지 구현하지 않았는가
+
+Planner의 execution plan을 for-loop로 실행하는 dynamic engine은 branch, skipped step, argument passing, error recovery를 함께 다뤄야 합니다. 이번 Sprint에서는 기존 E2E 안정성을 유지하면서 registry 기반 호출 구조만 도입했습니다.
+
+## 왜 Tool 이름을 Planner execution_plan과 맞췄는가
+
+Planner가 생성한 plan step과 Registry에 등록된 tool name이 같아야 향후 dynamic execution engine으로 자연스럽게 확장할 수 있습니다. 이번 Sprint에서는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save` 이름을 맞췄습니다.

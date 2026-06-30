@@ -118,3 +118,16 @@
 - `docs/sprint_book/`에 Sprint00~Sprint14 문서 생성
 - Sprint Book README에 project vision, phase, sprint index, architecture evolution 정리
 - 향후 모든 Sprint를 같은 형식으로 문서화하는 기반 마련
+
+## Sprint 16: Tool Registry & Tool Calling - Done
+
+- `ToolRegistry` 구현
+- OrchestratorAgent 내부 Agent/Memory 호출을 registry 기반으로 감싸기
+- Planner execution_plan step 이름과 registry tool 이름 정렬
+- 기존 E2E workflow 유지
+
+## Next Sprint Proposal
+
+- Context Engineering
+- Dynamic Execution Engine
+- LLM-based tool selection

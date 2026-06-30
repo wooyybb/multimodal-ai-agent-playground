@@ -109,3 +109,9 @@ Allowed files와 forbidden files를 분리해 tools와 requirements를 건드리
 Sprint 15 prompt는 Planner와 Orchestrator의 책임 분리를 명확히 하기 위한 Architecture Prompt입니다.
 
 핵심 제약은 `PlannerAgent`가 계획만 만들고, `OrchestratorAgent`가 기존 workflow를 계속 실행한다는 점입니다. 또한 dynamic execution engine을 이번 Sprint 범위에서 제외해 E2E 안정성을 유지했습니다.
+
+## Sprint 16 ToolRegistry Prompt
+
+Sprint 16 prompt는 architecture-changing task에서 수정 가능한 파일과 금지 파일을 분리해 기존 E2E 동작을 보호했습니다.
+
+특히 Tool 이름과 Planner execution_plan 이름을 맞추도록 명시해 향후 dynamic execution engine으로 확장할 기반을 만들었습니다. 동시에 이번 Sprint에서는 완전한 dynamic engine을 금지해 registry 기반 호출 구조만 안전하게 도입했습니다.

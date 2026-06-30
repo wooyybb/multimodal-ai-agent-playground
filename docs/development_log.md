@@ -160,3 +160,11 @@
 - 각 Sprint 문서는 Objective, Background, Problem, Design Decision, Architecture, Implementation Summary, AI Agent Concept, Prompt Engineering Note, Codex Usage, Debugging Experience, Interview Talking Points, Lessons Learned, Future Work 형식을 따릅니다.
 - Sprint Book README에 project vision, phase, sprint index, architecture evolution, learning journey, interview usage를 정리했습니다.
 - 앞으로 Sprint -> Code -> Documentation -> Interview Notes -> Retrospective -> Prompt Archive -> Commit 흐름을 반복 가능한 문서화 프로세스로 관리할 수 있게 했습니다.
+
+### Sprint 16 Tool Registry
+
+- `registry/` 패키지를 추가했습니다.
+- `ToolRegistry`에 `register`, `call`, `list_tools`, `has_tool` 메서드를 구현했습니다.
+- `OrchestratorAgent`가 기존 Agent와 MemoryManager 호출을 registry에 등록하도록 변경했습니다.
+- 기존 workflow 순서는 유지하되 각 단계 호출을 `registry.call(...)`로 감쌌습니다.
+- agent trace에 ToolRegistry 호출 단계를 기록하도록 수정했습니다.
