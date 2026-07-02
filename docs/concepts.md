@@ -357,3 +357,28 @@ Camera Planning decides view direction and scale such as eye-level, close-up, me
 ### Prompt Layout Design
 
 Prompt Layout Design converts visual structure plans into prompt phrases that image models can follow.
+## Sprint25 Concepts
+
+### Scene Planning
+
+Scene Planning interprets user intent as a visual situation before prompt assembly.
+
+### Scene Graph
+
+Scene Graph is a future extension where characters, relationships, actions, and objects are represented as connected nodes.
+
+### Intent Parsing
+
+Intent Parsing extracts scene type, emotion, relationship, interaction, and camera intent from natural language.
+
+### Visual Narrative Planning
+
+Visual Narrative Planning defines what story or moment the generated image should communicate.
+
+### Structured Intermediate Representation
+
+A structured intermediate representation sits between user prompt and generation prompt so downstream agents share the same plan.
+
+### Scene Plan vs Layout Plan
+
+Scene Plan describes what is happening. Layout Plan describes how it is arranged visually.

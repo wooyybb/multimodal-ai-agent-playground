@@ -1,9 +1,15 @@
 class LayoutAgent:
-    def run(self, user_prompt: str, planner_result: dict | None = None) -> dict:
+    def run(
+        self,
+        user_prompt: str,
+        planner_result: dict | None = None,
+        scene_plan: dict | None = None,
+    ) -> dict:
         print("[LayoutAgent] Planning layout...")
         text = str(user_prompt or "").lower()
-        layout_type = self._detect_layout_type(text)
-        camera_view = self._detect_camera_view(text)
+        scene_plan = scene_plan or {}
+        layout_type = self._layout_from_scene(scene_plan) or self._detect_layout_type(text)
+        camera_view = self._camera_from_scene(scene_plan) or self._detect_camera_view(text)
         subject_placement = self._detect_subject_placement(text)
 
         plan = {
@@ -45,6 +51,27 @@ class LayoutAgent:
             return "sticker_sheet"
         return "illustration"
 
+    def _layout_from_scene(self, scene_plan):
+        mapping = {
+            "photobooth_memory": "photobooth",
+            "profile_portrait": "portrait",
+            "poster_illustration": "poster",
+            "sticker_sheet": "sticker_sheet",
+            "action_scene": "cinematic",
+            "illustration_scene": "illustration",
+        }
+        return mapping.get(scene_plan.get("scene_type"))
+
+    def _camera_from_scene(self, scene_plan):
+        scene_type = scene_plan.get("scene_type")
+        if scene_type == "photobooth_memory":
+            return "eye_level"
+        if scene_type == "profile_portrait":
+            return "medium"
+        if scene_type == "action_scene":
+            return "wide"
+        return None
+
     def _detect_camera_view(self, text):
         camera_options = (
             "front",
@@ -83,7 +110,7 @@ class LayoutAgent:
 
     def _aspect_ratio(self, layout_type, text):
         if "vertical" in text or layout_type in ("photobooth", "portrait", "poster"):
-            return "vertical"
+            return "vertical 9:16" if layout_type == "photobooth" else "vertical"
         if layout_type in ("comic_page", "scrapbook"):
             return "page layout"
         if layout_type == "cinematic":

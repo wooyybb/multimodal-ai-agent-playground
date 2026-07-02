@@ -9,12 +9,16 @@ class PromptAssembler:
         pose_section,
         expression_section,
         negative_section,
+        scene_plan=None,
         compressed_context=None,
     ) -> dict:
         print("[PromptAssembler] Building generation prompt...")
         print("[PromptAssembler] Adding character preservation rules...")
+        if scene_plan:
+            print("[PromptAssembler] Adding scene plan...")
 
         character_bits = self._character_prompt_bits(character_section, caption)
+        scene_bits = self._scene_prompt_bits(scene_plan)
         style_bits = (style_section or {}).get("style_keywords", [])
         rendering_bits = (style_section or {}).get("rendering_rules", [])
         layout_bits = self._layout_prompt_bits(layout_section)
@@ -26,6 +30,7 @@ class PromptAssembler:
         parts = [
             "high quality",
             f"detailed image of {caption}",
+            ", ".join(scene_bits),
             ", ".join(character_bits),
             ", ".join(style_bits),
             ", ".join(rendering_bits),
@@ -50,6 +55,7 @@ class PromptAssembler:
                 "layout": layout_section,
                 "pose": pose_section,
                 "expression": expression_section,
+                "scene": scene_plan,
             },
         }
         print(f"[PromptAssembler] Generation prompt: {generation_prompt}")
@@ -164,3 +170,12 @@ class PromptAssembler:
         recognizable = "keep each character immediately recognizable from the reference"
 
         return [intro, ", ".join(caption_hints[:3]), preservation, recognizable]
+
+    def _scene_prompt_bits(self, scene_plan):
+        if not scene_plan:
+            return []
+        narrative = scene_plan.get("narrative")
+        camera_intent = scene_plan.get("camera_intent")
+        scene_rules = scene_plan.get("scene_rules") or []
+        bits = [narrative, camera_intent, ", ".join(scene_rules[:3])]
+        return [bit for bit in bits if bit]

@@ -238,3 +238,15 @@
 - Photobooth Layout Agent
 - Composition evaluator
 - Multi-image UI layout mapping
+## Sprint25: Scene Planning Agent - Done
+
+- ScenePlanningAgent added
+- scene_plan state added
+- Layout/Pose/Expression agents reflect scene_plan
+- PromptAssembler reflects scene narrative and rules
+
+## Next Sprint Proposal
+
+- Character Relationship Agent
+- Provider-specific Prompt Adapter
+- LLM-based Scene Planner

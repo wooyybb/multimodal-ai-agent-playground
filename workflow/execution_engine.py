@@ -5,6 +5,7 @@ class DynamicExecutionEngine:
         "memory_retrieval",
             "retrieval",
             "prompt_compressor",
+            "scene_planning",
             "character",
             "style",
             "layout",
@@ -119,6 +120,15 @@ class DynamicExecutionEngine:
             label="evaluation",
         )
 
+    def _run_scene_planning(self, registry, state):
+        state["scene_plan"] = registry.call(
+            "scene_planning",
+            state.get("user_prompt", ""),
+            caption=state.get("caption"),
+            planner_result=state.get("planner_result"),
+        )
+        state["agent_trace"].append("ScenePlanningAgent created scene plan")
+
     def _run_character(self, registry, state):
         state["character_section"] = registry.call(
             "character",
@@ -139,6 +149,7 @@ class DynamicExecutionEngine:
             "layout",
             state.get("user_prompt", ""),
             planner_result=state.get("planner_result", {}),
+            scene_plan=state.get("scene_plan"),
         )
 
     def _run_pose(self, registry, state):
@@ -146,12 +157,14 @@ class DynamicExecutionEngine:
             "pose",
             state.get("user_prompt", ""),
             character_section=state.get("character_section", {}),
+            scene_plan=state.get("scene_plan"),
         )
 
     def _run_expression(self, registry, state):
         state["expression_section"] = registry.call(
             "expression",
             state.get("user_prompt", ""),
+            scene_plan=state.get("scene_plan"),
         )
 
     def _run_lighting(self, registry, state):
@@ -179,6 +192,7 @@ class DynamicExecutionEngine:
             state.get("pose_section", {}),
             state.get("expression_section", {}),
             state.get("negative_section", {}),
+            scene_plan=state.get("scene_plan"),
             compressed_context=state.get("compressed_context", {}),
         )
         state["final_prompt"] = self._compress_prompt(

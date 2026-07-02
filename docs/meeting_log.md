@@ -100,3 +100,6 @@ The project generalized the goal of multi-character reference-based style transf
 ## Sprint24 Meeting Log
 
 The project decided to treat layout as a planning problem rather than a keyword selection problem. LayoutAgent now owns composition planning and PromptAssembler owns prompt conversion.
+## Sprint25 Meeting Log
+
+The project reframed image generation from prompt writing to scene planning. The team chose to add ScenePlanningAgent as a structured interpretation layer before layout, pose, expression, and prompt assembly.

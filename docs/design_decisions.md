@@ -281,3 +281,16 @@ Layout affects camera, frame, subject placement, and cropping. Treating it as a 
 ### Why convert Layout Plan in PromptAssembler?
 
 LayoutAgent should plan visual structure. PromptAssembler should translate that structure into final generation prompt language.
+## Sprint25 Decisions
+
+### Why separate ScenePlanningAgent from LayoutAgent?
+
+Scene Planning answers what situation is happening. Layout Planning answers how that situation is visually arranged. These are related but different responsibilities.
+
+### Why start rule-based?
+
+Rule-based scene planning is predictable and easy to debug. It creates a stable schema before introducing an LLM planner.
+
+### Why use Scene Plan as structured intermediate representation?
+
+Scene Plan lets Layout, Pose, Expression, and PromptAssembler share one interpretation of user intent.

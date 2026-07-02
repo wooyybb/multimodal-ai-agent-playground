@@ -138,3 +138,6 @@ Codex was guided with a schema-first prompt: build multi-character handling befo
 ## Sprint24 AI Usage
 
 Codex was used to refactor LayoutAgent into a structured composition planner while preserving the existing workflow and generation/evaluation interfaces.
+## Sprint25 AI Usage
+
+Codex에는 scene_plan schema와 downstream agent 반영 조건을 명시했습니다. 이를 통해 ScenePlanningAgent가 단순 추가 파일이 아니라 Layout/Pose/Expression/PromptAssembler에 연결되도록 구현했습니다.

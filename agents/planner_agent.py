@@ -7,6 +7,7 @@ class PlannerAgent:
             "vision",
             "retrieval",
             "prompt_compressor",
+            "scene_planning",
             "character",
             "style",
             "layout",

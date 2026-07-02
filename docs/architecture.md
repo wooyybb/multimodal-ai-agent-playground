@@ -318,3 +318,17 @@ User intent
 ```
 
 The Layout Plan includes `layout_type`, `aspect_ratio`, `frame_structure`, `camera_view`, `subject_placement`, `background_style`, and `composition_rules`. PromptAssembler converts this plan into image-generation prompt phrases instead of copying raw keywords.
+## Sprint25 Scene Planning
+
+Sprint25 adds `ScenePlanningAgent` between Planner and prompt section agents.
+
+```text
+User Prompt
+-> PlannerAgent
+-> ScenePlanningAgent
+-> Scene Plan
+-> LayoutAgent / PoseAgent / ExpressionAgent
+-> PromptAssembler
+```
+
+The Scene Plan captures `scene_type`, `emotion`, `relationship`, `interaction`, `energy`, `narrative`, `camera_intent`, `scene_rules`, and `avoid`. Downstream agents use this plan without copying the full structure into the prompt.

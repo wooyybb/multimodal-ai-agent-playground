@@ -192,3 +192,10 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - PromptAssembler converts layout fields into generation prompt phrases.
 - Existing workflow and agent interfaces are preserved.
 - Remaining risk: layout detection is rule-based and may need richer routing later.
+## Sprint25 Code Review
+
+- ScenePlanningAgent produces a stable scene_plan schema.
+- ExecutionEngine stores `state["scene_plan"]`.
+- Layout/Pose/Expression remain backward compatible when scene_plan is None.
+- PromptAssembler uses narrative and selected scene rules only, avoiding full plan dumping.
+- Remaining risk: scene parsing is rule-based and will need richer intent handling later.

@@ -13,6 +13,7 @@ from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
 from agents.retrieval_agent import RetrievalAgent
 from agents.retry_agent import RetryAgent
+from agents.scene_planning_agent import ScenePlanningAgent
 from agents.vision_agent import VisionAgent
 from agents.style_agent import StyleAgent
 from memory.history import MemoryManager
@@ -31,6 +32,7 @@ class OrchestratorAgent:
         self.lighting_agent = LightingAgent()
         self.negative_prompt_agent = NegativePromptAgent()
         self.prompt_assembler = PromptAssembler()
+        self.scene_planning_agent = ScenePlanningAgent()
         self.prompt_compressor = PromptCompressor()
         self.retrieval_agent = RetrievalAgent()
         self.vision_agent = VisionAgent()
@@ -53,6 +55,7 @@ class OrchestratorAgent:
         self.registry.register("vision", self.vision_agent)
         self.registry.register("retrieval", self.retrieval_agent)
         self.registry.register("prompt_compressor", self.prompt_compressor)
+        self.registry.register("scene_planning", self.scene_planning_agent)
         self.registry.register("character", self.character_agent)
         self.registry.register("style", self.style_agent)
         self.registry.register("layout", self.layout_agent)
@@ -109,6 +112,7 @@ class OrchestratorAgent:
             "prompt_context": final_state.get("prompt_context"),
             "retrieved_context": final_state.get("retrieved_context"),
             "compressed_context": final_state.get("compressed_context"),
+            "scene_plan": final_state.get("scene_plan"),
             "character_section": final_state.get("character_section"),
             "style_section": final_state.get("style_section"),
             "layout_section": final_state.get("layout_section"),

@@ -244,3 +244,12 @@
 - Added layout type detection for photobooth, scrapbook, poster, profile, portrait, illustration, sticker sheet, concept sheet, comic page, and cinematic layouts.
 - Added camera view, subject placement, background style, and composition rules.
 - Updated `PromptAssembler` to convert Layout Plan into generation prompt phrases.
+## Sprint25: Scene Planning Agent
+
+- Added `ScenePlanningAgent`.
+- Added `scene_planning` step to Planner and ExecutionEngine.
+- Orchestrator registers `scene_planning`.
+- LayoutAgent reflects scene_type and camera intent.
+- PoseAgent reflects relationship, interaction, and energy.
+- ExpressionAgent reflects scene emotion.
+- PromptAssembler adds compact scene narrative and scene rules.

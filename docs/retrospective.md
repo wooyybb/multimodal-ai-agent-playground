@@ -318,3 +318,14 @@
 ### 다음 Sprint
 
 - Photobooth-specific layout templates or composition evaluation.
+## Sprint25 Retrospective
+
+### 잘된 점
+
+- Scene-level intent is now explicit.
+- Downstream agents can share the same scene interpretation.
+- Existing workflow remains intact.
+
+### 다음 Sprint
+
+- Character relationship modeling or provider-specific prompt adapters.

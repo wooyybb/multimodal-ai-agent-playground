@@ -151,3 +151,6 @@ Character preservation prompt is decomposed into structured character schema and
 ## Sprint24 Prompt Engineering
 
 Layout prompt는 단순히 `photobooth`나 `vertical`을 붙이는 방식에서 벗어나 frame structure, camera view, subject placement, background style, composition rules로 분해했습니다.
+## Sprint25 Prompt Engineering
+
+이번 Sprint는 사용자 자연어를 바로 prompt로 만들지 않고 Scene Plan이라는 중간 표현으로 변환합니다. 이 방식은 prompt를 더 구조적으로 만들고, Layout/Pose/Expression agent가 같은 장면 해석을 공유하게 합니다.
