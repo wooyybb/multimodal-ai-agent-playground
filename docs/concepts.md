@@ -382,3 +382,20 @@ A structured intermediate representation sits between user prompt and generation
 ### Scene Plan vs Layout Plan
 
 Scene Plan describes what is happening. Layout Plan describes how it is arranged visually.
+## Sprint26 Concepts
+
+### Adapter Pattern
+
+Adapter Pattern converts one stable interface into provider-specific formats.
+
+### Canonical Prompt
+
+Canonical Prompt is the provider-neutral generation intent created by PromptAssembler.
+
+### Provider-specific Prompt
+
+Provider-specific Prompt is optimized for one image generation model or provider.
+
+### Model-specific Prompt Optimization
+
+Model-specific Prompt Optimization adjusts length, wording, negative prompt handling, and instruction style for each provider.

@@ -253,3 +253,11 @@
 - PoseAgent reflects relationship, interaction, and energy.
 - ExpressionAgent reflects scene emotion.
 - PromptAssembler adds compact scene narrative and scene rules.
+## Sprint26: Provider Prompt Adapter
+
+- Added `ProviderPromptAdapter`.
+- Added `canonical_prompt` to PromptAssembler output.
+- Added `provider_prompt_adapter` step to Planner and ExecutionEngine.
+- Registered provider adapter in Orchestrator.
+- FLUX provider prompt is now used as `final_prompt` for GenerationAgent.
+- GPT Image and SDXL adapter skeletons were added.

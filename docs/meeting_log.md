@@ -103,3 +103,6 @@ The project decided to treat layout as a planning problem rather than a keyword 
 ## Sprint25 Meeting Log
 
 The project reframed image generation from prompt writing to scene planning. The team chose to add ScenePlanningAgent as a structured interpretation layer before layout, pose, expression, and prompt assembly.
+## Sprint26 Meeting Log
+
+The project decided to avoid sending one canonical prompt directly to every image provider. Provider-specific adaptation was separated into ProviderPromptAdapter.

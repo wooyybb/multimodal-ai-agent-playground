@@ -329,3 +329,14 @@
 ### 다음 Sprint
 
 - Character relationship modeling or provider-specific prompt adapters.
+## Sprint26 Retrospective
+
+### 잘된 점
+
+- Canonical prompt and provider prompt are now separated.
+- FLUX adapter is connected without changing GenerationAgent.
+- GPT Image and SDXL extension points exist.
+
+### 다음 Sprint
+
+- Provider routing or multi-provider evaluation.

@@ -332,3 +332,16 @@ User Prompt
 ```
 
 The Scene Plan captures `scene_type`, `emotion`, `relationship`, `interaction`, `energy`, `narrative`, `camera_intent`, `scene_rules`, and `avoid`. Downstream agents use this plan without copying the full structure into the prompt.
+## Sprint26 Provider Prompt Adapter
+
+Sprint26 separates canonical prompt from provider-specific prompt.
+
+```text
+PromptAssembler
+-> canonical_prompt
+-> ProviderPromptAdapter
+-> provider_prompt
+-> GenerationAgent
+```
+
+The current workflow uses the FLUX adapter. GPT Image and SDXL adapters are skeletons. GenerationAgent interface remains unchanged; ExecutionEngine updates `final_prompt` with `provider_prompt`.

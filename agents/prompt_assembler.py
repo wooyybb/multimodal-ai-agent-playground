@@ -47,6 +47,7 @@ class PromptAssembler:
         generation_prompt = self._limit_words(generation_prompt, max_words=120)
 
         result = {
+            "canonical_prompt": generation_prompt,
             "generation_prompt": generation_prompt,
             "negative_prompt": negative_prompt,
             "prompt_sections": {

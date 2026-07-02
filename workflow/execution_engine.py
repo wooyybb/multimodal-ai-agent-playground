@@ -14,6 +14,7 @@ class DynamicExecutionEngine:
             "lighting",
             "negative_prompt",
             "prompt_assembler",
+            "provider_prompt_adapter",
             "generation",
         "evaluation",
         "reflection",
@@ -195,9 +196,13 @@ class DynamicExecutionEngine:
             scene_plan=state.get("scene_plan"),
             compressed_context=state.get("compressed_context", {}),
         )
+        state["canonical_prompt"] = assembler_result.get(
+            "canonical_prompt",
+            assembler_result.get("generation_prompt", ""),
+        )
         state["final_prompt"] = self._compress_prompt(
             registry,
-            assembler_result.get("generation_prompt", ""),
+            state["canonical_prompt"],
             max_words=120,
             label="generation",
         )
@@ -210,6 +215,36 @@ class DynamicExecutionEngine:
             state["final_prompt"],
             label="evaluation",
         )
+
+    def _run_provider_prompt_adapter(self, registry, state):
+        canonical_prompt = state.get("canonical_prompt") or state.get("final_prompt", "")
+        try:
+            adapter_result = registry.call(
+                "provider_prompt_adapter",
+                canonical_prompt,
+                state.get("negative_prompt"),
+                provider="flux",
+                prompt_sections=state.get("prompt_sections"),
+                scene_plan=state.get("scene_plan"),
+            )
+        except Exception as error:
+            print(f"[ExecutionEngine] Provider prompt adapter failed: {error}")
+            adapter_result = {
+                "provider": "flux",
+                "provider_prompt": canonical_prompt,
+                "provider_negative_prompt": state.get("negative_prompt") or "",
+                "adapter_notes": ["fallback to canonical prompt"],
+            }
+
+        state["provider"] = adapter_result.get("provider", "flux")
+        state["provider_prompt"] = adapter_result.get("provider_prompt", canonical_prompt)
+        state["provider_negative_prompt"] = adapter_result.get(
+            "provider_negative_prompt",
+            state.get("negative_prompt") or "",
+        )
+        state["adapter_notes"] = adapter_result.get("adapter_notes", [])
+        state["final_prompt"] = state["provider_prompt"]
+        print("[ExecutionEngine] Provider prompt created.")
 
     def _run_generation(self, registry, state):
         print("[ExecutionEngine] Initial attempt started.")
@@ -304,6 +339,11 @@ class DynamicExecutionEngine:
                     "initial_output_image_path": state.get("output_image_path"),
                     "evaluation_prompt": state.get("evaluation_prompt"),
                     "negative_prompt": state.get("negative_prompt"),
+                    "canonical_prompt": state.get("canonical_prompt"),
+                    "provider": state.get("provider"),
+                    "provider_prompt": state.get("provider_prompt"),
+                    "provider_negative_prompt": state.get("provider_negative_prompt"),
+                    "adapter_notes": state.get("adapter_notes"),
                     "reflection": state.get("reflection"),
                     "retry_needed": state.get("retry_needed"),
                     "retry_prompt": (

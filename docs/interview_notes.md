@@ -375,3 +375,13 @@ A. schema와 workflow 위치를 검증하기 위해 예측 가능한 rule-based 
 
 Q. Scene Plan은 PoseAgent와 ExpressionAgent에 어떻게 영향을 주나요?
 A. relationship, interaction, emotion 값이 pose_rules와 expression_rules에 반영됩니다.
+## Sprint26 Interview Notes
+
+Q. ProviderPromptAdapter는 왜 필요한가요?
+A. provider마다 prompt 해석 방식이 다르기 때문에 canonical prompt를 provider별 prompt로 변환해야 합니다.
+
+Q. Canonical Prompt는 무엇인가요?
+A. 특정 provider에 종속되지 않은 이미지 생성 의도입니다.
+
+Q. 왜 GenerationAgent를 직접 수정하지 않았나요?
+A. GenerationAgent는 생성 실행 책임을 유지하고, prompt 최적화는 adapter layer가 담당하도록 분리하기 위해서입니다.

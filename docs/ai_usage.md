@@ -141,3 +141,6 @@ Codex was used to refactor LayoutAgent into a structured composition planner whi
 ## Sprint25 AI Usage
 
 Codex에는 scene_plan schema와 downstream agent 반영 조건을 명시했습니다. 이를 통해 ScenePlanningAgent가 단순 추가 파일이 아니라 Layout/Pose/Expression/PromptAssembler에 연결되도록 구현했습니다.
+## Sprint26 AI Usage
+
+Codex was guided to implement Adapter Pattern while preserving interface stability. This kept provider optimization out of PromptAssembler and GenerationAgent.

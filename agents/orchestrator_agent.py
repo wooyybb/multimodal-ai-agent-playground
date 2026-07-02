@@ -8,6 +8,7 @@ from agents.planner_agent import PlannerAgent
 from agents.pose_agent import PoseAgent
 from agents.expression_agent import ExpressionAgent
 from agents.prompt_assembler import PromptAssembler
+from agents.provider_prompt_adapter import ProviderPromptAdapter
 from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
@@ -32,6 +33,7 @@ class OrchestratorAgent:
         self.lighting_agent = LightingAgent()
         self.negative_prompt_agent = NegativePromptAgent()
         self.prompt_assembler = PromptAssembler()
+        self.provider_prompt_adapter = ProviderPromptAdapter()
         self.scene_planning_agent = ScenePlanningAgent()
         self.prompt_compressor = PromptCompressor()
         self.retrieval_agent = RetrievalAgent()
@@ -64,6 +66,7 @@ class OrchestratorAgent:
         self.registry.register("lighting", self.lighting_agent)
         self.registry.register("negative_prompt", self.negative_prompt_agent)
         self.registry.register("prompt_assembler", self.prompt_assembler)
+        self.registry.register("provider_prompt_adapter", self.provider_prompt_adapter)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
         self.registry.register("evaluation", self.evaluation_agent)
@@ -120,6 +123,11 @@ class OrchestratorAgent:
             "expression_section": final_state.get("expression_section"),
             "lighting_section": final_state.get("lighting_section"),
             "negative_prompt": final_state.get("negative_prompt"),
+            "canonical_prompt": final_state.get("canonical_prompt"),
+            "provider": final_state.get("provider"),
+            "provider_prompt": final_state.get("provider_prompt"),
+            "provider_negative_prompt": final_state.get("provider_negative_prompt"),
+            "adapter_notes": final_state.get("adapter_notes"),
             "prompt_sections": final_state.get("prompt_sections"),
             "agent_trace": final_state.get("agent_trace", []),
         }

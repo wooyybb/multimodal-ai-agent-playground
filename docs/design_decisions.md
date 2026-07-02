@@ -294,3 +294,16 @@ Rule-based scene planning is predictable and easy to debug. It creates a stable 
 ### Why use Scene Plan as structured intermediate representation?
 
 Scene Plan lets Layout, Pose, Expression, and PromptAssembler share one interpretation of user intent.
+## Sprint26 Decisions
+
+### Why separate PromptAssembler and ProviderPromptAdapter?
+
+PromptAssembler should create provider-neutral canonical intent. ProviderPromptAdapter should optimize that intent for a specific image generation provider.
+
+### Why keep GenerationAgent unchanged?
+
+This sprint focuses on prompt adaptation. Keeping GenerationAgent stable preserves the existing FLUX workflow and reduces integration risk.
+
+### Why skeleton adapters for GPT Image and SDXL?
+
+The architecture can be validated before adding actual provider APIs.

@@ -250,3 +250,15 @@
 - Character Relationship Agent
 - Provider-specific Prompt Adapter
 - LLM-based Scene Planner
+## Sprint26: Provider Prompt Adapter - Done
+
+- ProviderPromptAdapter added
+- FLUX provider prompt connected
+- GPT Image / SDXL skeletons added
+- Canonical prompt separated from provider prompt
+
+## Next Sprint Proposal
+
+- Provider Routing
+- Multi-Provider Evaluation
+- Provider-specific negative prompt routing

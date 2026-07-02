@@ -199,3 +199,10 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - Layout/Pose/Expression remain backward compatible when scene_plan is None.
 - PromptAssembler uses narrative and selected scene rules only, avoiding full plan dumping.
 - Remaining risk: scene parsing is rule-based and will need richer intent handling later.
+## Sprint26 Code Review
+
+- ProviderPromptAdapter isolates provider-specific prompt logic.
+- PromptAssembler now returns `canonical_prompt` for backward-compatible `generation_prompt`.
+- ExecutionEngine updates `final_prompt` with provider prompt before generation.
+- GenerationAgent interface remains unchanged.
+- Remaining risk: FLUX word limit is word-based, not tokenizer-based.

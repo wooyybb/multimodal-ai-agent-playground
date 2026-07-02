@@ -154,3 +154,6 @@ Layout prompt는 단순히 `photobooth`나 `vertical`을 붙이는 방식에서 
 ## Sprint25 Prompt Engineering
 
 이번 Sprint는 사용자 자연어를 바로 prompt로 만들지 않고 Scene Plan이라는 중간 표현으로 변환합니다. 이 방식은 prompt를 더 구조적으로 만들고, Layout/Pose/Expression agent가 같은 장면 해석을 공유하게 합니다.
+## Sprint26 Prompt Engineering
+
+Canonical prompt is transformed into provider-specific prompt. FLUX adapter removes internal planning/debug terms and keeps visual keywords around subject, style, layout, lighting, pose, expression, and composition.
