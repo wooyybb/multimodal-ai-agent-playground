@@ -37,7 +37,10 @@ class ProviderPromptAdapter:
                     "provider_negative_prompt",
                     state.get("negative_prompt") or "",
                 ),
-                "adapter_notes": result.get("adapter_notes", []),
+                "adapter_notes": self._with_optimized_note(
+                    result.get("adapter_notes", []),
+                    state,
+                ),
                 "final_prompt": provider_prompt,
             }
 
@@ -141,3 +144,9 @@ class ProviderPromptAdapter:
         if len(words) > max_words:
             return " ".join(words[:max_words]).rstrip(" ,.")
         return prompt
+
+    def _with_optimized_note(self, notes, state):
+        notes = list(notes or [])
+        if state.get("optimized_prompt") and "used optimized prompt" not in notes:
+            notes.append("used optimized prompt")
+        return notes

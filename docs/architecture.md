@@ -399,3 +399,18 @@ ExecutionEngine
 ```
 
 Only selected upper-layer agents use the new state-based interface in this Sprint: `ScenePlanningAgent`, `PromptAssembler`, `PromptCriticAgent`, `ProviderRouter`, and `ProviderPromptAdapter`. Lower-level BLIP/FLUX/CLIP, retry, memory, and UI flows keep their existing interfaces for backward compatibility.
+
+## Sprint31 Prompt Optimizer Agent
+
+Sprint31 adds a rule-based optimization step after prompt critique.
+
+```text
+PromptAssembler
+-> PromptCriticAgent
+-> PromptOptimizerAgent
+-> ProviderRouter
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+`PromptOptimizerAgent` reads `prompt_report`, removes duplicate phrases and internal context terms, repairs missing sections with compact keywords, controls prompt length, and writes the optimized prompt back to `canonical_prompt` and `final_prompt`.

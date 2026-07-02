@@ -150,4 +150,8 @@ Codex was guided to implement Adapter Pattern while preserving interface stabili
 
 Codex was used for a constrained refactoring task. The prompt limited allowed files, required backward compatibility, and asked for an incremental migration rather than a full rewrite. This helped keep the workflow stable while improving the architecture.
 
+## Sprint31 AI Usage
+
+Codex was used to implement the Critic-Optimizer pattern with explicit rule constraints. The prompt described optimization rules, file boundaries, and done criteria so the implementation could remain deterministic and avoid changing generation or evaluation tools.
+
 Codex was guided with explicit provider selection rules and fallback policy. This kept routing deterministic and testable.

@@ -459,3 +459,25 @@ The pattern is similar to graph node execution: a node receives state, returns p
 ### Incremental Refactoring
 
 Incremental Refactoring changes a small safe slice first, keeps compatibility, and expands the pattern only after the workflow remains stable.
+
+## Sprint31 Concepts
+
+### Prompt Optimization
+
+Prompt Optimization improves a prompt before generation by removing noise, reducing repetition, adding missing visual cues, and controlling length.
+
+### Critic-Optimizer Pattern
+
+The Critic-Optimizer Pattern separates evaluation from repair. PromptCriticAgent diagnoses prompt issues, and PromptOptimizerAgent applies rule-based fixes.
+
+### Self-Improving Prompt Loop
+
+A Self-Improving Prompt Loop lets the system use its own critique result to improve the next intermediate artifact before calling a generation model.
+
+### Prompt Repair
+
+Prompt Repair adds compact missing-section keywords such as balanced composition, soft lighting, or readable silhouette.
+
+### Rule-based Prompt Refinement
+
+Rule-based Prompt Refinement uses deterministic rules instead of an LLM so the first optimizer is predictable and easy to test.

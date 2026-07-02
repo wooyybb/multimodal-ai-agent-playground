@@ -15,6 +15,7 @@ class DynamicExecutionEngine:
             "negative_prompt",
             "prompt_assembler",
             "prompt_critic",
+            "prompt_optimizer",
             "provider_router",
             "provider_prompt_adapter",
             "generation",
@@ -132,6 +133,30 @@ class DynamicExecutionEngine:
             state["prompt_report"] = None
             state["prompt_quality_score"] = 100
             state["agent_trace"].append("PromptCriticAgent skipped after error")
+
+    def _run_prompt_optimizer(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "prompt_optimizer")
+            state["agent_trace"].append("PromptOptimizerAgent optimized prompt")
+            print("[ExecutionEngine] PromptOptimizerAgent optimized prompt")
+            state["evaluation_prompt"] = self._make_evaluation_prompt(
+                registry,
+                state.get("caption", ""),
+                state.get("user_prompt", ""),
+                state.get("final_prompt", ""),
+                label="evaluation",
+            )
+        except Exception as error:
+            print(f"[ExecutionEngine] PromptOptimizer failed: {error}")
+            state["optimization_report"] = {
+                "length_before": 0,
+                "length_after": 0,
+                "duplicates_removed": [],
+                "keywords_added": [],
+                "keywords_removed": [],
+                "actions": ["optimization failed; kept existing prompt"],
+            }
+            state["agent_trace"].append("PromptOptimizerAgent skipped after error")
 
     def _run_scene_planning(self, registry, state):
         self._run_state_step(registry, state, "scene_planning")

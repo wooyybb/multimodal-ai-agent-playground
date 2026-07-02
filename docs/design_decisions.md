@@ -343,3 +343,21 @@ Full conversion would touch BLIP, FLUX, CLIP, memory, retry, and UI paths at the
 ### Why preserve backward compatibility?
 
 Existing tests, direct calls, and older workflow paths still use argument-based calls. Supporting both modes reduces refactor risk and makes the migration incremental.
+
+## Sprint31 Decisions
+
+### Why add PromptOptimizer after PromptCritic?
+
+PromptCritic makes prompt quality visible, but visibility alone does not improve generation input. PromptOptimizer turns the critique report into concrete prompt repair before provider routing and generation.
+
+### Why start with a rule-based optimizer?
+
+Rule-based optimization is deterministic, easy to debug, and does not add model dependencies. It is a safe first version of the Critic-Optimizer pattern.
+
+### Why optimize before ProviderPromptAdapter?
+
+ProviderPromptAdapter should receive a cleaner canonical prompt. This keeps provider-specific formatting separate from general prompt repair.
+
+### Why remove internal context terms?
+
+Generation prompts should describe the desired image, not workflow metadata. Removing terms such as memory hints, agent trace, and prompt quality score prevents internal debugging language from leaking into image generation.

@@ -17,6 +17,7 @@ class PlannerAgent:
             "negative_prompt",
             "prompt_assembler",
             "prompt_critic",
+            "prompt_optimizer",
             "provider_router",
             "provider_prompt_adapter",
             "generation",

@@ -281,3 +281,10 @@
 - Added state-based mode to ScenePlanningAgent, PromptAssembler, PromptCriticAgent, ProviderRouter, and ProviderPromptAdapter.
 - ExecutionEngine now uses `state.update(result)` for selected upper-layer prompt and provider steps.
 - Existing argument-based calls remain supported for backward compatibility.
+
+## Sprint31: Prompt Optimizer Agent
+
+- Added `PromptOptimizerAgent`.
+- Inserted `prompt_optimizer` after `prompt_critic` and before provider routing.
+- Optimized prompt now updates `optimized_prompt`, `canonical_prompt`, and `final_prompt`.
+- ProviderPromptAdapter records `used optimized prompt` when optimizer output is present.

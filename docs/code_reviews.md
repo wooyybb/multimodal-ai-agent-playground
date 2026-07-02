@@ -216,6 +216,13 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - Converted agents still support existing argument-based calls.
 - ExecutionEngine now applies state-based execution only to selected prompt/provider steps.
 - Risk: plain dict state can hide key naming mistakes. Future work should introduce `AgentState` or state schema validation.
+
+## Sprint31 Code Review
+
+- PromptOptimizerAgent is state-based and does not modify image-generation tools.
+- Optimizer updates `canonical_prompt` and `final_prompt`, so ProviderPromptAdapter uses the repaired prompt.
+- Duplicate removal is phrase-based and deterministic.
+- Risk: rule-based missing-section repair can add generic keywords. Future LLM optimization can make repairs more semantic.
 - ProviderPromptAdapter no longer receives a hardcoded provider in ExecutionEngine.
 - Unsupported providers fall back to FLUX.
 - Remaining risk: available providers are currently hardcoded as `["flux"]`.

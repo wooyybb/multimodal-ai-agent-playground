@@ -113,3 +113,7 @@ The project introduced ProviderRouter to separate provider selection from provid
 ## Sprint30A Meeting Log
 
 As the number of agents increased, the team decided that each agent should gradually move toward a standard `run(state) -> dict` interface. The first migration targets upper-layer prompt and provider agents while preserving the existing E2E workflow.
+
+## Sprint31 Meeting Log
+
+The team decided to add PromptOptimizerAgent because PromptCriticAgent only diagnosed prompt quality issues. Sprint31 connects diagnosis to repair by updating the canonical prompt before provider routing and generation.

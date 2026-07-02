@@ -359,6 +359,24 @@
 - Add `AgentState` dataclass or schema validation.
 - Convert more agents gradually.
 
+## Sprint31 Retrospective
+
+### 잘된 점
+
+- Critic results now affect the actual generation prompt.
+- Optimizer remains deterministic and easy to debug.
+
+### 아쉬운 점
+
+- Repair rules are still generic.
+- There is no A/B comparison between original and optimized prompts yet.
+
+### 다음 Sprint
+
+- LLM-based Prompt Optimizer
+- Provider-specific optimization
+- AgentState dataclass
+
 ### 잘된 점
 
 - Provider selection responsibility is now explicit.

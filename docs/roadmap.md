@@ -313,3 +313,16 @@
 - AgentState dataclass
 - PromptOptimizerAgent
 - More agents migrated to state-based interface
+
+## Sprint31: Prompt Optimizer Agent - Done
+
+- PromptOptimizerAgent added
+- Critic report now drives prompt repair
+- Optimized prompt updates canonical and final prompt
+- ProviderPromptAdapter records optimized prompt usage
+
+## Next Sprint Proposal
+
+- LLM Prompt Optimizer
+- AgentState dataclass
+- Provider-specific prompt optimization
