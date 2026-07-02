@@ -320,3 +320,12 @@ Only FLUX is currently connected to actual generation. Other providers are plann
 ### Why rule-based routing first?
 
 Rule-based routing is predictable and easy to test before introducing LLM-based provider selection.
+## Sprint29 Decisions
+
+### Why place PromptCriticAgent before Generation?
+
+Prompt quality problems are cheaper to detect before image generation. A rule-based critic can catch duplicated quality tags, missing layout details, weak character interaction, or overly long prompts before the provider adapter and generation tool run.
+
+### Why keep PromptCriticAgent separate from PromptAssembler?
+
+`PromptAssembler` is responsible for building the canonical prompt. `PromptCriticAgent` is responsible for reviewing that prompt. Separating build and critique responsibilities keeps the workflow easier to debug and prepares the project for future LLM-based or provider-specific critics.

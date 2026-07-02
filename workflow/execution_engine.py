@@ -14,6 +14,7 @@ class DynamicExecutionEngine:
             "lighting",
             "negative_prompt",
             "prompt_assembler",
+            "prompt_critic",
             "provider_router",
             "provider_prompt_adapter",
             "generation",
@@ -121,6 +122,23 @@ class DynamicExecutionEngine:
             state["final_prompt"],
             label="evaluation",
         )
+
+    def _run_prompt_critic(self, registry, state):
+        try:
+            prompt_report = registry.call(
+                "prompt_critic",
+                state.get("canonical_prompt", state.get("final_prompt", "")),
+                prompt_sections=state.get("prompt_sections", {}),
+                scene_plan=state.get("scene_plan"),
+            )
+            state["prompt_report"] = prompt_report
+            state["prompt_quality_score"] = prompt_report.get("quality_score", 100)
+            state["agent_trace"].append("PromptCriticAgent generated prompt report")
+        except Exception as error:
+            print(f"[ExecutionEngine] PromptCritic failed: {error}")
+            state["prompt_report"] = None
+            state["prompt_quality_score"] = 100
+            state["agent_trace"].append("PromptCriticAgent skipped after error")
 
     def _run_scene_planning(self, registry, state):
         state["scene_plan"] = registry.call(

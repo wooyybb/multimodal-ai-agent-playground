@@ -372,3 +372,17 @@ config/providers.json
 ```
 
 Provider information is no longer hardcoded inside `ProviderRouter`. The router loads `default_provider`, enabled providers, display names, and capability flags from `config/providers.json`. Only providers with `enabled: true` are selectable. The current workflow keeps FLUX as the default and enabled provider.
+
+## Sprint29 Prompt Critic Agent
+
+Sprint29 adds a prompt validation layer before provider routing.
+
+```text
+PromptAssembler
+-> PromptCriticAgent
+-> ProviderRouter
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+`PromptCriticAgent` does not generate images. It reviews the canonical prompt and reports duplicated keywords, missing prompt sections, prompt length warnings, a rule-based quality score, and improvement suggestions. The generation workflow continues even if the critic fails.

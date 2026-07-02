@@ -287,3 +287,16 @@
 - Multi-Provider Evaluation
 - Cost/latency-aware routing
 - UI provider selection
+
+## Sprint29: Prompt Critic Agent - Done
+
+- PromptCriticAgent added
+- Prompt critique inserted before provider routing
+- Prompt quality score stored in workflow state
+- Prompt report exposed through Orchestrator result
+
+## Next Sprint Proposal
+
+- LLM-based Prompt Critic
+- Provider-specific Prompt Critic
+- Automatic prompt revision before generation

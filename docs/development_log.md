@@ -268,3 +268,9 @@
 - Orchestrator registers provider_router.
 - ExecutionEngine stores `provider_routing` and `provider`.
 - ProviderPromptAdapter now uses state-selected provider instead of hardcoded flux.
+## Sprint29: Prompt Critic Agent
+
+- Added `PromptCriticAgent`.
+- Inserted `prompt_critic` after `prompt_assembler` and before provider routing.
+- Prompt reports now include duplicate keywords, missing sections, warnings, quality score, and suggestions.
+- The workflow falls back to `quality_score=100` if prompt critique fails.

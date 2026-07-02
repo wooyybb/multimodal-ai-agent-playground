@@ -420,3 +420,20 @@ Fallback Provider is used when the requested provider is unavailable.
 ### Routing Policy
 
 Routing Policy is the rule set used to choose requested and selected providers.
+## Sprint29 Concepts
+
+### Prompt Critique
+
+Prompt Critique means reviewing a prompt before generation to find structural issues such as duplication, missing sections, unclear composition, or excessive length.
+
+### Self Critique
+
+Self Critique is an agent pattern where the system evaluates its own intermediate output before passing it to the next step. In this project, the prompt is evaluated before provider routing and generation.
+
+### Prompt Validation
+
+Prompt Validation checks whether required prompt sections exist: character, style, layout, pose, expression, lighting, and negative prompt.
+
+### Prompt Diagnostics
+
+Prompt Diagnostics produces a structured report with warnings, suggestions, and a quality score. This makes prompt quality observable instead of hidden inside generation results.

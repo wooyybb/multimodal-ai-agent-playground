@@ -16,6 +16,7 @@ class PlannerAgent:
             "lighting",
             "negative_prompt",
             "prompt_assembler",
+            "prompt_critic",
             "provider_router",
             "provider_prompt_adapter",
             "generation",

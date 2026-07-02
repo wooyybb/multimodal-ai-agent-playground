@@ -408,3 +408,14 @@ A. Provider Registry는 provider의 capability와 enabled 상태를 보관하는
 
 Q. 왜 현재는 FLUX만 enabled인가요?
 A. 현재 실제 workflow는 FLUX 중심으로 검증되어 있습니다. GPT Image와 SDXL은 capability 정보만 등록하고 `enabled: false`로 두어, 향후 연결 시 config 변경만으로 routing 후보에 넣을 수 있게 했습니다.
+
+## Sprint29 Interview Notes
+
+Q. PromptCriticAgent는 무엇인가요?
+A. PromptAssembler가 만든 canonical prompt를 generation 전에 점검하는 Agent입니다. 중복 keyword, 누락 section, prompt 길이, 품질 점수를 rule-based로 분석합니다.
+
+Q. 왜 Generation 전에 Prompt를 검토하나요?
+A. 이미지 생성은 비용과 시간이 드는 단계입니다. generation 전에 prompt 문제를 발견하면 provider 호출 전에 품질 저하 원인을 확인할 수 있습니다.
+
+Q. Prompt 품질은 어떻게 평가하나요?
+A. 현재는 100점에서 시작해 duplicate keyword, missing section, 너무 긴 prompt, 너무 짧은 prompt에 감점을 적용합니다. 향후에는 LLM critic이나 provider-specific critic으로 확장할 수 있습니다.
