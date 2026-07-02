@@ -214,3 +214,15 @@
 - ExpressionAgent added
 - PromptAssembler returns `generation_prompt`, `negative_prompt`, `prompt_sections`
 - Negative prompt stored separately in state
+## Sprint23: Character Reference Handling - Done
+
+- Multi-character schema in CharacterAgent
+- Character preservation rules in PromptAssembler
+- Single-image fallback maintained
+- Future multi-image UI prepared
+
+## Next Sprint Proposal
+
+- Photobooth Layout Agent
+- Multi-image UI
+- Identity similarity evaluation

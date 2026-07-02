@@ -292,3 +292,16 @@ CharacterAgent
 ```
 
 `PromptAssembler` returns `generation_prompt`, `negative_prompt`, and `prompt_sections`. Agent context, planner debug, memory debug, and retrieval debug are not copied directly into the generation prompt.
+## Sprint23 Character Reference Handling
+
+Sprint23 extends the prompt orchestration framework with character reference handling.
+
+```text
+Reference images or character_inputs
+-> CharacterAgent
+-> character_count / characters / global_character_rules
+-> PromptAssembler
+-> generation_prompt with identity preservation rules
+```
+
+Each uploaded image is treated as one separate character. The system does not merge characters and adds compact preservation rules for outfit, hairstyle, silhouette, proportions, visual vibe, and color balance.

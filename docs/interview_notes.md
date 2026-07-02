@@ -339,3 +339,16 @@ A. negative prompt는 provider별로 별도 필드가 될 수 있고, positive g
 
 Q. 이 구조가 ChatGPT 이미지 생성 방식과 어떤 점에서 유사한가요?
 A. 사용자는 자연어로 요청하지만 내부적으로는 character, style, layout, pose 같은 구조화된 prompt section으로 분해한다는 점이 유사합니다.
+## Sprint23 Interview Notes
+
+Q. Character Reference Handling이란 무엇인가요?
+A. uploaded reference image를 character identity source로 보고 generation prompt에 identity preservation rule을 반영하는 구조입니다.
+
+Q. 여러 reference image가 있을 때 캐릭터가 섞이는 문제를 어떻게 방지하나요?
+A. 각 image를 one separate character로 취급하고 `do not merge characters` rule을 prompt에 포함합니다.
+
+Q. 왜 UI보다 내부 schema를 먼저 만들었나요?
+A. UI 변경 전에도 character reference semantics를 안정화하고 single-image workflow를 깨지 않기 위해서입니다.
+
+Q. CharacterAgent와 PromptAssembler의 역할 차이는 무엇인가요?
+A. CharacterAgent는 character schema를 만들고, PromptAssembler는 그 schema를 generation prompt rule로 조립합니다.

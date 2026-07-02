@@ -319,3 +319,24 @@ Generation Prompt is the concise image creation instruction. Agent Context inclu
 ### Negative Prompt Separation
 
 Negative Prompt Separation keeps avoid-rules separate from positive image description so future generation providers can receive it as a dedicated field.
+## Sprint23 Concepts
+
+### Character Reference Handling
+
+Character Reference Handling treats uploaded images as identity references for one or more characters.
+
+### Identity Preservation
+
+Identity Preservation means keeping recognizable outfit, hairstyle, silhouette, proportions, visual vibe, and color balance.
+
+### Multi-Character Prompting
+
+Multi-Character Prompting structures prompts so multiple characters remain separate and recognizable.
+
+### Character Separation
+
+Character Separation prevents multiple reference images from being merged into a single hybrid character.
+
+### Reference-aware Prompting
+
+Reference-aware Prompting adds explicit rules that generated images should preserve the reference identity.

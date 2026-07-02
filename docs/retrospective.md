@@ -296,3 +296,14 @@
 - Character reference handling
 - Negative prompt routing
 - Provider-specific prompt adapters
+## Sprint23 Retrospective
+
+### 잘된 점
+
+- Character schema now supports future multi-image input.
+- Identity preservation rules are centralized in PromptAssembler.
+- Existing single-image workflow remains intact.
+
+### 다음 Sprint
+
+- Multi-image UI or Photobooth Layout Agent.

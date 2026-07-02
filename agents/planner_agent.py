@@ -23,7 +23,11 @@ class PlannerAgent:
         ]
 
         result = {
-            "task_type": "image_generation",
+            "task_type": (
+                "multi_character_image_generation"
+                if self._has_multi_character_hint(user_prompt)
+                else "image_generation"
+            ),
             "requires_vision": image_provided,
             "requires_generation": True,
             "requires_evaluation": True,
@@ -37,6 +41,11 @@ class PlannerAgent:
 
     def _build_reason(self, user_prompt, image_provided):
         has_prompt = bool(user_prompt and user_prompt.strip())
+        if self._has_multi_character_hint(user_prompt):
+            return (
+                "Prompt includes possible multi-character reference intent, so "
+                "character reference preservation should be considered."
+            )
 
         if image_provided and has_prompt:
             return (
@@ -54,3 +63,8 @@ class PlannerAgent:
                 "workflow is selected."
             )
         return "No specific input is provided, so default generation workflow is selected."
+
+    def _has_multi_character_hint(self, user_prompt):
+        text = str(user_prompt or "").lower()
+        hints = ("2명", "two", "friends", "group", "photobooth", "couple")
+        return any(hint in text for hint in hints)

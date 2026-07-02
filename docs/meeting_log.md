@@ -94,3 +94,6 @@ PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 p
 ## Sprint22 Detailed Meeting Log
 
 The project generalized a long photobooth-style user request into a Prompt Orchestration Framework. The decision was to split prompt generation into section agents and keep PromptAssembler responsible only for final image prompt assembly.
+## Sprint23 Meeting Log
+
+The project generalized the goal of multi-character reference-based style transfer into Character Reference Handling. The decision was to build internal schema first before changing UI.

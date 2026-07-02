@@ -259,3 +259,16 @@ PromptAssembler combines section outputs into an image-focused generation prompt
 ### Why separate negative_prompt?
 
 Negative prompts may become provider-specific inputs later. The current GenerationAgent interface is unchanged, but `negative_prompt` is stored separately in state for future FLUX provider routing.
+## Sprint23 Decisions
+
+### Why schema-first before multi-image UI?
+
+The project can stabilize character reference semantics before changing UI. This keeps the current single-image workflow intact while preparing for multi-image input.
+
+### Why treat each reference image as a separate character?
+
+Style transfer requests often fail when multiple references are blended. Treating each reference as one separate character gives the prompt explicit separation and identity preservation rules.
+
+### Why assemble preservation rules in PromptAssembler?
+
+CharacterAgent owns character schema. PromptAssembler owns final generation prompt wording, so it is the right place to compactly include preservation rules.

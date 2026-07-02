@@ -145,3 +145,6 @@ Vector DB를 금지한 제약은 오히려 RAG의 본질인 retrieval responsibi
 ## Sprint22 Detailed Prompt Engineering
 
 Long manual prompt programs are decomposed into section prompts: character, style, layout, pose, expression, lighting, and negative prompt. This turns prompt writing into prompt orchestration.
+## Sprint23 Prompt Engineering
+
+Character preservation prompt is decomposed into structured character schema and compact generation prompt rules. The goal is to preserve identity without repeating long prompt sentences.

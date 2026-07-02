@@ -12,8 +12,9 @@ class PromptAssembler:
         compressed_context=None,
     ) -> dict:
         print("[PromptAssembler] Building generation prompt...")
+        print("[PromptAssembler] Adding character preservation rules...")
 
-        character_bits = self._dict_values(character_section)
+        character_bits = self._character_prompt_bits(character_section, caption)
         style_bits = (style_section or {}).get("style_keywords", [])
         rendering_bits = (style_section or {}).get("rendering_rules", [])
         layout_bits = self._dict_values(layout_section)
@@ -69,3 +70,32 @@ class PromptAssembler:
             elif value:
                 values.append(str(value))
         return values
+
+    def _character_prompt_bits(self, character_section, caption):
+        if not character_section:
+            return [str(caption or "main character")]
+
+        characters = character_section.get("characters") or []
+        if not characters:
+            return [str(caption or "main character")]
+
+        character_count = character_section.get("character_count", len(characters))
+        if character_count > 1:
+            intro = f"{character_count} separate recognizable characters"
+        else:
+            intro = "one recognizable character"
+
+        caption_hints = [
+            character.get("caption_hint")
+            for character in characters
+            if character.get("caption_hint")
+        ]
+        preservation = (
+            "use uploaded screenshots as character references, each reference image "
+            "represents one separate character, do not merge characters, preserve "
+            "each character's outfit, hairstyle, silhouette, proportions, visual "
+            "vibe, and color balance"
+        )
+        recognizable = "keep each character immediately recognizable from the reference"
+
+        return [intro, ", ".join(caption_hints[:3]), preservation, recognizable]

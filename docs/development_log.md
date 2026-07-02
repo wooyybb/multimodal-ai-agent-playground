@@ -231,3 +231,10 @@
 - Updated `PromptAssembler` to return `generation_prompt`, `negative_prompt`, and `prompt_sections`.
 - Updated `ExecutionEngine` to store `character_section`, `style_section`, `layout_section`, `pose_section`, `expression_section`, and `negative_section`.
 - Kept GenerationAgent, EvaluationAgent, ReflectionAgent, RetryAgent, VisionAgent unchanged.
+## Sprint23: Character Reference Handling
+
+- Extended `CharacterAgent` to return `character_count`, `characters`, and `global_character_rules`.
+- Added fallback for single-image workflow with `character_count=1`.
+- Added prompt-based multi-character hints such as `two characters`, `friends`, `couple`, and `photobooth`.
+- Updated `PromptAssembler` to add compact character preservation rules to `generation_prompt`.
+- Kept UI and model agents unchanged.
