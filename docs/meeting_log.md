@@ -109,3 +109,7 @@ The project decided to avoid sending one canonical prompt directly to every imag
 ## Sprint27 Meeting Log
 
 The project introduced ProviderRouter to separate provider selection from provider-specific prompt adaptation.
+
+## Sprint30A Meeting Log
+
+As the number of agents increased, the team decided that each agent should gradually move toward a standard `run(state) -> dict` interface. The first migration targets upper-layer prompt and provider agents while preserving the existing E2E workflow.

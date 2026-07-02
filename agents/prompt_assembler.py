@@ -1,6 +1,59 @@
 class PromptAssembler:
     def run(
         self,
+        state_or_caption,
+        user_prompt=None,
+        character_section=None,
+        style_section=None,
+        layout_section=None,
+        pose_section=None,
+        expression_section=None,
+        negative_section=None,
+        scene_plan=None,
+        compressed_context=None,
+        lighting_section=None,
+    ) -> dict:
+        if isinstance(state_or_caption, dict):
+            state = state_or_caption
+            result = self._run_legacy(
+                state.get("caption", ""),
+                state.get("user_prompt", ""),
+                state.get("character_section", {}),
+                state.get("style_section", {}),
+                state.get("layout_section", {}),
+                state.get("pose_section", {}),
+                state.get("expression_section", {}),
+                state.get("negative_section", {}),
+                scene_plan=state.get("scene_plan"),
+                compressed_context=state.get("compressed_context", {}),
+                lighting_section=state.get("lighting_section", {}),
+            )
+            return {
+                "canonical_prompt": result.get("canonical_prompt", ""),
+                "final_prompt": result.get(
+                    "canonical_prompt",
+                    result.get("generation_prompt", ""),
+                ),
+                "negative_prompt": result.get("negative_prompt"),
+                "prompt_sections": result.get("prompt_sections", {}),
+            }
+
+        return self._run_legacy(
+            state_or_caption,
+            user_prompt,
+            character_section,
+            style_section,
+            layout_section,
+            pose_section,
+            expression_section,
+            negative_section,
+            scene_plan=scene_plan,
+            compressed_context=compressed_context,
+            lighting_section=lighting_section,
+        )
+
+    def _run_legacy(
+        self,
         caption,
         user_prompt,
         character_section,
@@ -11,6 +64,7 @@ class PromptAssembler:
         negative_section,
         scene_plan=None,
         compressed_context=None,
+        lighting_section=None,
     ) -> dict:
         print("[PromptAssembler] Building generation prompt...")
         print("[PromptAssembler] Adding character preservation rules...")
@@ -24,7 +78,8 @@ class PromptAssembler:
         layout_bits = self._layout_prompt_bits(layout_section)
         pose_bits = (pose_section or {}).get("pose_rules", [])
         expression_bits = (expression_section or {}).get("expression_rules", [])
-        lighting_bits = (compressed_context or {}).get("retrieved_lighting_hint")
+        lighting_bits = self._lighting_prompt_bits(lighting_section)
+        retrieved_lighting = (compressed_context or {}).get("retrieved_lighting_hint")
         negative_prompt = ", ".join((negative_section or {}).get("negative_prompt", []))
 
         parts = [
@@ -37,7 +92,8 @@ class PromptAssembler:
             ", ".join(layout_bits),
             ", ".join(pose_bits),
             ", ".join(expression_bits),
-            lighting_bits,
+            ", ".join(lighting_bits),
+            retrieved_lighting,
         ]
 
         if user_prompt and str(user_prompt).strip():
@@ -56,6 +112,8 @@ class PromptAssembler:
                 "layout": layout_section,
                 "pose": pose_section,
                 "expression": expression_section,
+                "lighting": lighting_section,
+                "negative": negative_section,
                 "scene": scene_plan,
             },
         }
@@ -180,3 +238,14 @@ class PromptAssembler:
         scene_rules = scene_plan.get("scene_rules") or []
         bits = [narrative, camera_intent, ", ".join(scene_rules[:3])]
         return [bit for bit in bits if bit]
+
+    def _lighting_prompt_bits(self, lighting_section):
+        if not lighting_section:
+            return []
+        values = []
+        for value in lighting_section.values():
+            if isinstance(value, list):
+                values.extend(str(item) for item in value if item)
+            elif value:
+                values.append(str(value))
+        return values

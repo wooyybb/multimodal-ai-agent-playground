@@ -11,6 +11,46 @@ class ProviderPromptAdapter:
 
     def run(
         self,
+        state_or_canonical_prompt,
+        negative_prompt: str | None = None,
+        provider: str = "flux",
+        prompt_sections: dict | None = None,
+        scene_plan: dict | None = None,
+    ) -> dict:
+        if isinstance(state_or_canonical_prompt, dict):
+            state = state_or_canonical_prompt
+            result = self._run_legacy(
+                state.get("canonical_prompt") or state.get("final_prompt", ""),
+                negative_prompt=state.get("negative_prompt"),
+                provider=state.get("provider", "flux"),
+                prompt_sections=state.get("prompt_sections"),
+                scene_plan=state.get("scene_plan"),
+            )
+            provider_prompt = result.get(
+                "provider_prompt",
+                state.get("canonical_prompt") or state.get("final_prompt", ""),
+            )
+            return {
+                "provider": result.get("provider", "flux"),
+                "provider_prompt": provider_prompt,
+                "provider_negative_prompt": result.get(
+                    "provider_negative_prompt",
+                    state.get("negative_prompt") or "",
+                ),
+                "adapter_notes": result.get("adapter_notes", []),
+                "final_prompt": provider_prompt,
+            }
+
+        return self._run_legacy(
+            state_or_canonical_prompt,
+            negative_prompt=negative_prompt,
+            provider=provider,
+            prompt_sections=prompt_sections,
+            scene_plan=scene_plan,
+        )
+
+    def _run_legacy(
+        self,
         canonical_prompt: str,
         negative_prompt: str | None = None,
         provider: str = "flux",

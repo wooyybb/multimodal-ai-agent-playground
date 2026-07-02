@@ -7,6 +7,32 @@ class ProviderRouter:
 
     def run(
         self,
+        state_or_user_prompt,
+        scene_plan: dict | None = None,
+        planner_result: dict | None = None,
+        available_providers: list[str] | None = None,
+    ) -> dict:
+        if isinstance(state_or_user_prompt, dict):
+            result = self._run_legacy(
+                state_or_user_prompt.get("user_prompt", ""),
+                scene_plan=state_or_user_prompt.get("scene_plan"),
+                planner_result=state_or_user_prompt.get("planner_result"),
+                available_providers=available_providers,
+            )
+            return {
+                "provider_routing": result,
+                "provider": result.get("selected_provider", "flux"),
+            }
+
+        return self._run_legacy(
+            state_or_user_prompt,
+            scene_plan=scene_plan,
+            planner_result=planner_result,
+            available_providers=available_providers,
+        )
+
+    def _run_legacy(
+        self,
         user_prompt: str,
         scene_plan: dict | None = None,
         planner_result: dict | None = None,

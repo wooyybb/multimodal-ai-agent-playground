@@ -274,3 +274,10 @@
 - Inserted `prompt_critic` after `prompt_assembler` and before provider routing.
 - Prompt reports now include duplicate keywords, missing sections, warnings, quality score, and suggestions.
 - The workflow falls back to `quality_score=100` if prompt critique fails.
+
+## Sprint30A: Standard Agent Interface
+
+- Added `ToolRegistry.run_with_state(name, state)`.
+- Added state-based mode to ScenePlanningAgent, PromptAssembler, PromptCriticAgent, ProviderRouter, and ProviderPromptAdapter.
+- ExecutionEngine now uses `state.update(result)` for selected upper-layer prompt and provider steps.
+- Existing argument-based calls remain supported for backward compatibility.

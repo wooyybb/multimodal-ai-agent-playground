@@ -209,6 +209,13 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 ## Sprint27 Code Review
 
 - ProviderRouter handles provider selection independently.
+
+## Sprint30A Code Review
+
+- `ToolRegistry.run_with_state()` adds a standard state-based execution path.
+- Converted agents still support existing argument-based calls.
+- ExecutionEngine now applies state-based execution only to selected prompt/provider steps.
+- Risk: plain dict state can hide key naming mistakes. Future work should introduce `AgentState` or state schema validation.
 - ProviderPromptAdapter no longer receives a hardcoded provider in ExecutionEngine.
 - Unsupported providers fall back to FLUX.
 - Remaining risk: available providers are currently hardcoded as `["flux"]`.

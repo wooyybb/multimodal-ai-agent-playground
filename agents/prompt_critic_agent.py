@@ -20,6 +20,30 @@ class PromptCriticAgent:
 
     def run(
         self,
+        state_or_canonical_prompt,
+        prompt_sections=None,
+        scene_plan=None,
+    ):
+        if isinstance(state_or_canonical_prompt, dict):
+            state = state_or_canonical_prompt
+            report = self._run_legacy(
+                state.get("canonical_prompt") or state.get("final_prompt", ""),
+                prompt_sections=state.get("prompt_sections", {}),
+                scene_plan=state.get("scene_plan"),
+            )
+            return {
+                "prompt_report": report,
+                "prompt_quality_score": report.get("quality_score", 100),
+            }
+
+        return self._run_legacy(
+            state_or_canonical_prompt,
+            prompt_sections=prompt_sections,
+            scene_plan=scene_plan,
+        )
+
+    def _run_legacy(
+        self,
         canonical_prompt,
         prompt_sections=None,
         scene_plan=None,

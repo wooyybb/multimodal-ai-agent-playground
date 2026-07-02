@@ -437,3 +437,25 @@ Prompt Validation checks whether required prompt sections exist: character, styl
 ### Prompt Diagnostics
 
 Prompt Diagnostics produces a structured report with warnings, suggestions, and a quality score. This makes prompt quality observable instead of hidden inside generation results.
+
+## Sprint30A Concepts
+
+### State-based Agent
+
+A State-based Agent receives the shared workflow state and returns a dictionary containing only the values it created or changed.
+
+### Agent Interface
+
+The target interface is `run(state: dict) -> dict`. This reduces step-specific argument mapping in the execution engine.
+
+### State Update
+
+State Update means applying `state.update(result)` after an agent returns. This makes each node's output explicit and inspectable.
+
+### LangGraph-style Node
+
+The pattern is similar to graph node execution: a node receives state, returns partial state, and the engine merges the result.
+
+### Incremental Refactoring
+
+Incremental Refactoring changes a small safe slice first, keeps compatibility, and expands the pattern only after the workflow remains stable.

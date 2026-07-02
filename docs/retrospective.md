@@ -342,6 +342,23 @@
 - Provider routing or multi-provider evaluation.
 ## Sprint27 Retrospective
 
+## Sprint30A Retrospective
+
+### 잘된 점
+
+- State-based interface was introduced without breaking backward compatibility.
+- ExecutionEngine now has a reusable `state.update(result)` path.
+
+### 아쉬운 점
+
+- The project still mixes state-based and argument-based agents.
+- State is still an untyped dict.
+
+### 다음 Sprint
+
+- Add `AgentState` dataclass or schema validation.
+- Convert more agents gradually.
+
 ### 잘된 점
 
 - Provider selection responsibility is now explicit.

@@ -386,3 +386,16 @@ PromptAssembler
 ```
 
 `PromptCriticAgent` does not generate images. It reviews the canonical prompt and reports duplicated keywords, missing prompt sections, prompt length warnings, a rule-based quality score, and improvement suggestions. The generation workflow continues even if the critic fails.
+
+## Sprint30A Standard Agent Interface
+
+Sprint30A starts an incremental move toward a standard Agent interface.
+
+```text
+Agent.run(state: dict) -> dict
+ExecutionEngine
+-> registry.run_with_state(step, state)
+-> state.update(result)
+```
+
+Only selected upper-layer agents use the new state-based interface in this Sprint: `ScenePlanningAgent`, `PromptAssembler`, `PromptCriticAgent`, `ProviderRouter`, and `ProviderPromptAdapter`. Lower-level BLIP/FLUX/CLIP, retry, memory, and UI flows keep their existing interfaces for backward compatibility.

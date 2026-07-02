@@ -329,3 +329,17 @@ Prompt quality problems are cheaper to detect before image generation. A rule-ba
 ### Why keep PromptCriticAgent separate from PromptAssembler?
 
 `PromptAssembler` is responsible for building the canonical prompt. `PromptCriticAgent` is responsible for reviewing that prompt. Separating build and critique responsibilities keeps the workflow easier to debug and prepares the project for future LLM-based or provider-specific critics.
+
+## Sprint30A Decisions
+
+### Why standardize on `run(state) -> dict`?
+
+As the number of agents grows, ExecutionEngine should not know every agent's argument list. A state-based interface lets each agent read the context it needs and return only the state updates it owns.
+
+### Why not convert every agent at once?
+
+Full conversion would touch BLIP, FLUX, CLIP, memory, retry, and UI paths at the same time. Sprint30A converts only upper-layer orchestration agents so the E2E workflow remains stable.
+
+### Why preserve backward compatibility?
+
+Existing tests, direct calls, and older workflow paths still use argument-based calls. Supporting both modes reduces refactor risk and makes the migration incremental.

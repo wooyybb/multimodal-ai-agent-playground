@@ -300,3 +300,16 @@
 - LLM-based Prompt Critic
 - Provider-specific Prompt Critic
 - Automatic prompt revision before generation
+
+## Sprint30A: Standard Agent Interface - Done
+
+- `ToolRegistry.run_with_state()` added
+- Selected agents support `run(state) -> dict`
+- ExecutionEngine uses state-based execution for selected prompt/provider steps
+- Backward compatibility preserved
+
+## Next Sprint Proposal
+
+- AgentState dataclass
+- PromptOptimizerAgent
+- More agents migrated to state-based interface

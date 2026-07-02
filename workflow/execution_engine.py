@@ -125,14 +125,7 @@ class DynamicExecutionEngine:
 
     def _run_prompt_critic(self, registry, state):
         try:
-            prompt_report = registry.call(
-                "prompt_critic",
-                state.get("canonical_prompt", state.get("final_prompt", "")),
-                prompt_sections=state.get("prompt_sections", {}),
-                scene_plan=state.get("scene_plan"),
-            )
-            state["prompt_report"] = prompt_report
-            state["prompt_quality_score"] = prompt_report.get("quality_score", 100)
+            self._run_state_step(registry, state, "prompt_critic")
             state["agent_trace"].append("PromptCriticAgent generated prompt report")
         except Exception as error:
             print(f"[ExecutionEngine] PromptCritic failed: {error}")
@@ -141,12 +134,7 @@ class DynamicExecutionEngine:
             state["agent_trace"].append("PromptCriticAgent skipped after error")
 
     def _run_scene_planning(self, registry, state):
-        state["scene_plan"] = registry.call(
-            "scene_planning",
-            state.get("user_prompt", ""),
-            caption=state.get("caption"),
-            planner_result=state.get("planner_result"),
-        )
+        self._run_state_step(registry, state, "scene_planning")
         state["agent_trace"].append("ScenePlanningAgent created scene plan")
 
     def _run_character(self, registry, state):
@@ -202,31 +190,16 @@ class DynamicExecutionEngine:
         )
 
     def _run_prompt_assembler(self, registry, state):
-        assembler_result = registry.call(
-            "prompt_assembler",
-            state.get("caption", ""),
-            state.get("user_prompt", ""),
-            state.get("character_section", {}),
-            state.get("style_section", {}),
-            state.get("layout_section", {}),
-            state.get("pose_section", {}),
-            state.get("expression_section", {}),
-            state.get("negative_section", {}),
-            scene_plan=state.get("scene_plan"),
-            compressed_context=state.get("compressed_context", {}),
-        )
-        state["canonical_prompt"] = assembler_result.get(
-            "canonical_prompt",
-            assembler_result.get("generation_prompt", ""),
-        )
+        self._run_state_step(registry, state, "prompt_assembler")
+        state["canonical_prompt"] = state.get("canonical_prompt", state.get("final_prompt", ""))
         state["final_prompt"] = self._compress_prompt(
             registry,
             state["canonical_prompt"],
             max_words=120,
             label="generation",
         )
-        state["negative_prompt"] = assembler_result.get("negative_prompt")
-        state["prompt_sections"] = assembler_result.get("prompt_sections", {})
+        state.setdefault("negative_prompt", "")
+        state.setdefault("prompt_sections", {})
         state["evaluation_prompt"] = self._make_evaluation_prompt(
             registry,
             state.get("caption", ""),
@@ -237,13 +210,7 @@ class DynamicExecutionEngine:
 
     def _run_provider_router(self, registry, state):
         try:
-            result = registry.call(
-                "provider_router",
-                state.get("user_prompt", ""),
-                scene_plan=state.get("scene_plan"),
-                planner_result=state.get("planner_result"),
-                available_providers=["flux"],
-            )
+            self._run_state_step(registry, state, "provider_router")
         except Exception as error:
             print(f"[ExecutionEngine] ProviderRouter failed: {error}")
             result = {
@@ -253,41 +220,27 @@ class DynamicExecutionEngine:
                 "reason": "ProviderRouter failed; fallback to flux.",
                 "capabilities": {},
             }
+            state["provider_routing"] = result
+            state["provider"] = result.get("selected_provider", "flux")
 
-        state["provider_routing"] = result
-        state["provider"] = result.get("selected_provider", "flux")
         trace = f"ProviderRouter selected provider: {state['provider']}"
         state["agent_trace"].append(trace)
         print(f"[ExecutionEngine] {trace}")
 
     def _run_provider_prompt_adapter(self, registry, state):
-        canonical_prompt = state.get("canonical_prompt") or state.get("final_prompt", "")
         try:
-            adapter_result = registry.call(
-                "provider_prompt_adapter",
-                canonical_prompt,
-                state.get("negative_prompt"),
-                provider=state.get("provider", "flux"),
-                prompt_sections=state.get("prompt_sections"),
-                scene_plan=state.get("scene_plan"),
-            )
+            self._run_state_step(registry, state, "provider_prompt_adapter")
         except Exception as error:
             print(f"[ExecutionEngine] Provider prompt adapter failed: {error}")
+            canonical_prompt = state.get("canonical_prompt") or state.get("final_prompt", "")
             adapter_result = {
                 "provider": "flux",
                 "provider_prompt": canonical_prompt,
                 "provider_negative_prompt": state.get("negative_prompt") or "",
                 "adapter_notes": ["fallback to canonical prompt"],
             }
-
-        state["provider"] = adapter_result.get("provider", "flux")
-        state["provider_prompt"] = adapter_result.get("provider_prompt", canonical_prompt)
-        state["provider_negative_prompt"] = adapter_result.get(
-            "provider_negative_prompt",
-            state.get("negative_prompt") or "",
-        )
-        state["adapter_notes"] = adapter_result.get("adapter_notes", [])
-        state["final_prompt"] = state["provider_prompt"]
+            state.update(adapter_result)
+            state["final_prompt"] = state["provider_prompt"]
         print("[ExecutionEngine] Provider prompt created.")
 
     def _run_generation(self, registry, state):
@@ -472,3 +425,10 @@ class DynamicExecutionEngine:
             insert_at = normalized.index("vision") + 1
             normalized.insert(insert_at, "memory_retrieval")
         return normalized
+
+    def _run_state_step(self, registry, state, step):
+        print(f"[ExecutionEngine] Running state-based step: {step}")
+        result = registry.run_with_state(step, state)
+        state.update(result)
+        print(f"[ExecutionEngine] State updated by: {step}")
+        return result

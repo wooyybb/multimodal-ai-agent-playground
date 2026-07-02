@@ -1,6 +1,22 @@
 class ScenePlanningAgent:
     def run(
         self,
+        state_or_user_prompt,
+        caption: str | None = None,
+        planner_result: dict | None = None,
+    ) -> dict:
+        if isinstance(state_or_user_prompt, dict):
+            scene_plan = self._run_legacy(
+                state_or_user_prompt.get("user_prompt", ""),
+                caption=state_or_user_prompt.get("caption"),
+                planner_result=state_or_user_prompt.get("planner_result"),
+            )
+            return {"scene_plan": scene_plan}
+
+        return self._run_legacy(state_or_user_prompt, caption, planner_result)
+
+    def _run_legacy(
+        self,
         user_prompt: str,
         caption: str | None = None,
         planner_result: dict | None = None,

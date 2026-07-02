@@ -20,6 +20,32 @@ class ToolRegistry:
 
         raise ValueError(f"Registered tool is not callable: {name}")
 
+    def run_with_state(self, name: str, state: dict) -> dict:
+        print(f"[ToolRegistry] Running state-based tool: {name}")
+
+        if name not in self._tools:
+            raise ValueError(f"Tool is not registered: {name}")
+
+        tool = self._tools[name]
+        if hasattr(tool, "run"):
+            result = tool.run(state)
+        elif callable(tool):
+            result = tool(state)
+        else:
+            raise ValueError(f"Registered tool is not callable: {name}")
+
+        if result is None:
+            result = {}
+        if not isinstance(result, dict):
+            print(
+                f"[ToolRegistry] Warning: {name} returned "
+                f"{type(result).__name__}; wrapping result."
+            )
+            result = {name: result}
+
+        print(f"[ToolRegistry] State update keys: {list(result.keys())}")
+        return result
+
     def list_tools(self) -> list[str]:
         return list(self._tools.keys())
 

@@ -160,3 +160,7 @@ Canonical prompt is transformed into provider-specific prompt. FLUX adapter remo
 ## Sprint27 Prompt Engineering
 
 Provider별 prompt 최적화와 provider routing을 분리했습니다. Routing은 provider 선택을 담당하고, Adapter는 선택된 provider에 맞는 prompt 변환을 담당합니다.
+
+## Sprint30A Prompt Engineering
+
+이번 Prompt는 대규모 refactoring을 요청하면서도 `incremental refactoring`과 `backward compatibility`를 명시했습니다. 이는 Codex가 모든 Agent를 한 번에 바꾸지 않고, 지정된 Agent만 안전하게 state-based interface로 전환하도록 범위를 제한하기 위함입니다.
