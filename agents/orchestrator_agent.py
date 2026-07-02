@@ -9,6 +9,7 @@ from agents.pose_agent import PoseAgent
 from agents.expression_agent import ExpressionAgent
 from agents.prompt_assembler import PromptAssembler
 from agents.prompt_critic_agent import PromptCriticAgent
+from agents.llm_prompt_optimizer_agent import LLMPromptOptimizerAgent
 from agents.prompt_optimizer_agent import PromptOptimizerAgent
 from agents.provider_prompt_adapter import ProviderPromptAdapter
 from agents.provider_router import ProviderRouter
@@ -38,6 +39,7 @@ class OrchestratorAgent:
         self.prompt_assembler = PromptAssembler()
         self.prompt_critic_agent = PromptCriticAgent()
         self.prompt_optimizer_agent = PromptOptimizerAgent()
+        self.llm_prompt_optimizer_agent = LLMPromptOptimizerAgent()
         self.provider_router = ProviderRouter()
         self.provider_prompt_adapter = ProviderPromptAdapter()
         self.scene_planning_agent = ScenePlanningAgent()
@@ -74,6 +76,7 @@ class OrchestratorAgent:
         self.registry.register("prompt_assembler", self.prompt_assembler)
         self.registry.register("prompt_critic", self.prompt_critic_agent)
         self.registry.register("prompt_optimizer", self.prompt_optimizer_agent)
+        self.registry.register("llm_prompt_optimizer", self.llm_prompt_optimizer_agent)
         self.registry.register("provider_router", self.provider_router)
         self.registry.register("provider_prompt_adapter", self.provider_prompt_adapter)
         self.registry.register("prompt", self.prompt_agent)
@@ -137,6 +140,8 @@ class OrchestratorAgent:
             "prompt_quality_score": final_state.get("prompt_quality_score"),
             "optimized_prompt": final_state.get("optimized_prompt"),
             "optimization_report": final_state.get("optimization_report"),
+            "llm_optimized_prompt": final_state.get("llm_optimized_prompt"),
+            "llm_optimizer_report": final_state.get("llm_optimizer_report"),
             "provider_routing": final_state.get("provider_routing"),
             "provider": final_state.get("provider"),
             "provider_prompt": final_state.get("provider_prompt"),

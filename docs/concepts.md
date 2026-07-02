@@ -481,3 +481,25 @@ Prompt Repair adds compact missing-section keywords such as balanced composition
 ### Rule-based Prompt Refinement
 
 Rule-based Prompt Refinement uses deterministic rules instead of an LLM so the first optimizer is predictable and easy to test.
+
+## Sprint33 Concepts
+
+### LLM-based Prompt Optimization
+
+LLM-based Prompt Optimization uses a language model to rewrite or improve generation prompts based on context and critique reports.
+
+### Hybrid Rule + LLM Optimization
+
+Hybrid optimization keeps deterministic rule-based repair as a baseline and adds an optional LLM layer for more natural rewriting.
+
+### Fallback Strategy
+
+Fallback Strategy ensures the workflow continues when optional services are disabled or fail.
+
+### Interface-first Design
+
+Interface-first Design defines inputs, outputs, and failure behavior before integrating an external API.
+
+### Optional AI Service Integration
+
+Optional integration means the system can run without the external service while still exposing a clear extension point.

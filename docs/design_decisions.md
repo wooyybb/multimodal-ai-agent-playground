@@ -361,3 +361,21 @@ ProviderPromptAdapter should receive a cleaner canonical prompt. This keeps prov
 ### Why remove internal context terms?
 
 Generation prompts should describe the desired image, not workflow metadata. Removing terms such as memory hints, agent trace, and prompt quality score prevents internal debugging language from leaking into image generation.
+
+## Sprint33 Decisions
+
+### Why start with an interface before a real LLM API?
+
+The workflow needs a stable extension point before adding credentials, latency, cost, and provider-specific failures. Interface-first design lets the project validate state flow and fallback behavior first.
+
+### Why support disabled, mock, and fallback modes?
+
+The optimizer should never break the image generation workflow. Disabled mode preserves the current prompt, mock mode allows local testing, and future LLM mode can fallback when API access is unavailable.
+
+### Why add LLMPromptOptimizerAgent after PromptOptimizerAgent?
+
+The rule-based optimizer remains deterministic and debuggable. The LLM optimizer is an optional reasoning layer on top of the safer baseline.
+
+### Why avoid external API calls in this Sprint?
+
+This Sprint is about architecture, not vendor integration. Avoiding API calls keeps the project runnable without keys and prevents accidental credential handling.

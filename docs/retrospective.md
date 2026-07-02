@@ -377,6 +377,24 @@
 - Provider-specific optimization
 - AgentState dataclass
 
+## Sprint33 Retrospective
+
+### 잘된 점
+
+- LLM optimization extension point was added without introducing API dependency.
+- Disabled and mock modes keep the workflow runnable.
+
+### 아쉬운 점
+
+- No real LLM rewrite quality can be measured yet.
+- Provider-specific LLM prompting remains future work.
+
+### 다음 Sprint
+
+- AgentState dataclass
+- Prompt benchmark
+- Real LLM provider integration
+
 ### 잘된 점
 
 - Provider selection responsibility is now explicit.

@@ -29,6 +29,7 @@ User
 -> PromptAssembler
 -> PromptCritic
 -> PromptOptimizer
+-> LLMPromptOptimizerAgent optional interface
 -> ProviderRouter
 -> ProviderPromptAdapter
 -> GenerationAgent
@@ -58,6 +59,7 @@ This makes the workflow closer to a graph-style agent system while still staying
 - PromptAssembler for canonical prompt construction
 - PromptCritic for duplicate, missing-section, warning, and quality-score analysis
 - PromptOptimizer for report-driven prompt repair
+- Optional LLMPromptOptimizerAgent interface with disabled/mock fallback modes
 - ProviderRouter with config-driven provider capability loading
 - ProviderPromptAdapter for provider-specific prompt formatting
 - Reflection and retry decision flow
@@ -92,6 +94,16 @@ HF_TOKEN=your_local_token_here
 ```
 
 Do not commit `.env` or paste real token values into documentation.
+
+Optional LLM Prompt Optimizer flags can be configured locally:
+
+```text
+LLM_OPTIMIZER_ENABLED=false
+LLM_OPTIMIZER_MOCK=true
+LLM_OPTIMIZER_PROVIDER=openai
+```
+
+The current LLM optimizer is an interface-first extension. It does not call an external LLM API by default. Disabled mode keeps the existing optimized prompt, and mock mode runs a local deterministic mock optimizer. Do not put real API keys in README or committed files.
 
 Run the app:
 
@@ -153,12 +165,13 @@ outputs/     Runtime generated outputs
 - Sprint 30A: Standard `run(state) -> dict` interface migration
 - Sprint 31: PromptOptimizerAgent
 - Sprint 32: Intelligent Prompt Optimizer
+- Sprint 33: LLM Prompt Optimizer Interface
 
 ## Roadmap
 
 Planned future work:
 
-- LLM Prompt Optimizer
+- Real LLM Prompt Optimizer integration
 - `AgentState` dataclass or state schema validation
 - Multi-provider generation
 - Reference image handling improvements

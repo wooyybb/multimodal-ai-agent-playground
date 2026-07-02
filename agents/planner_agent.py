@@ -18,6 +18,7 @@ class PlannerAgent:
             "prompt_assembler",
             "prompt_critic",
             "prompt_optimizer",
+            "llm_prompt_optimizer",
             "provider_router",
             "provider_prompt_adapter",
             "generation",

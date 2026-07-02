@@ -295,3 +295,10 @@
 - Added reasoning steps, before score, and estimated after score to `optimization_report`.
 - Optimizer now reacts separately to duplicates, missing sections, warnings, and score bands.
 - ExecutionEngine prints Prompt Preview before generation.
+
+## Sprint33: LLM Prompt Optimizer Interface
+
+- Added `LLMPromptOptimizerAgent`.
+- Added `llm_prompt_optimizer` after rule-based `prompt_optimizer`.
+- Added disabled, mock, and future llm modes without external API calls.
+- Added `llm_optimizer_report` and `llm_optimized_prompt` state outputs.

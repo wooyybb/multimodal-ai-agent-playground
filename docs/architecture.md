@@ -430,3 +430,20 @@ PromptCriticAgent
 ```
 
 The optimizer now reads duplicate keywords, missing sections, warnings, and prompt quality score before editing. It performs only the repairs requested by the critic report and prints a Prompt Preview immediately before generation.
+
+## Sprint33 LLM Prompt Optimizer Interface
+
+Sprint33 adds an optional LLM optimization interface after the rule-based optimizer.
+
+```text
+PromptAssembler
+-> PromptCriticAgent
+-> PromptOptimizerAgent
+-> LLMPromptOptimizerAgent
+   -> disabled/mock/future llm mode
+-> ProviderRouter
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+The current implementation does not call an external LLM API. Disabled mode keeps the existing optimized prompt, mock mode performs deterministic local cleanup, and future LLM mode is represented as a safe fallback interface.

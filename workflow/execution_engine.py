@@ -16,6 +16,7 @@ class DynamicExecutionEngine:
             "prompt_assembler",
             "prompt_critic",
             "prompt_optimizer",
+            "llm_prompt_optimizer",
             "provider_router",
             "provider_prompt_adapter",
             "generation",
@@ -157,6 +158,32 @@ class DynamicExecutionEngine:
                 "actions": ["optimization failed; kept existing prompt"],
             }
             state["agent_trace"].append("PromptOptimizerAgent skipped after error")
+
+    def _run_llm_prompt_optimizer(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "llm_prompt_optimizer")
+            state["agent_trace"].append("LLMPromptOptimizerAgent processed prompt")
+            print("[ExecutionEngine] LLMPromptOptimizerAgent processed prompt")
+            state["evaluation_prompt"] = self._make_evaluation_prompt(
+                registry,
+                state.get("caption", ""),
+                state.get("user_prompt", ""),
+                state.get("final_prompt", ""),
+                label="evaluation",
+            )
+        except Exception as error:
+            print(f"[ExecutionEngine] LLMPromptOptimizer failed: {error}")
+            prompt = state.get("canonical_prompt") or state.get("final_prompt", "")
+            state["llm_optimized_prompt"] = prompt
+            state["canonical_prompt"] = prompt
+            state["final_prompt"] = prompt
+            state["llm_optimizer_report"] = {
+                "mode": "disabled",
+                "reason": "LLM optimizer failed; kept existing prompt.",
+                "changes": [],
+                "used_fallback": True,
+            }
+            state["agent_trace"].append("LLMPromptOptimizerAgent skipped after error")
 
     def _run_scene_planning(self, registry, state):
         self._run_state_step(registry, state, "scene_planning")

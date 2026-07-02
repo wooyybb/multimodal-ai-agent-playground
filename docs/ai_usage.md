@@ -154,4 +154,8 @@ Codex was used for a constrained refactoring task. The prompt limited allowed fi
 
 Codex was used to implement the Critic-Optimizer pattern with explicit rule constraints. The prompt described optimization rules, file boundaries, and done criteria so the implementation could remain deterministic and avoid changing generation or evaluation tools.
 
+## Sprint33 AI Usage
+
+Codex was used to build an interface-first LLM optimizer structure without making external API calls. The prompt constrained the implementation to disabled/mock/fallback behavior so architecture could improve without introducing secret handling or network dependency.
+
 Codex was guided with explicit provider selection rules and fallback policy. This kept routing deterministic and testable.
