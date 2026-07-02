@@ -262,3 +262,15 @@
 - Provider Routing
 - Multi-Provider Evaluation
 - Provider-specific negative prompt routing
+## Sprint27: Provider Router - Done
+
+- ProviderRouter added
+- provider_router execution step added
+- selected_provider stored in state
+- ProviderPromptAdapter uses selected provider
+
+## Next Sprint Proposal
+
+- Multi-Provider Evaluation
+- Provider Capability Config
+- Cost/latency-aware routing

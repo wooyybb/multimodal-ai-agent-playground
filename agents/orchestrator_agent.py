@@ -9,6 +9,7 @@ from agents.pose_agent import PoseAgent
 from agents.expression_agent import ExpressionAgent
 from agents.prompt_assembler import PromptAssembler
 from agents.provider_prompt_adapter import ProviderPromptAdapter
+from agents.provider_router import ProviderRouter
 from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
 from agents.reflection_agent import ReflectionAgent
@@ -33,6 +34,7 @@ class OrchestratorAgent:
         self.lighting_agent = LightingAgent()
         self.negative_prompt_agent = NegativePromptAgent()
         self.prompt_assembler = PromptAssembler()
+        self.provider_router = ProviderRouter()
         self.provider_prompt_adapter = ProviderPromptAdapter()
         self.scene_planning_agent = ScenePlanningAgent()
         self.prompt_compressor = PromptCompressor()
@@ -66,6 +68,7 @@ class OrchestratorAgent:
         self.registry.register("lighting", self.lighting_agent)
         self.registry.register("negative_prompt", self.negative_prompt_agent)
         self.registry.register("prompt_assembler", self.prompt_assembler)
+        self.registry.register("provider_router", self.provider_router)
         self.registry.register("provider_prompt_adapter", self.provider_prompt_adapter)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
@@ -124,6 +127,7 @@ class OrchestratorAgent:
             "lighting_section": final_state.get("lighting_section"),
             "negative_prompt": final_state.get("negative_prompt"),
             "canonical_prompt": final_state.get("canonical_prompt"),
+            "provider_routing": final_state.get("provider_routing"),
             "provider": final_state.get("provider"),
             "provider_prompt": final_state.get("provider_prompt"),
             "provider_negative_prompt": final_state.get("provider_negative_prompt"),

@@ -14,6 +14,7 @@ class DynamicExecutionEngine:
             "lighting",
             "negative_prompt",
             "prompt_assembler",
+            "provider_router",
             "provider_prompt_adapter",
             "generation",
         "evaluation",
@@ -216,6 +217,31 @@ class DynamicExecutionEngine:
             label="evaluation",
         )
 
+    def _run_provider_router(self, registry, state):
+        try:
+            result = registry.call(
+                "provider_router",
+                state.get("user_prompt", ""),
+                scene_plan=state.get("scene_plan"),
+                planner_result=state.get("planner_result"),
+                available_providers=["flux"],
+            )
+        except Exception as error:
+            print(f"[ExecutionEngine] ProviderRouter failed: {error}")
+            result = {
+                "requested_provider": "flux",
+                "selected_provider": "flux",
+                "fallback_provider": "flux",
+                "reason": "ProviderRouter failed; fallback to flux.",
+                "capabilities": {},
+            }
+
+        state["provider_routing"] = result
+        state["provider"] = result.get("selected_provider", "flux")
+        trace = f"ProviderRouter selected provider: {state['provider']}"
+        state["agent_trace"].append(trace)
+        print(f"[ExecutionEngine] {trace}")
+
     def _run_provider_prompt_adapter(self, registry, state):
         canonical_prompt = state.get("canonical_prompt") or state.get("final_prompt", "")
         try:
@@ -223,7 +249,7 @@ class DynamicExecutionEngine:
                 "provider_prompt_adapter",
                 canonical_prompt,
                 state.get("negative_prompt"),
-                provider="flux",
+                provider=state.get("provider", "flux"),
                 prompt_sections=state.get("prompt_sections"),
                 scene_plan=state.get("scene_plan"),
             )

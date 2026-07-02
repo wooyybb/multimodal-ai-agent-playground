@@ -261,3 +261,10 @@
 - Registered provider adapter in Orchestrator.
 - FLUX provider prompt is now used as `final_prompt` for GenerationAgent.
 - GPT Image and SDXL adapter skeletons were added.
+## Sprint27: Provider Router
+
+- Added `ProviderRouter`.
+- Added `provider_router` step before `provider_prompt_adapter`.
+- Orchestrator registers provider_router.
+- ExecutionEngine stores `provider_routing` and `provider`.
+- ProviderPromptAdapter now uses state-selected provider instead of hardcoded flux.

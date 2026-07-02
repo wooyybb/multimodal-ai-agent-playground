@@ -399,3 +399,24 @@ Provider-specific Prompt is optimized for one image generation model or provider
 ### Model-specific Prompt Optimization
 
 Model-specific Prompt Optimization adjusts length, wording, negative prompt handling, and instruction style for each provider.
+## Sprint27 Concepts
+
+### Provider Routing
+
+Provider Routing selects the generation provider based on request intent and provider capability.
+
+### Capability-based Routing
+
+Capability-based Routing chooses a provider based on available model strengths such as negative prompt support or long instruction following.
+
+### Model Selection
+
+Model Selection is the decision layer that chooses which model or provider should handle a task.
+
+### Fallback Provider
+
+Fallback Provider is used when the requested provider is unavailable.
+
+### Routing Policy
+
+Routing Policy is the rule set used to choose requested and selected providers.

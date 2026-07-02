@@ -307,3 +307,16 @@ This sprint focuses on prompt adaptation. Keeping GenerationAgent stable preserv
 ### Why skeleton adapters for GPT Image and SDXL?
 
 The architecture can be validated before adding actual provider APIs.
+## Sprint27 Decisions
+
+### Why separate ProviderRouter and ProviderPromptAdapter?
+
+ProviderRouter chooses the provider. ProviderPromptAdapter transforms prompt for that provider. Keeping these separate improves extensibility.
+
+### Why only FLUX in available_providers?
+
+Only FLUX is currently connected to actual generation. Other providers are planned but unavailable, so routing falls back to FLUX.
+
+### Why rule-based routing first?
+
+Rule-based routing is predictable and easy to test before introducing LLM-based provider selection.

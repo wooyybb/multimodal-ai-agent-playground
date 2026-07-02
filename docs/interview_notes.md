@@ -385,3 +385,16 @@ A. 특정 provider에 종속되지 않은 이미지 생성 의도입니다.
 
 Q. 왜 GenerationAgent를 직접 수정하지 않았나요?
 A. GenerationAgent는 생성 실행 책임을 유지하고, prompt 최적화는 adapter layer가 담당하도록 분리하기 위해서입니다.
+## Sprint27 Interview Notes
+
+Q. ProviderRouter는 왜 필요한가요?
+A. provider 선택과 prompt 변환을 분리해 provider 확장성을 높이기 위해 필요합니다.
+
+Q. ProviderRouter와 ProviderPromptAdapter의 차이는 무엇인가요?
+A. ProviderRouter는 어떤 provider를 쓸지 고르고, ProviderPromptAdapter는 선택된 provider에 맞게 prompt를 변환합니다.
+
+Q. 현재 FLUX만 사용하는데 왜 필요한가요?
+A. 지금은 fallback 구조지만, 나중에 SDXL/GPT Image/Imagen을 연결할 때 선택 계층을 그대로 사용할 수 있습니다.
+
+Q. unsupported provider 요청은 어떻게 처리하나요?
+A. 현재 available provider가 아니면 fallback provider인 FLUX를 선택합니다.

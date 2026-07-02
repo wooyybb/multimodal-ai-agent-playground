@@ -345,3 +345,16 @@ PromptAssembler
 ```
 
 The current workflow uses the FLUX adapter. GPT Image and SDXL adapters are skeletons. GenerationAgent interface remains unchanged; ExecutionEngine updates `final_prompt` with `provider_prompt`.
+## Sprint27 Provider Router
+
+Sprint27 adds provider selection before provider prompt adaptation.
+
+```text
+Planner / ScenePlan / UserPrompt
+-> ProviderRouter
+-> selected_provider
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+Currently only FLUX is available, so unsupported requested providers fall back to `flux`.

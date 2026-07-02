@@ -106,3 +106,6 @@ The project reframed image generation from prompt writing to scene planning. The
 ## Sprint26 Meeting Log
 
 The project decided to avoid sending one canonical prompt directly to every image provider. Provider-specific adaptation was separated into ProviderPromptAdapter.
+## Sprint27 Meeting Log
+
+The project introduced ProviderRouter to separate provider selection from provider-specific prompt adaptation.

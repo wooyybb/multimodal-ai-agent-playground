@@ -206,3 +206,9 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - ExecutionEngine updates `final_prompt` with provider prompt before generation.
 - GenerationAgent interface remains unchanged.
 - Remaining risk: FLUX word limit is word-based, not tokenizer-based.
+## Sprint27 Code Review
+
+- ProviderRouter handles provider selection independently.
+- ProviderPromptAdapter no longer receives a hardcoded provider in ExecutionEngine.
+- Unsupported providers fall back to FLUX.
+- Remaining risk: available providers are currently hardcoded as `["flux"]`.

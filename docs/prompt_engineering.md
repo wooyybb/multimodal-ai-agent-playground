@@ -157,3 +157,6 @@ Layout prompt는 단순히 `photobooth`나 `vertical`을 붙이는 방식에서 
 ## Sprint26 Prompt Engineering
 
 Canonical prompt is transformed into provider-specific prompt. FLUX adapter removes internal planning/debug terms and keeps visual keywords around subject, style, layout, lighting, pose, expression, and composition.
+## Sprint27 Prompt Engineering
+
+Provider별 prompt 최적화와 provider routing을 분리했습니다. Routing은 provider 선택을 담당하고, Adapter는 선택된 provider에 맞는 prompt 변환을 담당합니다.

@@ -340,3 +340,14 @@
 ### 다음 Sprint
 
 - Provider routing or multi-provider evaluation.
+## Sprint27 Retrospective
+
+### 잘된 점
+
+- Provider selection responsibility is now explicit.
+- FLUX fallback keeps the current workflow stable.
+- ProviderPromptAdapter can focus on prompt conversion.
+
+### 다음 Sprint
+
+- Provider capability config or multi-provider evaluation.

@@ -19,15 +19,26 @@ class ProviderPromptAdapter:
     ) -> dict:
         print("[ProviderPromptAdapter] Running...")
         provider = (provider or "flux").lower()
+        fallback_used = False
         if provider not in {"flux", "gpt_image", "sdxl"}:
             provider = "flux"
+            fallback_used = True
         print(f"[ProviderPromptAdapter] Provider: {provider}")
 
         if provider == "gpt_image":
-            return self._adapt_gpt_image(canonical_prompt, negative_prompt, prompt_sections)
+            result = self._adapt_gpt_image(canonical_prompt, negative_prompt, prompt_sections)
+            if fallback_used:
+                result["adapter_notes"].append("unknown provider fallback to flux")
+            return result
         if provider == "sdxl":
-            return self._adapt_sdxl(canonical_prompt, negative_prompt)
-        return self._adapt_flux(canonical_prompt, negative_prompt, scene_plan)
+            result = self._adapt_sdxl(canonical_prompt, negative_prompt)
+            if fallback_used:
+                result["adapter_notes"].append("unknown provider fallback to flux")
+            return result
+        result = self._adapt_flux(canonical_prompt, negative_prompt, scene_plan)
+        if fallback_used:
+            result["adapter_notes"].append("unknown provider fallback to flux")
+        return result
 
     def _adapt_flux(self, canonical_prompt, negative_prompt, scene_plan):
         prompt = self._clean_prompt(canonical_prompt)
