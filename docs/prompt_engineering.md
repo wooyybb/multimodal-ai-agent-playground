@@ -148,3 +148,6 @@ Long manual prompt programs are decomposed into section prompts: character, styl
 ## Sprint23 Prompt Engineering
 
 Character preservation prompt is decomposed into structured character schema and compact generation prompt rules. The goal is to preserve identity without repeating long prompt sentences.
+## Sprint24 Prompt Engineering
+
+Layout prompt는 단순히 `photobooth`나 `vertical`을 붙이는 방식에서 벗어나 frame structure, camera view, subject placement, background style, composition rules로 분해했습니다.

@@ -352,3 +352,13 @@ A. UI 변경 전에도 character reference semantics를 안정화하고 single-i
 
 Q. CharacterAgent와 PromptAssembler의 역할 차이는 무엇인가요?
 A. CharacterAgent는 character schema를 만들고, PromptAssembler는 그 schema를 generation prompt rule로 조립합니다.
+## Sprint24 Interview Notes
+
+Q. LayoutAgent는 Prompt를 만드는 Agent인가요?
+A. LayoutAgent는 final prompt를 직접 만들기보다 layout plan을 만들고, PromptAssembler가 이를 generation prompt로 변환합니다.
+
+Q. Composition Planning이 중요한 이유는?
+A. 생성 결과의 frame, camera, subject placement, cropping이 prompt 품질에 큰 영향을 주기 때문입니다.
+
+Q. Camera View를 Prompt에서 분리한 이유는?
+A. camera view는 style이나 character와 다른 visual structure decision이므로 LayoutAgent에서 별도로 관리하는 것이 명확합니다.

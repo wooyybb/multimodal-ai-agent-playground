@@ -186,3 +186,9 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - PromptAssembler compresses character preservation rules instead of repeating long text.
 - Existing single-image workflow remains available.
 - Remaining risk: actual multi-image captioning is not implemented yet, so reference details are still schema-level placeholders.
+## Sprint24 Code Review
+
+- LayoutAgent now returns a structured Layout Plan.
+- PromptAssembler converts layout fields into generation prompt phrases.
+- Existing workflow and agent interfaces are preserved.
+- Remaining risk: layout detection is rule-based and may need richer routing later.

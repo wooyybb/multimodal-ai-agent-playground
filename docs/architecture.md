@@ -305,3 +305,16 @@ Reference images or character_inputs
 ```
 
 Each uploaded image is treated as one separate character. The system does not merge characters and adds compact preservation rules for outfit, hairstyle, silhouette, proportions, visual vibe, and color balance.
+## Sprint24 Layout Planning
+
+Sprint24 upgrades `LayoutAgent` from keyword generation to composition planning.
+
+```text
+User intent
+-> LayoutAgent
+-> Layout Plan
+-> PromptAssembler
+-> Generation Prompt
+```
+
+The Layout Plan includes `layout_type`, `aspect_ratio`, `frame_structure`, `camera_view`, `subject_placement`, `background_style`, and `composition_rules`. PromptAssembler converts this plan into image-generation prompt phrases instead of copying raw keywords.

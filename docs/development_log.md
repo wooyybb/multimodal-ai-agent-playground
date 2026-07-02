@@ -238,3 +238,9 @@
 - Added prompt-based multi-character hints such as `two characters`, `friends`, `couple`, and `photobooth`.
 - Updated `PromptAssembler` to add compact character preservation rules to `generation_prompt`.
 - Kept UI and model agents unchanged.
+## Sprint24: Layout Planning Agent
+
+- Changed `LayoutAgent` from keyword generation to layout planning.
+- Added layout type detection for photobooth, scrapbook, poster, profile, portrait, illustration, sticker sheet, concept sheet, comic page, and cinematic layouts.
+- Added camera view, subject placement, background style, and composition rules.
+- Updated `PromptAssembler` to convert Layout Plan into generation prompt phrases.

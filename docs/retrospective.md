@@ -307,3 +307,14 @@
 ### 다음 Sprint
 
 - Multi-image UI or Photobooth Layout Agent.
+## Sprint24 Retrospective
+
+### 잘된 점
+
+- LayoutAgent responsibility became clearer.
+- Camera view and subject placement are now explicit.
+- PromptAssembler uses structured layout data.
+
+### 다음 Sprint
+
+- Photobooth-specific layout templates or composition evaluation.

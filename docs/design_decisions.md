@@ -272,3 +272,12 @@ Style transfer requests often fail when multiple references are blended. Treatin
 ### Why assemble preservation rules in PromptAssembler?
 
 CharacterAgent owns character schema. PromptAssembler owns final generation prompt wording, so it is the right place to compactly include preservation rules.
+## Sprint24 Decisions
+
+### Why make LayoutAgent a planning agent?
+
+Layout affects camera, frame, subject placement, and cropping. Treating it as a plan rather than a keyword list gives the generation prompt a clearer visual structure.
+
+### Why convert Layout Plan in PromptAssembler?
+
+LayoutAgent should plan visual structure. PromptAssembler should translate that structure into final generation prompt language.

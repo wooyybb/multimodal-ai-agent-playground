@@ -17,7 +17,7 @@ class PromptAssembler:
         character_bits = self._character_prompt_bits(character_section, caption)
         style_bits = (style_section or {}).get("style_keywords", [])
         rendering_bits = (style_section or {}).get("rendering_rules", [])
-        layout_bits = self._dict_values(layout_section)
+        layout_bits = self._layout_prompt_bits(layout_section)
         pose_bits = (pose_section or {}).get("pose_rules", [])
         expression_bits = (expression_section or {}).get("expression_rules", [])
         lighting_bits = (compressed_context or {}).get("retrieved_lighting_hint")
@@ -70,6 +70,71 @@ class PromptAssembler:
             elif value:
                 values.append(str(value))
         return values
+
+    def _layout_prompt_bits(self, layout_section):
+        if not layout_section:
+            return []
+
+        layout_type = layout_section.get("layout_type")
+        aspect_ratio = layout_section.get("aspect_ratio")
+        frame_structure = layout_section.get("frame_structure")
+        camera_view = layout_section.get("camera_view")
+        subject_placement = layout_section.get("subject_placement")
+        background_style = layout_section.get("background_style")
+        composition_rules = layout_section.get("composition_rules") or []
+
+        layout_phrase = self._layout_type_phrase(layout_type)
+        camera_phrase = self._camera_phrase(camera_view)
+        placement_phrase = self._placement_phrase(subject_placement)
+
+        bits = [
+            layout_phrase,
+            aspect_ratio,
+            frame_structure,
+            camera_phrase,
+            placement_phrase,
+            background_style,
+            ", ".join(composition_rules[:4]),
+        ]
+        return [bit for bit in bits if bit]
+
+    def _layout_type_phrase(self, layout_type):
+        phrases = {
+            "photobooth": "vertical Korean photobooth strip",
+            "scrapbook": "scrapbook-style page layout",
+            "poster": "clean poster composition",
+            "profile": "profile portrait layout",
+            "portrait": "portrait composition",
+            "illustration": "illustration-focused composition",
+            "sticker_sheet": "sticker sheet layout",
+            "concept_sheet": "concept sheet layout",
+            "comic_page": "comic page layout",
+            "cinematic": "cinematic scene composition",
+        }
+        return phrases.get(layout_type, "balanced image composition")
+
+    def _camera_phrase(self, camera_view):
+        phrases = {
+            "front": "front-facing camera",
+            "eye_level": "eye-level view",
+            "slightly_above": "slightly above camera angle",
+            "wide": "wide camera view",
+            "close_up": "close-up view",
+            "medium": "medium shot",
+            "full_body": "full-body view",
+            "half_body": "half-body view",
+        }
+        return phrases.get(camera_view, camera_view)
+
+    def _placement_phrase(self, subject_placement):
+        phrases = {
+            "centered": "centered subject placement",
+            "rule_of_thirds": "rule-of-thirds composition",
+            "symmetrical": "symmetrical subject placement",
+            "diagonal": "diagonal visual flow",
+            "balanced": "balanced centered composition",
+        }
+        return phrases.get(subject_placement, subject_placement)
 
     def _character_prompt_bits(self, character_section, caption):
         if not character_section:

@@ -97,3 +97,6 @@ The project generalized a long photobooth-style user request into a Prompt Orche
 ## Sprint23 Meeting Log
 
 The project generalized the goal of multi-character reference-based style transfer into Character Reference Handling. The decision was to build internal schema first before changing UI.
+## Sprint24 Meeting Log
+
+The project decided to treat layout as a planning problem rather than a keyword selection problem. LayoutAgent now owns composition planning and PromptAssembler owns prompt conversion.

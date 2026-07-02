@@ -226,3 +226,15 @@
 - Photobooth Layout Agent
 - Multi-image UI
 - Identity similarity evaluation
+## Sprint24: Layout Planning Agent - Done
+
+- Layout Plan schema added
+- Camera view planning added
+- Subject placement planning added
+- PromptAssembler layout conversion added
+
+## Next Sprint Proposal
+
+- Photobooth Layout Agent
+- Composition evaluator
+- Multi-image UI layout mapping

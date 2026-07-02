@@ -135,3 +135,6 @@ Codex was used to refactor prompt generation into section agents while preservin
 ## Sprint23 AI Usage
 
 Codex was guided with a schema-first prompt: build multi-character handling before UI changes, keep single-image fallback, and do not modify model/tool agents.
+## Sprint24 AI Usage
+
+Codex was used to refactor LayoutAgent into a structured composition planner while preserving the existing workflow and generation/evaluation interfaces.

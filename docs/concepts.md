@@ -340,3 +340,20 @@ Character Separation prevents multiple reference images from being merged into a
 ### Reference-aware Prompting
 
 Reference-aware Prompting adds explicit rules that generated images should preserve the reference identity.
+## Sprint24 Concepts
+
+### Visual Composition Planning
+
+Visual Composition Planning defines how subjects, frames, camera, background, and spacing should be arranged.
+
+### Scene Layout Planning
+
+Scene Layout Planning describes the overall structure of the generated image, including frame type and background style.
+
+### Camera Planning
+
+Camera Planning decides view direction and scale such as eye-level, close-up, medium shot, or full-body view.
+
+### Prompt Layout Design
+
+Prompt Layout Design converts visual structure plans into prompt phrases that image models can follow.
