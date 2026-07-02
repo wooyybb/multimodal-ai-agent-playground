@@ -302,3 +302,10 @@
 - Added `llm_prompt_optimizer` after rule-based `prompt_optimizer`.
 - Added disabled, mock, and future llm modes without external API calls.
 - Added `llm_optimizer_report` and `llm_optimized_prompt` state outputs.
+
+## Sprint34: AgentState Framework Core
+
+- Added `workflow/agent_state.py`.
+- Added `AgentState.from_dict()`, `to_dict()`, `update_from_dict()`, and `validate()`.
+- ExecutionEngine now builds and validates AgentState at workflow boundaries.
+- ToolRegistry state-based execution now accepts dict and AgentState inputs.

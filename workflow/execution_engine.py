@@ -1,3 +1,6 @@
+from workflow.agent_state import AgentState
+
+
 class DynamicExecutionEngine:
     DEFAULT_PLAN = [
         "memory_load",
@@ -29,7 +32,9 @@ class DynamicExecutionEngine:
     def run(self, execution_plan: list[str], registry, state: dict) -> dict:
         print("[ExecutionEngine] Starting dynamic execution...")
 
-        state = state or {}
+        agent_state = AgentState.from_dict(state)
+        agent_state.validate()
+        state = agent_state.to_dict()
         state.setdefault("agent_trace", [])
         plan = self._normalize_plan(execution_plan or self.DEFAULT_PLAN)
 
@@ -53,7 +58,9 @@ class DynamicExecutionEngine:
                     raise
 
         print("[ExecutionEngine] Dynamic execution completed.")
-        return state
+        final_state = AgentState.from_dict(state)
+        final_state.validate()
+        return final_state.to_dict()
 
     def _run_memory_load(self, registry, state):
         state["last_run"] = registry.call("memory_load")

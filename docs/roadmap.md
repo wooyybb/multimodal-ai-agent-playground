@@ -352,3 +352,16 @@
 - AgentState dataclass
 - Prompt benchmark
 - Real LLM optimizer integration
+
+## Sprint34: AgentState Framework Core - Done
+
+- AgentState dataclass added
+- ExecutionEngine validates state at workflow boundaries
+- ToolRegistry accepts dict and AgentState state inputs
+- Existing dict workflow preserved
+
+## Next Sprint Proposal
+
+- AgentState adoption inside more agents
+- Graph State
+- Multi-session state management

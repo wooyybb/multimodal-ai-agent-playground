@@ -1,3 +1,6 @@
+from workflow.agent_state import AgentState
+
+
 class ToolRegistry:
     def __init__(self):
         self._tools = {}
@@ -27,10 +30,11 @@ class ToolRegistry:
             raise ValueError(f"Tool is not registered: {name}")
 
         tool = self._tools[name]
+        state_payload = state.to_dict() if isinstance(state, AgentState) else state
         if hasattr(tool, "run"):
-            result = tool.run(state)
+            result = tool.run(state_payload)
         elif callable(tool):
-            result = tool(state)
+            result = tool(state_payload)
         else:
             raise ValueError(f"Registered tool is not callable: {name}")
 
@@ -44,6 +48,8 @@ class ToolRegistry:
             result = {name: result}
 
         print(f"[ToolRegistry] State update keys: {list(result.keys())}")
+        if isinstance(state, AgentState):
+            state.update_from_dict(result)
         return result
 
     def list_tools(self) -> list[str]:

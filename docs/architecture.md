@@ -447,3 +447,18 @@ PromptAssembler
 ```
 
 The current implementation does not call an external LLM API. Disabled mode keeps the existing optimized prompt, mock mode performs deterministic local cleanup, and future LLM mode is represented as a safe fallback interface.
+
+## Sprint34 AgentState Framework Core
+
+Sprint34 introduces `AgentState` as the framework-level shared state object.
+
+```text
+ExecutionEngine
+-> AgentState.from_dict()
+-> validate()
+-> dict-compatible workflow
+-> AgentState.from_dict()
+-> to_dict()
+```
+
+The existing Agent code still receives dict-style state in this Sprint. `AgentState` acts as a framework core boundary that centralizes common fields, supports validation warnings, preserves unknown keys in `extra`, and keeps the current workflow compatible.
