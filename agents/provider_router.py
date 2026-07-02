@@ -1,10 +1,9 @@
+import json
+from pathlib import Path
+
+
 class ProviderRouter:
-    CAPABILITIES = {
-        "flux": ["text_to_image", "fast_generation"],
-        "sdxl": ["text_to_image", "negative_prompt", "style_control"],
-        "gpt_image": ["long_instruction_following", "image_editing"],
-        "imagen": ["natural_language_prompting"],
-    }
+    CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "providers.json"
 
     def run(
         self,
@@ -14,18 +13,36 @@ class ProviderRouter:
         available_providers: list[str] | None = None,
     ) -> dict:
         print("[ProviderRouter] Running...")
-        available_providers = available_providers or ["flux"]
-        requested_provider = self._requested_provider(user_prompt)
-        fallback_provider = "flux"
+        config = self._load_config()
+        providers = config.get("providers", {})
+        default_provider = config.get("default_provider", "flux")
+        enabled_providers = [
+            name for name, info in providers.items() if info.get("enabled") is True
+        ]
 
-        if requested_provider in available_providers:
+        if available_providers is not None:
+            enabled_providers = [
+                provider for provider in enabled_providers if provider in available_providers
+            ]
+        if not enabled_providers:
+            enabled_providers = [default_provider]
+
+        print(f"[ProviderRouter] Enabled providers: {enabled_providers}")
+        print(f"[ProviderRouter] Default provider: {default_provider}")
+
+        requested_provider = self._requested_provider(user_prompt)
+        fallback_provider = (
+            default_provider if default_provider in enabled_providers else enabled_providers[0]
+        )
+
+        if requested_provider in enabled_providers:
             selected_provider = requested_provider
             reason = f"{requested_provider} is available and matches the request."
         else:
             selected_provider = fallback_provider
             reason = (
                 f"{requested_provider} would be suitable for this request, "
-                f"but only {', '.join(available_providers)} is currently available."
+                f"but only {', '.join(enabled_providers)} is currently enabled."
             )
 
         print(f"[ProviderRouter] Requested provider: {requested_provider}")
@@ -36,8 +53,31 @@ class ProviderRouter:
             "selected_provider": selected_provider,
             "fallback_provider": fallback_provider,
             "reason": reason,
-            "capabilities": self.CAPABILITIES,
+            "capabilities": providers,
         }
+
+    def _load_config(self):
+        print("[ProviderRouter] Loading providers.json...")
+        try:
+            with self.CONFIG_PATH.open("r", encoding="utf-8") as file:
+                return json.load(file)
+        except Exception as error:
+            print(f"[ProviderRouter] Failed to load provider config: {error}")
+            return {
+                "default_provider": "flux",
+                "providers": {
+                    "flux": {
+                        "enabled": True,
+                        "display_name": "FLUX.1 Schnell",
+                        "supports_long_prompt": False,
+                        "supports_negative_prompt": False,
+                        "supports_image_edit": False,
+                        "supports_multi_image": False,
+                        "speed": "fast",
+                        "quality": "high",
+                    }
+                },
+            }
 
     def _requested_provider(self, user_prompt):
         text = str(user_prompt or "").lower()

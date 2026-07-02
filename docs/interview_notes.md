@@ -398,3 +398,13 @@ A. 지금은 fallback 구조지만, 나중에 SDXL/GPT Image/Imagen을 연결할
 
 Q. unsupported provider 요청은 어떻게 처리하나요?
 A. 현재 available provider가 아니면 fallback provider인 FLUX를 선택합니다.
+## Sprint28 Interview Notes
+
+Q. 왜 Config-driven architecture를 적용했나요?
+A. provider capability를 코드에 직접 박아두면 provider가 늘어날 때마다 Router 코드를 수정해야 합니다. `providers.json`으로 분리하면 provider 활성화 여부, capability, display name을 설정 파일에서 관리할 수 있어 확장성이 좋아집니다.
+
+Q. Provider Registry와 ProviderRouter의 차이는 무엇인가요?
+A. Provider Registry는 provider의 capability와 enabled 상태를 보관하는 설정 계층이고, ProviderRouter는 그 설정을 읽어 현재 요청에 맞는 provider를 선택하는 실행 계층입니다.
+
+Q. 왜 현재는 FLUX만 enabled인가요?
+A. 현재 실제 workflow는 FLUX 중심으로 검증되어 있습니다. GPT Image와 SDXL은 capability 정보만 등록하고 `enabled: false`로 두어, 향후 연결 시 config 변경만으로 routing 후보에 넣을 수 있게 했습니다.

@@ -1,0 +1,35 @@
+{
+  "default_provider": "flux",
+  "providers": {
+    "flux": {
+      "enabled": true,
+      "display_name": "FLUX.1 Schnell",
+      "supports_long_prompt": false,
+      "supports_negative_prompt": false,
+      "supports_image_edit": false,
+      "supports_multi_image": false,
+      "speed": "fast",
+      "quality": "high"
+    },
+    "gpt_image": {
+      "enabled": false,
+      "display_name": "GPT Image",
+      "supports_long_prompt": true,
+      "supports_negative_prompt": false,
+      "supports_image_edit": true,
+      "supports_multi_image": true,
+      "speed": "medium",
+      "quality": "very_high"
+    },
+    "sdxl": {
+      "enabled": false,
+      "display_name": "Stable Diffusion XL",
+      "supports_long_prompt": false,
+      "supports_negative_prompt": true,
+      "supports_image_edit": true,
+      "supports_multi_image": false,
+      "speed": "medium",
+      "quality": "high"
+    }
+  }
+}

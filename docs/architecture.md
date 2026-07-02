@@ -358,3 +358,17 @@ Planner / ScenePlan / UserPrompt
 ```
 
 Currently only FLUX is available, so unsupported requested providers fall back to `flux`.
+
+## Sprint28 Provider Capability Config
+
+Sprint28 adds a config layer for provider capabilities.
+
+```text
+config/providers.json
+-> ProviderRouter
+-> selected_provider
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+Provider information is no longer hardcoded inside `ProviderRouter`. The router loads `default_provider`, enabled providers, display names, and capability flags from `config/providers.json`. Only providers with `enabled: true` are selectable. The current workflow keeps FLUX as the default and enabled provider.

@@ -274,3 +274,16 @@
 - Multi-Provider Evaluation
 - Provider Capability Config
 - Cost/latency-aware routing
+
+## Sprint28: Provider Capability Config - Done
+
+- `config/providers.json` added
+- Provider capabilities moved out of `ProviderRouter`
+- Router now loads enabled providers from config
+- FLUX remains the default enabled provider
+
+## Next Sprint Proposal
+
+- Multi-Provider Evaluation
+- Cost/latency-aware routing
+- UI provider selection
