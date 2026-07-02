@@ -270,6 +270,7 @@ class DynamicExecutionEngine:
 
     def _run_generation(self, registry, state):
         print("[ExecutionEngine] Initial attempt started.")
+        self._print_prompt_preview(state)
         state["output_image_path"] = registry.call(
             "generation",
             state.get("final_prompt", ""),
@@ -457,3 +458,31 @@ class DynamicExecutionEngine:
         state.update(result)
         print(f"[ExecutionEngine] State updated by: {step}")
         return result
+
+    def _print_prompt_preview(self, state):
+        sections = state.get("prompt_sections") or {}
+        print("========== Prompt Preview ==========")
+        print(f"Character\n{self._preview_section(sections.get('character'))}")
+        print(f"Layout\n{self._preview_section(sections.get('layout'))}")
+        print(f"Style\n{self._preview_section(sections.get('style'))}")
+        print(f"Lighting\n{self._preview_section(sections.get('lighting'))}")
+        print(
+            "Negative\n"
+            f"{state.get('provider_negative_prompt') or state.get('negative_prompt') or ''}"
+        )
+        print("====================================")
+
+    def _preview_section(self, section):
+        if section is None:
+            return ""
+        if isinstance(section, dict):
+            values = []
+            for value in section.values():
+                if isinstance(value, list):
+                    values.extend(str(item) for item in value[:3])
+                elif value:
+                    values.append(str(value))
+            return ", ".join(values[:5])
+        if isinstance(section, list):
+            return ", ".join(str(item) for item in section[:5])
+        return str(section)

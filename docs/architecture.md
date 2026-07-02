@@ -414,3 +414,19 @@ PromptAssembler
 ```
 
 `PromptOptimizerAgent` reads `prompt_report`, removes duplicate phrases and internal context terms, repairs missing sections with compact keywords, controls prompt length, and writes the optimized prompt back to `canonical_prompt` and `final_prompt`.
+
+## Sprint32 Intelligent Prompt Optimizer
+
+Sprint32 upgrades PromptOptimizerAgent from broad rule-based cleanup to report-driven optimization.
+
+```text
+PromptCriticAgent
+-> prompt_report
+-> reasoning
+-> PromptOptimizerAgent
+-> optimized_prompt
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+The optimizer now reads duplicate keywords, missing sections, warnings, and prompt quality score before editing. It performs only the repairs requested by the critic report and prints a Prompt Preview immediately before generation.

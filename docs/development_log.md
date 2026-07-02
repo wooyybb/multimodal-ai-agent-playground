@@ -288,3 +288,10 @@
 - Inserted `prompt_optimizer` after `prompt_critic` and before provider routing.
 - Optimized prompt now updates `optimized_prompt`, `canonical_prompt`, and `final_prompt`.
 - ProviderPromptAdapter records `used optimized prompt` when optimizer output is present.
+
+## Sprint32: Intelligent Prompt Optimizer
+
+- PromptOptimizerAgent now reads `prompt_report` before editing.
+- Added reasoning steps, before score, and estimated after score to `optimization_report`.
+- Optimizer now reacts separately to duplicates, missing sections, warnings, and score bands.
+- ExecutionEngine prints Prompt Preview before generation.

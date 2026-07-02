@@ -453,3 +453,14 @@ A. 의미적 모호성이나 고급 미학 판단은 어렵습니다. 하지만 
 
 Q. LLM 기반 optimizer로 어떻게 확장할 수 있나요?
 A. 현재 optimization_report와 prompt_report를 LLM 입력으로 사용해 semantic rewrite, provider-specific rewrite, A/B prompt 후보 생성을 추가할 수 있습니다.
+
+## Sprint32 Interview Notes
+
+Q. PromptOptimizer는 무엇을 기준으로 Prompt를 수정하는가?
+A. PromptCriticAgent가 만든 `prompt_report`를 기준으로 수정합니다. duplicate keyword, missing section, warning, quality score를 먼저 읽고 필요한 작업만 수행합니다.
+
+Q. Rule 기반 Optimizer와 Intelligent Optimizer의 차이는?
+A. 기존 rule 기반 Optimizer는 정해진 정리 작업을 넓게 적용했습니다. Intelligent Optimizer는 Critic Report를 해석해 중복이 있을 때만 제거하고, 누락된 section만 보완하며, warning이 있을 때만 길이 조절을 수행합니다.
+
+Q. Critic Report를 어떻게 활용하는가?
+A. `duplicate_keywords`는 중복 제거에, `missing_sections`는 필요한 keyword 추가에, `warnings`는 압축 또는 보강 판단에, `quality_score`는 수정 강도 조절에 사용합니다.
