@@ -125,3 +125,20 @@ The project decided to extend prompt optimization with an LLM-ready interface. T
 ## Sprint36 Meeting Log
 
 The project prioritized observability before deployment hardening. Debug reports make it easier to explain, compare, and improve generation runs before adding Docker or production infrastructure.
+## Sprint39 Meeting Log
+
+### Topic
+
+Context Program Builder를 도입해 Prompt Orchestration 결과를 provider-independent 중간 표현으로 정리한다.
+
+### Decision
+
+Specialist Agent 결과를 바로 prompt로 합치지 않고 `ContextProgramBuilder`가 먼저 structured context program을 만든다.
+
+### Reason
+
+Agent가 많아지면서 prompt assembly가 점점 복잡해졌고, provider-specific prompt formatting과 context planning이 섞이기 시작했다. Context Program Layer를 두면 context planning, prompt assembly, provider adaptation을 분리할 수 있다.
+
+### Follow-up
+
+Context Program schema validation과 provider-specific compiler test를 추가한다.

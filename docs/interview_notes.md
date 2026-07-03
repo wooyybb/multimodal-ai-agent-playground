@@ -548,3 +548,19 @@ A. Debug Report는 한 run의 세부 lifecycle을 보여주고, Benchmark Report
 
 Q. 실험 결과를 어떻게 비교했나요?
 A. benchmark result JSON을 읽어 total, average best_score, retry rate, best/worst run, failed runs, result table로 정리했습니다.
+## Sprint39 Interview Notes
+
+Q. Context Program이란 무엇인가요?
+A. 여러 specialist agent가 만든 scene, character, style, layout, lighting, negative constraint를 provider-independent structured object로 정리한 중간 표현입니다.
+
+Q. 왜 ContextProgramBuilder를 만들었나요?
+A. prompt가 길어질수록 agent state와 generation prompt가 섞이는 문제가 생깁니다. ContextProgramBuilder는 먼저 context를 구조화하고, 이후 PromptAssembler와 ProviderPromptAdapter가 필요한 visual instruction만 prompt로 컴파일하게 합니다.
+
+Q. Context Engineering과 Prompt Engineering의 차이는 무엇인가요?
+A. Context Engineering은 agent가 사용할 정보 구조를 설계하는 일이고, Prompt Engineering은 그 정보를 특정 모델이나 provider가 이해할 수 있는 입력 문장으로 바꾸는 일입니다.
+
+Q. ProviderPromptAdapter는 Context Program을 어떻게 사용하나요?
+A. FLUX에는 subject, style, layout, lighting, pose, expression 중심의 짧은 visual prompt를 만들고, GPT Image나 SDXL은 각 provider의 skeleton에 맞게 같은 context를 다르게 변환합니다.
+
+Q. 왜 context_program 전체를 prompt에 넣지 않나요?
+A. 전체 객체에는 내부 state, provider constraint, memory hint가 포함될 수 있습니다. 모델에는 시각적으로 필요한 instruction만 전달해야 prompt가 짧고 명확해집니다.

@@ -1,5 +1,27 @@
 # Architecture
 
+## Sprint39: Context Program Layer
+
+현재 구조는 Prompt Specialist Agent가 만든 결과를 바로 긴 generation prompt로 합치는 방식에서 한 단계 더 발전했습니다.
+
+```text
+PlannerAgent
+-> DynamicExecutionEngine
+-> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
+-> ContextProgramBuilder
+-> PromptAssembler
+-> PromptCritic / PromptOptimizer
+-> ProviderRouter
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+`ContextProgramBuilder`는 provider-independent structured context program을 만듭니다. 이 객체는 `task`, `user_goal`, `scene`, `characters`, `style`, `layout`, `pose`, `expression`, `lighting`, `quality`, `negative`, `memory`, `retrieval`, `provider`, `output` 섹션으로 구성됩니다.
+
+중요한 점은 `context_program` 전체를 prompt에 그대로 붙이지 않는다는 것입니다. `PromptAssembler`와 `ProviderPromptAdapter`는 이 구조화된 중간 표현을 읽고, 실제 generation prompt에는 subject, style, layout, lighting, pose, expression처럼 provider가 이해할 수 있는 visual instruction만 컴파일합니다.
+
+이 레이어를 추가한 이유는 Context Engineering과 Prompt Engineering을 분리하기 위해서입니다. Context Program은 agent state를 정리하는 framework-level intermediate representation이고, ProviderPromptAdapter는 이를 FLUX, GPT Image, SDXL 같은 provider별 prompt 형식으로 변환합니다.
+
 이 프로젝트는 단일 파이프라인(Single Pipeline)에서 멀티 에이전트 아키텍처(Multi-Agent Architecture)로 발전 중입니다.
 
 ## Current Structure

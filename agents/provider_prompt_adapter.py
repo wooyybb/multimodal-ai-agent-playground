@@ -25,6 +25,7 @@ class ProviderPromptAdapter:
                 provider=state.get("provider", "flux"),
                 prompt_sections=state.get("prompt_sections"),
                 scene_plan=state.get("scene_plan"),
+                context_program=state.get("context_program"),
             )
             provider_prompt = result.get(
                 "provider_prompt",
@@ -59,6 +60,7 @@ class ProviderPromptAdapter:
         provider: str = "flux",
         prompt_sections: dict | None = None,
         scene_plan: dict | None = None,
+        context_program: dict | None = None,
     ) -> dict:
         print("[ProviderPromptAdapter] Running...")
         provider = (provider or "flux").lower()
@@ -69,22 +71,36 @@ class ProviderPromptAdapter:
         print(f"[ProviderPromptAdapter] Provider: {provider}")
 
         if provider == "gpt_image":
-            result = self._adapt_gpt_image(canonical_prompt, negative_prompt, prompt_sections)
+            result = self._adapt_gpt_image(
+                canonical_prompt,
+                negative_prompt,
+                prompt_sections,
+                context_program,
+            )
             if fallback_used:
                 result["adapter_notes"].append("unknown provider fallback to flux")
             return result
         if provider == "sdxl":
-            result = self._adapt_sdxl(canonical_prompt, negative_prompt)
+            result = self._adapt_sdxl(canonical_prompt, negative_prompt, context_program)
             if fallback_used:
                 result["adapter_notes"].append("unknown provider fallback to flux")
             return result
-        result = self._adapt_flux(canonical_prompt, negative_prompt, scene_plan)
+        result = self._adapt_flux(
+            canonical_prompt,
+            negative_prompt,
+            scene_plan,
+            context_program,
+        )
         if fallback_used:
             result["adapter_notes"].append("unknown provider fallback to flux")
         return result
 
-    def _adapt_flux(self, canonical_prompt, negative_prompt, scene_plan):
-        prompt = self._clean_prompt(canonical_prompt)
+    def _adapt_flux(self, canonical_prompt, negative_prompt, scene_plan, context_program=None):
+        if context_program:
+            print("[ProviderPromptAdapter] Compiling FLUX prompt from context program...")
+            prompt = self._compile_flux_from_context(context_program, canonical_prompt)
+        else:
+            prompt = self._clean_prompt(canonical_prompt)
         prompt = self._deduplicate_phrases(prompt)
         prompt = self._limit_words(prompt, min_words=70, max_words=110)
         print(f"[ProviderPromptAdapter] FLUX prompt word count: {len(prompt.split())}")
@@ -96,32 +112,50 @@ class ProviderPromptAdapter:
                 "compressed for FLUX",
                 "removed internal planning terms",
                 "kept visual subject, style, layout, pose, expression, composition",
+                "used context program" if context_program else "used canonical prompt",
             ],
         }
 
-    def _adapt_gpt_image(self, canonical_prompt, negative_prompt, prompt_sections):
-        return {
-            "provider": "gpt_image",
-            "provider_prompt": (
+    def _adapt_gpt_image(
+        self,
+        canonical_prompt,
+        negative_prompt,
+        prompt_sections,
+        context_program=None,
+    ):
+        if context_program:
+            prompt = self._compile_gpt_image_from_context(context_program, canonical_prompt)
+        else:
+            prompt = (
                 "Create an image using this structured instruction: "
                 f"{self._clean_prompt(canonical_prompt)}"
-            ),
+            )
+        return {
+            "provider": "gpt_image",
+            "provider_prompt": prompt,
             "provider_negative_prompt": negative_prompt or "",
             "adapter_notes": [
                 "skeleton adapter for GPT Image",
                 "structured instruction format",
+                "used context program" if context_program else "used canonical prompt",
             ],
             "sections": prompt_sections or {},
         }
 
-    def _adapt_sdxl(self, canonical_prompt, negative_prompt):
+    def _adapt_sdxl(self, canonical_prompt, negative_prompt, context_program=None):
+        if context_program:
+            prompt = self._compile_flux_from_context(context_program, canonical_prompt)
+            negative_prompt = self._negative_from_context(context_program, negative_prompt)
+        else:
+            prompt = self._clean_prompt(canonical_prompt)
         return {
             "provider": "sdxl",
-            "provider_prompt": self._clean_prompt(canonical_prompt),
+            "provider_prompt": prompt,
             "provider_negative_prompt": negative_prompt or "",
             "adapter_notes": [
                 "skeleton adapter for SDXL",
                 "separated prompt and negative prompt",
+                "used context program" if context_program else "used canonical prompt",
             ],
         }
 
@@ -150,3 +184,70 @@ class ProviderPromptAdapter:
         if state.get("optimized_prompt") and "used optimized prompt" not in notes:
             notes.append("used optimized prompt")
         return notes
+
+    def _compile_flux_from_context(self, context_program, fallback_prompt):
+        scene = context_program.get("scene") or {}
+        characters = context_program.get("characters") or {}
+        style = context_program.get("style") or {}
+        layout = context_program.get("layout") or {}
+        pose = context_program.get("pose") or {}
+        expression = context_program.get("expression") or {}
+        lighting = context_program.get("lighting") or {}
+        quality = context_program.get("quality") or {}
+
+        parts = [
+            scene.get("narrative"),
+            self._character_phrase(characters),
+            ", ".join(style.get("style_keywords", [])[:6]),
+            ", ".join(style.get("rendering_rules", [])[:4]),
+            self._layout_phrase(layout),
+            ", ".join(pose.get("pose_rules", [])[:4]),
+            ", ".join(expression.get("expression_rules", [])[:4]),
+            ", ".join(lighting.get("lighting_keywords", [])[:5]),
+            ", ".join(quality.get("quality_keywords", [])[:4]),
+        ]
+        prompt = ", ".join(part for part in parts if part)
+        return self._clean_prompt(prompt or fallback_prompt)
+
+    def _compile_gpt_image_from_context(self, context_program, fallback_prompt):
+        user_goal = context_program.get("user_goal") or {}
+        lines = [
+            "Create an image from this structured visual brief.",
+            f"Goal: {user_goal.get('interpreted_goal') or fallback_prompt}",
+            f"Subject: {self._character_phrase(context_program.get('characters') or {})}",
+            f"Scene: {(context_program.get('scene') or {}).get('narrative') or ''}",
+            f"Layout: {self._layout_phrase(context_program.get('layout') or {})}",
+            f"Style: {', '.join((context_program.get('style') or {}).get('style_keywords', [])[:6])}",
+            f"Lighting: {', '.join((context_program.get('lighting') or {}).get('lighting_keywords', [])[:5])}",
+        ]
+        return self._clean_prompt(" ".join(line for line in lines if line.strip()))
+
+    def _negative_from_context(self, context_program, fallback_negative):
+        negative = context_program.get("negative") or {}
+        values = negative.get("negative_prompt", []) + negative.get("strict_avoid", [])
+        return ", ".join(values) or fallback_negative or ""
+
+    def _character_phrase(self, characters):
+        count = characters.get("character_count") or 1
+        rules = characters.get("preservation_rules") or []
+        character_items = characters.get("characters") or []
+        hints = [
+            item.get("caption_hint")
+            for item in character_items
+            if isinstance(item, dict) and item.get("caption_hint")
+        ]
+        bits = [f"{count} recognizable character"]
+        bits.extend(hints[:3])
+        bits.extend(rules[:2])
+        return ", ".join(str(bit) for bit in bits if bit)
+
+    def _layout_phrase(self, layout):
+        values = [
+            layout.get("layout_type"),
+            layout.get("aspect_ratio"),
+            layout.get("frame_structure"),
+            layout.get("camera_view"),
+            layout.get("subject_placement"),
+            ", ".join(layout.get("composition_rules", [])[:4]),
+        ]
+        return ", ".join(str(value) for value in values if value)

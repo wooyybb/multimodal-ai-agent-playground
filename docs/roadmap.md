@@ -417,3 +417,16 @@
 - API Schema expansion
 - Docker packaging
 - Benchmark dashboard
+## Sprint39: Context Program Builder - Done
+
+- `ContextProgramBuilder` 추가
+- provider-independent `context_program` 생성
+- PromptAssembler가 Context Program을 참조
+- ProviderPromptAdapter가 provider별 prompt로 컴파일
+- Debug Report에 Context Program 저장
+
+## Next Sprint Proposal
+
+- Context Program schema validation
+- Provider-specific context compiler tests
+- Visual prompt contract tests

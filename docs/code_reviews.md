@@ -241,3 +241,19 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - ProviderPromptAdapter no longer receives a hardcoded provider in ExecutionEngine.
 - Unsupported providers fall back to FLUX.
 - Remaining risk: available providers are currently hardcoded as `["flux"]`.
+## Sprint39 Code Review
+
+### Review Focus
+
+Context Program 도입이 기존 workflow를 깨지 않고, provider-independent structured context를 prompt compilation 앞단에 추가하는지 검토했습니다.
+
+### Findings
+
+- `ContextProgramBuilder`는 state를 직접 실행 가능한 provider prompt로 만들지 않고 중간 표현으로 유지합니다.
+- `PromptAssembler`는 `context_program`이 있을 때도 전체 객체를 prompt에 복사하지 않고 visual fields만 추출합니다.
+- `ProviderPromptAdapter`는 FLUX/GPT Image/SDXL 경로에서 context 기반 prompt compilation을 지원하면서 legacy canonical prompt fallback을 유지합니다.
+- `DebugReportManager`는 context program을 저장하므로 실행 후 prompt lifecycle을 추적할 수 있습니다.
+
+### Residual Risk
+
+Context Program schema는 아직 dataclass나 JSON schema로 강제되지 않습니다. 다음 단계에서는 schema validation과 provider compiler unit test가 필요합니다.

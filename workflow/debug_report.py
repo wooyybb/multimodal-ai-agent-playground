@@ -74,6 +74,9 @@ class DebugReportManager:
             "scene_plan": self._safe(state.get("scene_plan")),
             "memory_context": self._safe(state.get("memory_context")),
             "retrieved_context": self._safe(state.get("retrieved_context")),
+            "context_program": self._safe(state.get("context_program")),
+            "context_program_summary": self._safe(state.get("context_program_summary")),
+            "context_program_version": self._safe(state.get("context_program_version")),
             "character_section": self._safe(state.get("character_section")),
             "style_section": self._safe(state.get("style_section")),
             "layout_section": self._safe(state.get("layout_section")),
@@ -108,6 +111,15 @@ class DebugReportManager:
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
         self._append_block(lines, "SCENE PLAN", state.get("scene_plan"))
+        self._append_block(
+            lines,
+            "CONTEXT PROGRAM",
+            {
+                "version": state.get("context_program_version"),
+                "summary": state.get("context_program_summary"),
+                "program": state.get("context_program"),
+            },
+        )
         self._append_block(lines, "CHARACTER", state.get("character_section"))
         self._append_block(lines, "STYLE", state.get("style_section"))
         self._append_block(lines, "LAYOUT", state.get("layout_section"))

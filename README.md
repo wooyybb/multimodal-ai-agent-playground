@@ -26,6 +26,7 @@ User
 -> Knowledge Retrieval
 -> ScenePlanningAgent
 -> Character / Style / Layout / Pose / Expression / Lighting Agents
+-> ContextProgramBuilder
 -> PromptAssembler
 -> PromptCritic
 -> PromptOptimizer
@@ -56,6 +57,7 @@ This makes the workflow closer to a graph-style agent system while still staying
 - Prompt compression for generation and CLIP-safe evaluation prompts
 - Multi-agent prompt orchestration
 - Scene, character, style, layout, pose, expression, lighting, and negative prompt agents
+- ContextProgramBuilder for provider-independent structured visual context
 - PromptAssembler for canonical prompt construction
 - PromptCritic for duplicate, missing-section, warning, and quality-score analysis
 - PromptOptimizer for report-driven prompt repair
@@ -205,6 +207,22 @@ outputs/runs/run_*/best.png
 
 Runtime images are copied only when the corresponding source files exist. Do not commit the whole `outputs/` directory.
 
+## Context Program Layer
+
+Sprint 39 adds a provider-independent `context_program` between specialist agents and prompt generation.
+
+```text
+Specialist Agents
+-> ContextProgramBuilder
+-> PromptAssembler
+-> ProviderPromptAdapter
+-> GenerationAgent
+```
+
+The context program is a structured intermediate representation for subject, scene, style, layout, pose, expression, lighting, negative constraints, memory hints, retrieval hints, and provider constraints. It is not copied directly into the generation prompt. `PromptAssembler` and `ProviderPromptAdapter` read it and compile only the visual instructions each provider needs.
+
+This keeps Context Engineering separate from provider-specific Prompt Engineering.
+
 ## Sprint History
 
 - Sprint 00: Project skeleton
@@ -241,17 +259,19 @@ Runtime images are copied only when the corresponding source files exist. Do not
 - Sprint 31: PromptOptimizerAgent
 - Sprint 32: Intelligent Prompt Optimizer
 - Sprint 33: LLM Prompt Optimizer Interface
+- Sprint 34: AgentState Framework Core
 - Sprint 35: FastAPI Service Layer
 - Sprint 36: Prompt Debug Report and Trace Viewer
 - Sprint 37: Benchmark Runner
 - Sprint 38: Run Comparison Report
+- Sprint 39: ContextProgramBuilder and provider-independent context program
 
 ## Roadmap
 
 Planned future work:
 
 - Real LLM Prompt Optimizer integration
-- `AgentState` dataclass or state schema validation
+- Typed state validation expansion beyond the current `AgentState` core
 - Multi-provider generation
 - Reference image handling improvements
 - Image editing workflow

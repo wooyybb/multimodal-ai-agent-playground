@@ -15,6 +15,7 @@ class PlannerAgent:
             "expression",
             "lighting",
             "negative_prompt",
+            "context_program_builder",
             "prompt_assembler",
             "prompt_critic",
             "prompt_optimizer",

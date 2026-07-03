@@ -27,6 +27,7 @@ class PromptAssembler:
                 scene_plan=state.get("scene_plan"),
                 compressed_context=state.get("compressed_context", {}),
                 lighting_section=state.get("lighting_section", {}),
+                context_program=state.get("context_program"),
             )
             return {
                 "canonical_prompt": result.get("canonical_prompt", ""),
@@ -65,22 +66,38 @@ class PromptAssembler:
         scene_plan=None,
         compressed_context=None,
         lighting_section=None,
+        context_program=None,
     ) -> dict:
         print("[PromptAssembler] Building generation prompt...")
+        if context_program:
+            print("[PromptAssembler] Reading context program...")
         print("[PromptAssembler] Adding character preservation rules...")
         if scene_plan:
             print("[PromptAssembler] Adding scene plan...")
 
-        character_bits = self._character_prompt_bits(character_section, caption)
-        scene_bits = self._scene_prompt_bits(scene_plan)
-        style_bits = (style_section or {}).get("style_keywords", [])
-        rendering_bits = (style_section or {}).get("rendering_rules", [])
-        layout_bits = self._layout_prompt_bits(layout_section)
-        pose_bits = (pose_section or {}).get("pose_rules", [])
-        expression_bits = (expression_section or {}).get("expression_rules", [])
-        lighting_bits = self._lighting_prompt_bits(lighting_section)
-        retrieved_lighting = (compressed_context or {}).get("retrieved_lighting_hint")
-        negative_prompt = ", ".join((negative_section or {}).get("negative_prompt", []))
+        if context_program:
+            visual = self._visual_from_context_program(context_program, caption)
+            character_bits = visual["character"]
+            scene_bits = visual["scene"]
+            style_bits = visual["style"]
+            rendering_bits = visual["rendering"]
+            layout_bits = visual["layout"]
+            pose_bits = visual["pose"]
+            expression_bits = visual["expression"]
+            lighting_bits = visual["lighting"]
+            retrieved_lighting = visual["retrieved_lighting"]
+            negative_prompt = ", ".join(visual["negative"])
+        else:
+            character_bits = self._character_prompt_bits(character_section, caption)
+            scene_bits = self._scene_prompt_bits(scene_plan)
+            style_bits = (style_section or {}).get("style_keywords", [])
+            rendering_bits = (style_section or {}).get("rendering_rules", [])
+            layout_bits = self._layout_prompt_bits(layout_section)
+            pose_bits = (pose_section or {}).get("pose_rules", [])
+            expression_bits = (expression_section or {}).get("expression_rules", [])
+            lighting_bits = self._lighting_prompt_bits(lighting_section)
+            retrieved_lighting = (compressed_context or {}).get("retrieved_lighting_hint")
+            negative_prompt = ", ".join((negative_section or {}).get("negative_prompt", []))
 
         parts = [
             "high quality",
@@ -115,6 +132,9 @@ class PromptAssembler:
                 "lighting": lighting_section,
                 "negative": negative_section,
                 "scene": scene_plan,
+                "context_program_summary": (
+                    self._context_summary(context_program) if context_program else None
+                ),
             },
         }
         print(f"[PromptAssembler] Generation prompt: {generation_prompt}")
@@ -249,3 +269,69 @@ class PromptAssembler:
             elif value:
                 values.append(str(value))
         return values
+
+    def _visual_from_context_program(self, context_program, caption):
+        scene = context_program.get("scene") or {}
+        characters = context_program.get("characters") or {}
+        style = context_program.get("style") or {}
+        layout = context_program.get("layout") or {}
+        pose = context_program.get("pose") or {}
+        expression = context_program.get("expression") or {}
+        lighting = context_program.get("lighting") or {}
+        quality = context_program.get("quality") or {}
+        negative = context_program.get("negative") or {}
+        retrieval = context_program.get("retrieval") or {}
+
+        layout_section = {
+            "layout_type": layout.get("layout_type"),
+            "aspect_ratio": layout.get("aspect_ratio"),
+            "frame_structure": layout.get("frame_structure"),
+            "camera_view": layout.get("camera_view"),
+            "subject_placement": layout.get("subject_placement"),
+            "composition_rules": layout.get("composition_rules", []),
+        }
+
+        character_bits = [
+            f"{characters.get('character_count', 1) or 1} recognizable character",
+            ", ".join(
+                str(item)
+                for item in characters.get("preservation_rules", [])[:3]
+            ),
+            str(caption or "main subject"),
+        ]
+
+        return {
+            "scene": self._clean_bits([
+                scene.get("narrative"),
+                scene.get("camera_intent"),
+                scene.get("interaction"),
+            ]),
+            "character": [bit for bit in character_bits if bit],
+            "style": self._clean_bits(style.get("style_keywords", [])),
+            "rendering": (
+                self._clean_bits(style.get("rendering_rules", []))
+                + self._clean_bits(quality.get("quality_keywords", []))
+            ),
+            "layout": self._layout_prompt_bits(layout_section),
+            "pose": self._clean_bits(pose.get("pose_rules", [])),
+            "expression": self._clean_bits(expression.get("expression_rules", [])),
+            "lighting": self._clean_bits(lighting.get("lighting_keywords", [])),
+            "retrieved_lighting": retrieval.get("retrieved_lighting"),
+            "negative": (
+                self._clean_bits(negative.get("negative_prompt", []))
+                + self._clean_bits(negative.get("strict_avoid", []))
+            ),
+        }
+
+    def _context_summary(self, context_program):
+        scene = context_program.get("scene") or {}
+        layout = context_program.get("layout") or {}
+        provider = context_program.get("provider") or {}
+        return {
+            "scene_type": scene.get("scene_type"),
+            "layout_type": layout.get("layout_type"),
+            "provider": provider.get("selected_provider"),
+        }
+
+    def _clean_bits(self, values):
+        return [str(value) for value in (values or []) if value]

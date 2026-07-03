@@ -163,3 +163,14 @@ Codex was used to build an interface-first LLM optimizer structure without makin
 Codex was used to add an observability layer with constrained file scope. The implementation focused on debug report generation, safe serialization, and best-effort behavior without changing agents or tools.
 
 Codex was guided with explicit provider selection rules and fallback policy. This kept routing deterministic and testable.
+## Sprint39: Codex Usage
+
+Codex는 Context Program Builder 도입을 위해 기존 agent flow를 읽고, 허용된 파일 범위 안에서 incremental refactor를 수행하는 데 사용했습니다.
+
+- Planner execution plan에 `context_program_builder` 위치를 추가했습니다.
+- Orchestrator registry에 ContextProgramBuilder를 연결했습니다.
+- ExecutionEngine에 state-based step을 추가했습니다.
+- PromptAssembler와 ProviderPromptAdapter가 `context_program`을 참조하도록 수정했습니다.
+- Debug Report와 README/docs에 설계 의도를 기록했습니다.
+
+이번 작업에서 Codex는 코드 생성 도구가 아니라 architecture refactoring assistant로 활용되었습니다.

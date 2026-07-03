@@ -393,3 +393,16 @@ Memory history is optimized for lightweight retrieval across runs. Debug reports
 ### Why save reports best-effort?
 
 Observability should not break generation. If report serialization or image copying fails, the workflow should continue and record a trace warning.
+## Sprint39 Decisions
+
+### Why introduce ContextProgramBuilder?
+
+Prompt orchestration had many specialist outputs, but the system still moved quickly from sections to a long text prompt. `ContextProgramBuilder` creates a structured intermediate representation so the framework can reason about context before compiling provider prompts.
+
+### Why keep Context Program provider-independent?
+
+FLUX, GPT Image, and SDXL have different prompt constraints. A provider-independent context program keeps agent planning reusable, while `ProviderPromptAdapter` handles provider-specific formatting.
+
+### Why should PromptAssembler and ProviderPromptAdapter reference Context Program instead of copying it?
+
+The context program contains framework state and semantic structure. Generation prompts should contain only visual instructions. Copying the whole object would leak internal context and make prompts longer, noisier, and harder for providers to follow.

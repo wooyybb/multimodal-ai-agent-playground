@@ -331,3 +331,11 @@
 - Added Markdown report generation under `benchmark/reports/`.
 - Added static HTML report generation under `benchmark/reports/`.
 - Report summarizes total runs, success/failure count, average best score, retry rate, best run, failed runs, and result table.
+## Sprint39: Context Program Builder
+
+- Added `ContextProgramBuilder`.
+- Added `context_program_builder` after negative prompt generation and before `PromptAssembler`.
+- Context Program now stores provider-independent visual context sections such as task, user goal, scene, characters, style, layout, pose, expression, lighting, quality, negative, memory, retrieval, provider, and output.
+- `PromptAssembler` now reads `context_program` when available and compiles only visual prompt content.
+- `ProviderPromptAdapter` now references `context_program` for provider-specific prompt formatting.
+- Debug reports now include `context_program`, `context_program_summary`, and `context_program_version`.

@@ -525,3 +525,15 @@ Reproducibility improves when report files preserve prompts, scores, outputs, an
 ### Debug Report
 
 Debug Report is a structured record of one generation run, stored separately from memory history.
+## Sprint39: Context Program
+
+Context Program은 여러 Agent가 만든 state를 provider-independent structured intermediate representation으로 정리하는 개념입니다.
+
+- Context Engineering: Agent가 사용할 task, scene, memory, retrieval, provider constraint를 구조화하는 과정입니다.
+- Context Program: prompt 이전 단계의 structured object입니다. `task`, `scene`, `characters`, `style`, `layout`, `pose`, `expression`, `lighting`, `negative` 같은 섹션을 가집니다.
+- Structured Intermediate Representation: 사람이 읽을 수 있고 기계적으로 변환 가능한 중간 표현입니다.
+- Provider-independent Prompt Planning: FLUX나 SDXL 같은 특정 provider 문법에 묶이지 않고 먼저 visual intent를 설계합니다.
+- Context-to-Prompt Compilation: Context Program에서 필요한 시각 지시만 뽑아 provider prompt로 변환하는 단계입니다.
+- Prompt Program: 단순한 문장 prompt가 아니라, prompt를 만들기 위한 구조화된 계획입니다.
+
+이번 Sprint의 핵심은 Context Program을 그대로 generation prompt에 넣지 않는 것입니다. Agent Context는 구조화된 상태로 보존하고, ProviderPromptAdapter가 provider별로 필요한 instruction만 컴파일합니다.

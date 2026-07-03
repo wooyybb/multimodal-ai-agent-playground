@@ -17,6 +17,7 @@ class DynamicExecutionEngine:
             "expression",
             "lighting",
             "negative_prompt",
+            "context_program_builder",
             "prompt_assembler",
             "prompt_critic",
             "prompt_optimizer",
@@ -248,6 +249,18 @@ class DynamicExecutionEngine:
             state.get("user_prompt", ""),
             retrieved_context=state.get("retrieved_context", {}),
         )
+
+    def _run_context_program_builder(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "context_program_builder")
+            state["agent_trace"].append("ContextProgramBuilder created context program")
+            print("[ExecutionEngine] ContextProgramBuilder created context program")
+        except Exception as error:
+            print(f"[ExecutionEngine] ContextProgramBuilder failed: {error}")
+            state["context_program"] = {}
+            state["context_program_summary"] = "context program unavailable"
+            state["context_program_version"] = "v1"
+            state["agent_trace"].append("ContextProgramBuilder skipped after error")
 
     def _run_prompt_assembler(self, registry, state):
         self._run_state_step(registry, state, "prompt_assembler")

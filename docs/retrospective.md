@@ -422,3 +422,21 @@
 ### 다음 Sprint
 
 - Provider capability config or multi-provider evaluation.
+## Sprint39 Retrospective
+
+### 잘된 점
+
+- PromptAgent 중심 구조에서 Context Program 중심 구조로 한 단계 발전했다.
+- PromptAssembler와 ProviderPromptAdapter의 책임이 더 명확해졌다.
+- Debug Report에 중간 표현이 저장되어 분석 가능성이 높아졌다.
+
+### 아쉬운 점
+
+- Context Program schema validation은 아직 없다.
+- Provider별 context compiler의 테스트가 더 필요하다.
+
+### 다음 Sprint
+
+- Context Program schema를 명시적으로 검증한다.
+- provider별 prompt compiler regression test를 추가한다.
+- benchmark report에 context_program_summary를 포함한다.
