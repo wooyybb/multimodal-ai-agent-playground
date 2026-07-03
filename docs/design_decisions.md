@@ -1,408 +1,70 @@
 # Design Decisions
 
-## 왜 Reflection을 Agent로 분리했는가
+## ExecutionEngine
 
-`ReflectionAgent`는 평가 결과를 해석하고 개선 방향을 제안하는 feedback agent입니다. 이 책임을 `EvaluationAgent`나 `PromptAgent`에 넣으면 평가, 분석, prompt 생성의 책임이 섞입니다.
+Decision: Add `DynamicExecutionEngine`.
 
-별도 agent로 분리하면 현재 rule-based mock reflection을 유지하면서도, 향후 LLM 기반 reflection으로 자연스럽게 교체할 수 있습니다.
+Reason: Workflow order should not live as one long procedural method. A dynamic engine can execute planner output and make agent steps easier to inspect.
 
-## 왜 RetryAgent를 따로 만들었는가
+Future: Conditional branching, queue execution, async jobs.
 
-`RetryAgent`는 score가 threshold를 넘는지 판단하는 decision agent입니다. Reflection은 "무엇을 개선할지"를 말하고, Retry는 "다시 시도할지"를 결정합니다.
+## ToolRegistry
 
-이 둘을 분리하면 나중에 retry 정책을 score threshold, 사용자 선호, 비용 제한, memory history 기반 정책으로 확장할 수 있습니다.
+Decision: Route agent calls through `ToolRegistry`.
 
-## 왜 Memory를 Sprint 7에 붙였는가
+Reason: ExecutionEngine should call named tools/agents without importing every class directly.
 
-Self-improving AI Agent는 이전 실행 결과를 기억해야 개선 방향을 학습할 수 있습니다. 현재는 단순히 `history.json`에 저장하지만, 이 기록은 향후 prompt 개선, retry 분석, 성능 비교의 기반이 됩니다.
+Future: Capability-based tool discovery.
 
-## 왜 MemoryManager를 도입했는가
+## AgentState
 
-초기 `History` 클래스는 저장(save)에 집중한 단순 유틸이었습니다. Sprint 7 Memory Engineering에서는 memory를 agent context와 state management의 interface로 다루기 위해 `MemoryManager`를 도입했습니다.
+Decision: Introduce `AgentState`.
 
-`MemoryManager`는 `load_last_run()`, `save_run()`, `get_history()`, `clear_history()`를 제공해 orchestrator가 memory를 일관된 방식으로 사용할 수 있게 합니다.
+Reason: Shared dict state became large and typo-prone.
 
-## 왜 Memory는 Agent가 아니고 Manager인가
+Future: Stronger validation and schema-driven state contracts.
 
-현재 memory는 판단하거나 생성하는 agent가 아니라 상태(state)를 저장하고 조회하는 infrastructure layer입니다. 따라서 `MemoryAgent`보다 `MemoryManager`라는 이름이 역할을 더 정확히 드러냅니다.
+## Context Program
 
-향후 memory retrieval, summarization, preference learning처럼 능동적 판단이 들어가면 별도 Memory Agent를 검토할 수 있습니다.
+Decision: Add `ContextProgramBuilder`.
 
-## 왜 Orchestrator만 Memory에 접근하게 했는가
+Reason: Context Engineering and Prompt Engineering needed a clean boundary. Context Program is a provider-independent intermediate representation.
 
-개별 agent가 memory file이나 database에 직접 접근하면 agent 간 결합도가 높아집니다. `VisionAgent`, `PromptAgent`, `EvaluationAgent`는 자신의 전문 작업에만 집중하고, state load/save는 `OrchestratorAgent`가 담당하도록 했습니다.
+Future: Context Program v2 schema and provider compiler tests.
 
-이 구조는 loose coupling을 유지합니다. 향후 JSON에서 SQLite 또는 vector DB로 바뀌어도 대부분의 agent 코드는 변경하지 않아도 됩니다.
+## Provider Adapter
 
-## 왜 무한 Retry가 아니라 1회 Retry로 시작했는가
+Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.
 
-초기 MVP에서는 debug 가능성과 안정성이 중요합니다. 무한 retry는 종료 조건, 비용, 실행 시간, memory schema를 복잡하게 만듭니다.
+Reason: Provider selection and provider prompt formatting are different responsibilities.
 
-1회 retry는 reflection 기반 개선이 실제 workflow에 반영되는지 검증하기에 충분하면서도, loop가 폭주하지 않도록 제어할 수 있습니다.
+Future: More providers and provider-specific optimization rules.
 
-## 왜 Orchestrator가 Retry Loop를 제어하는가
+## Debug Report
 
-`RetryAgent`는 정책 판단(policy decision)을 담당하고, `OrchestratorAgent`는 workflow state transition을 담당합니다. retry 실행까지 `RetryAgent`가 맡으면 agent 책임이 섞입니다.
+Decision: Save `report.json` and `prompt_preview.txt`.
 
-따라서 `RetryAgent.should_retry(score)`는 bool만 반환하고, second generation과 evaluation 실행은 orchestrator가 제어합니다.
+Reason: Agent workflows need observability. JSON supports machine analysis, while preview text supports interviews and debugging.
 
-## 왜 Best Result를 저장하는가
+Future: Trace viewer and dashboard.
 
-initial attempt와 retry attempt가 모두 존재할 때는 최종적으로 어떤 결과를 사용할지 명확해야 합니다. `best_score`, `best_prompt`, `best_output_image_path`를 저장하면 이후 UI, memory analysis, portfolio 설명에서 최종 선택 기준을 추적할 수 있습니다.
+## FastAPI
 
-## 왜 UI가 Agent를 직접 호출하지 않고 Pipeline을 호출하는가
+Decision: Add FastAPI as a service layer while keeping Gradio.
 
-UI가 개별 agent를 직접 호출하면 화면 코드가 workflow 순서와 retry policy를 알게 됩니다. 그러면 agent 구조가 바뀔 때 UI도 함께 수정해야 합니다.
+Reason: Gradio is useful for demos; FastAPI is useful for external programs and deployment.
 
-`ui/app.py`는 `MultimodalPipeline`만 호출하고, pipeline은 `OrchestratorAgent`를 호출합니다. 이 구조는 UI를 result visualization layer로 유지하고, agent orchestration은 backend workflow에 남겨 둡니다.
+Future: Auth, queue, async jobs, deployment guide.
 
-## 왜 모델 통합 전에 UI를 먼저 연결하는가
+## Benchmark
 
-실제 BLIP, FLUX, CLIP을 붙이기 전에도 사용자가 workflow를 실행하고 결과 trace를 확인할 수 있어야 합니다. Gradio UI를 먼저 연결하면 demo-driven development가 가능해지고, 이후 실제 모델을 붙였을 때 사용자 흐름을 다시 설계하지 않아도 됩니다.
+Decision: Add benchmark runner and report generator.
 
-## 왜 BLIP를 VisionAgent 내부가 아니라 BlipTool로 분리했는가
+Reason: Single demos are not enough to evaluate an agent framework. Multiple prompts need comparable metrics and debug paths.
 
-`VisionAgent`는 image captioning이라는 agent responsibility만 가져야 합니다. model loading, processor, torch inference, image preprocessing은 implementation detail입니다.
+Future: Benchmark dashboard and curated prompt suites.
 
-이를 `BlipTool`로 분리하면 VisionAgent interface를 유지하면서 BLIP, BLIP-2, LLaVA, external VLM API 등으로 tool implementation을 교체할 수 있습니다.
+## Future Work
 
-## 왜 Lazy Loading을 사용하는가
-
-BLIP 모델은 무겁고 로딩 시간이 있습니다. 앱 시작이나 import 시점마다 모델을 로딩하면 UI 실행이 느려지고 테스트도 어려워집니다.
-
-lazy loading을 사용하면 첫 caption 요청 시점에만 model과 processor를 로드하고, 이후에는 재사용할 수 있습니다.
-
-## 왜 Fallback Caption이 필요한가
-
-실제 모델 통합은 dependency, network, model cache, device 문제로 실패할 수 있습니다. fallback caption을 두면 BLIP 실패가 전체 multi-agent workflow 중단으로 이어지지 않습니다.
-
-현재 fallback caption은 `"An uploaded image"`입니다.
-
-## 왜 FLUX를 GenerationAgent 내부가 아니라 FluxTool로 분리했는가
-
-`GenerationAgent`는 prompt를 받아 image path를 반환하는 agent interface에 집중해야 합니다. Hugging Face token, API client, image saving, fallback image 생성은 tool implementation detail입니다.
-
-`FluxTool`로 분리하면 이후 local diffusers, SDXL, 다른 image generation API로 교체해도 `GenerationAgent` interface를 유지할 수 있습니다.
-
-## 왜 API 기반으로 먼저 통합했는가
-
-FLUX를 local inference로 실행하려면 GPU, VRAM, diffusers 설정, 모델 다운로드 부담이 큽니다. MVP 단계에서는 Hugging Face Inference API 기반 통합이 빠르고 local hardware 의존성을 줄일 수 있습니다.
-
-## 왜 Fallback Mock Generation을 유지하는가
-
-실제 image generation API는 token, network, quota, service 상태에 따라 실패할 수 있습니다. fallback image를 유지하면 generation 실패가 전체 multi-agent workflow 중단으로 이어지지 않습니다.
-
-## 왜 HF_TOKEN을 환경변수로 사용하는가
-
-API token은 보안 정보이므로 코드에 직접 넣으면 안 됩니다. `HF_TOKEN` 환경변수를 사용하면 local 개발, 배포, demo 환경에서 token을 분리해 관리할 수 있습니다.
-
-## 왜 CLIP을 EvaluationAgent 내부가 아니라 ClipTool로 분리했는가
-
-`EvaluationAgent`는 evaluation 단계의 agent 역할만 담당해야 합니다. CLIP processor, model loading, embedding extraction, cosine similarity 계산은 tool implementation detail입니다.
-
-`ClipTool`로 분리하면 향후 DINO similarity, aesthetic score, human preference model 등으로 평가 backend를 교체하기 쉽습니다.
-
-## 왜 Image-Text Similarity부터 시작했는가
-
-현재 pipeline의 핵심 출력은 generated image와 final prompt입니다. 따라서 먼저 image와 text가 얼마나 잘 맞는지 평가하는 것이 가장 직접적입니다.
-
-reference image similarity는 중요한 확장 포인트지만, 이번 Sprint에서는 interface만 유지하고 generated image와 final prompt의 alignment를 먼저 평가합니다.
-
-## 왜 Reference Image Interface를 유지하는가
-
-`EvaluationAgent.run(reference_image, generated_image_path, final_prompt)` interface를 유지하면 향후 image-image similarity나 reference-guided evaluation을 추가할 때 orchestrator 변경을 줄일 수 있습니다.
-
-이번 Sprint에서는 reference image를 사용하지 않지만, 다음 평가 확장을 위한 compatibility를 남겨 둡니다.
-
-## 왜 Fallback Score를 0.0으로 두는가
-
-CLIP loading 또는 inference 실패는 평가를 신뢰할 수 없다는 의미입니다. 이 경우 높은 점수를 주면 retry loop가 잘못된 판단을 할 수 있으므로 `0.0`을 반환합니다.
-
-## 왜 기능 추가 대신 Integration Test Sprint를 진행했는가
-
-BLIP, FLUX, CLIP, Reflection, Retry, Memory, UI가 모두 연결된 뒤에는 새 기능보다 End-to-End 안정성이 더 중요합니다. 검증 없이 기능만 추가하면 portfolio demo에서 실제 흐름을 설명하기 어려워집니다.
-
-Sprint 13은 전체 workflow가 이미지 입력부터 UI 출력과 memory 저장까지 이어지는지 확인하기 위한 안정화 Sprint입니다.
-
-## 왜 Demo Script와 Known Issues를 문서화했는가
-
-면접이나 portfolio demo에서는 완벽한 시스템보다 현재 가능한 것과 한계를 명확히 설명하는 능력이 중요합니다. `demo_script.md`는 시연 흐름을 정리하고, `known_issues.md`는 모델/API/fallback의 한계를 투명하게 기록합니다.
-
-## 왜 LLM Planner가 아니라 Rule-based Planner로 시작했는가
-
-Planner 개념을 처음 도입하는 단계에서는 예측 가능성과 디버깅 가능성이 중요합니다. Rule-based planner는 입력 조건과 execution plan이 명확해 학습과 검증에 적합합니다.
-
-향후에는 LLM-based planning으로 확장할 수 있지만, 먼저 Planner와 Orchestrator의 책임 분리를 안정화하는 것이 우선입니다.
-
-## 왜 PlannerAgent가 직접 실행하지 않고 계획만 생성하는가
-
-PlannerAgent는 "무엇을 할지"를 계획하고, OrchestratorAgent는 "어떻게 실행할지"를 관리합니다. Planner가 직접 agent를 실행하면 planning과 orchestration 책임이 섞입니다.
-
-따라서 이번 Sprint에서는 PlannerAgent가 execution plan만 만들고, OrchestratorAgent가 기존 workflow를 그대로 실행합니다.
-
-## 왜 이번 Sprint에서 Dynamic Execution Engine까지 구현하지 않았는가
-
-동적 실행 엔진은 conditional branch, skipped step, dependency management, failure handling을 함께 설계해야 합니다. 한 번에 도입하면 기존 E2E 안정성이 흔들릴 수 있습니다.
-
-이번 Sprint는 plan 생성과 기록을 먼저 도입하고, 다음 단계에서 execution plan 기반 동적 실행으로 확장할 수 있게 준비하는 단계입니다.
-
-## 왜 Orchestrator가 Agent를 직접 호출하지 않고 ToolRegistry를 사용하게 했는가
-
-Agent와 Tool이 늘어날수록 Orchestrator가 모든 구현 객체를 직접 알고 호출하는 구조는 결합도가 높아집니다. `ToolRegistry`를 두면 Orchestrator는 이름 기반 호출을 사용하고, 실제 callable 관리 책임은 Registry가 담당합니다.
-
-이 구조는 Dependency Inversion과 Open-Closed Principle을 학습하기에 적합합니다. 새 tool을 추가할 때 Orchestrator 내부 로직을 크게 바꾸지 않고 registry 등록을 확장할 수 있습니다.
-
-## 왜 이번 Sprint에서 완전한 Dynamic Execution Engine까지 구현하지 않았는가
-
-Planner의 execution plan을 for-loop로 실행하는 dynamic engine은 branch, skipped step, argument passing, error recovery를 함께 다뤄야 합니다. 이번 Sprint에서는 기존 E2E 안정성을 유지하면서 registry 기반 호출 구조만 도입했습니다.
-
-## 왜 Tool 이름을 Planner execution_plan과 맞췄는가
-
-Planner가 생성한 plan step과 Registry에 등록된 tool name이 같아야 향후 dynamic execution engine으로 자연스럽게 확장할 수 있습니다. 이번 Sprint에서는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save` 이름을 맞췄습니다.
-
-## 왜 PromptAgent가 MemoryManager를 직접 호출하지 않는가
-
-PromptAgent가 MemoryManager를 직접 호출하면 prompt 생성 agent가 storage 구조에 결합됩니다. 이는 Tool-Agent Separation과 Single Responsibility Principle을 흐립니다.
-
-따라서 OrchestratorAgent가 memory와 planner 결과를 모아 context를 구성하고, PromptAgent는 전달받은 context만 사용합니다.
-
-## 왜 OrchestratorAgent가 Context를 구성하는가
-
-OrchestratorAgent는 workflow state를 가장 잘 알고 있습니다. planner result, last run, caption, user prompt 같은 runtime context를 한 곳에서 조합하면 PromptAgent는 순수 prompt builder 역할에 집중할 수 있습니다.
-
-## 왜 Context를 Dict 기반으로 시작했는가
-
-초기 단계에서는 schema class보다 dict가 빠르고 유연합니다. `planner_result`, `last_run`, `previous_best_prompt`, `previous_best_score`를 실험하면서 어떤 context가 유용한지 학습하기 좋습니다.
-
-## 왜 Context 정보를 Prompt에 과도하게 넣지 않는가
-
-이전 prompt나 score를 그대로 길게 복사하면 final prompt가 장황해지고 민감하거나 불필요한 정보가 섞일 수 있습니다. 이번 Sprint에서는 짧은 planning note와 previous best prompt summary만 반영하도록 제한했습니다.
-## Sprint 18 Decisions
-
-### Decision: Prompt Compression이 필요한 이유
-
-Context-aware Agent는 Planner, Memory, Retry History 등 많은 정보를 사용할 수 있지만 모든 정보를 prompt에 직접 넣으면 token budget을 초과할 수 있습니다. 따라서 필요한 정보만 선택하고 짧은 hint로 압축하는 `PromptCompressor`를 분리했습니다.
-
-### Decision: Context Budget을 고려해야 하는 이유
-
-CLIP text encoder처럼 입력 길이가 제한된 모델은 긴 prompt를 처리하지 못할 수 있습니다. Context Budget은 agent가 사용할 수 있는 정보량을 제한하고, 중요한 정보만 남기는 engineering 기준입니다.
-## Sprint 19 Decisions
-
-### Decision: Orchestrator에서 실행 로직을 분리한 이유
-
-OrchestratorAgent가 planning, registry setup, step execution을 모두 담당하면 책임이 커진다. 실행 책임을 `DynamicExecutionEngine`으로 분리해 Orchestrator는 조율자 역할에 집중하도록 했다.
-
-### Decision: DynamicExecutionEngine을 별도 class로 만든 이유
-
-별도 class로 분리하면 step별 state transition, error handling, trace logging을 한 곳에서 관리할 수 있다. 향후 conditional branch나 parallel execution도 이 계층에서 확장할 수 있다.
-
-### Decision: 아직 rule-based plan을 사용하는 이유
-
-LLM planner는 강력하지만 초기 MVP에서는 예측 가능성과 디버깅 가능성이 중요하다. 따라서 rule-based PlannerAgent로 시작하고, plan 실행 구조를 먼저 안정화했다.
-
-### Decision: state dict 기반으로 시작한 이유
-
-state dict는 간단하고 직관적이며, agent 간 입출력 흐름을 빠르게 관찰할 수 있다. 향후 필요하면 dataclass나 typed state schema로 확장할 수 있다.
-## Sprint 20 Decisions
-
-### Decision: JSON Knowledge Store부터 시작한 이유
-
-초기 단계에서는 Vector DB보다 knowledge schema와 retrieval 책임 분리가 더 중요합니다. JSON은 구조가 단순하고 디버깅이 쉬워 Rule-based RAG skeleton을 검증하기에 적합합니다.
-
-### Decision: RetrievalAgent와 PromptAgent를 분리한 이유
-
-RetrievalAgent는 필요한 지식을 찾고, PromptAgent는 최종 prompt를 작성합니다. 두 책임을 분리하면 향후 semantic search나 hybrid retrieval을 추가해도 PromptAgent interface를 크게 바꾸지 않을 수 있습니다.
-
-### Decision: KnowledgeManager를 만든 이유
-
-KnowledgeManager는 storage access layer입니다. RetrievalAgent가 JSON 파일 경로나 parsing details를 직접 알지 않게 만들어, 나중에 ChromaDB나 FAISS로 교체하기 쉽게 했습니다.
-## Sprint 21 Decisions
-
-### Decision: Vector DB가 아니라 JSON keyword similarity로 시작한 이유
-
-초기 MVP에서는 retrieval 위치, memory schema, prompt budget을 검증하는 것이 우선입니다. JSON keyword similarity는 단순하고 디버깅이 쉬워 interface 설계에 적합합니다.
-
-### Decision: memory_retrieval을 vision 이후에 배치한 이유
-
-caption이 생성된 뒤에야 현재 이미지 내용과 user prompt를 결합한 검색 query를 만들 수 있습니다. 따라서 `memory_retrieval`은 `vision` 이후, knowledge `retrieval` 이전이 자연스럽습니다.
-
-### Decision: full history를 prompt에 넣지 않는 이유
-
-과거 run 전체를 prompt에 넣으면 prompt budget을 초과하고 irrelevant context가 섞일 수 있습니다. 그래서 `memory_hint`와 `reuse successful visual style` 같은 짧은 signal만 사용합니다.
-
-### Decision: MemoryManager interface를 확장한 이유
-
-`search_similar_runs()`, `get_best_run()`, `get_memory_context()`를 분리하면 나중에 JSON backend를 ChromaDB나 FAISS로 바꿔도 Orchestrator와 PromptAgent interface를 유지할 수 있습니다.
-## Sprint 22 Decisions
-
-### Decision: Prompt를 여러 Agent로 나눈 이유
-
-Image generation prompt는 character, style, layout, lighting, negative prompt처럼 서로 다른 역할을 가진 요소로 구성됩니다. 하나의 PromptAgent가 모든 책임을 가지면 디버깅과 개선이 어려워지므로 역할별 agent로 분리했습니다.
-
-### Decision: PromptAssembler를 둔 이유
-
-각 agent의 결과를 그대로 generation에 넘기면 prompt 일관성이 떨어질 수 있습니다. PromptAssembler는 fragment를 하나의 generation prompt로 조립하는 전담 책임을 가집니다.
-
-### Decision: 기존 Generation/Evaluation workflow를 유지한 이유
-
-이번 Sprint의 초점은 prompt 생성 구조입니다. 생성, 평가, retry agent는 기존 interface를 유지해 변경 범위를 prompt orchestration에 제한했습니다.
-## Sprint22 Detailed Decisions
-
-### Why split prompt generation into section agents?
-
-Prompt sections such as character, style, layout, pose, expression, and negative prompt have different responsibilities. Splitting them makes prompt engineering easier to debug and extend.
-
-### Why keep PromptAssembler separate?
-
-PromptAssembler combines section outputs into an image-focused generation prompt while keeping agent context and debug state out of the final prompt.
-
-### Why separate negative_prompt?
-
-Negative prompts may become provider-specific inputs later. The current GenerationAgent interface is unchanged, but `negative_prompt` is stored separately in state for future FLUX provider routing.
-## Sprint23 Decisions
-
-### Why schema-first before multi-image UI?
-
-The project can stabilize character reference semantics before changing UI. This keeps the current single-image workflow intact while preparing for multi-image input.
-
-### Why treat each reference image as a separate character?
-
-Style transfer requests often fail when multiple references are blended. Treating each reference as one separate character gives the prompt explicit separation and identity preservation rules.
-
-### Why assemble preservation rules in PromptAssembler?
-
-CharacterAgent owns character schema. PromptAssembler owns final generation prompt wording, so it is the right place to compactly include preservation rules.
-## Sprint24 Decisions
-
-### Why make LayoutAgent a planning agent?
-
-Layout affects camera, frame, subject placement, and cropping. Treating it as a plan rather than a keyword list gives the generation prompt a clearer visual structure.
-
-### Why convert Layout Plan in PromptAssembler?
-
-LayoutAgent should plan visual structure. PromptAssembler should translate that structure into final generation prompt language.
-## Sprint25 Decisions
-
-### Why separate ScenePlanningAgent from LayoutAgent?
-
-Scene Planning answers what situation is happening. Layout Planning answers how that situation is visually arranged. These are related but different responsibilities.
-
-### Why start rule-based?
-
-Rule-based scene planning is predictable and easy to debug. It creates a stable schema before introducing an LLM planner.
-
-### Why use Scene Plan as structured intermediate representation?
-
-Scene Plan lets Layout, Pose, Expression, and PromptAssembler share one interpretation of user intent.
-## Sprint26 Decisions
-
-### Why separate PromptAssembler and ProviderPromptAdapter?
-
-PromptAssembler should create provider-neutral canonical intent. ProviderPromptAdapter should optimize that intent for a specific image generation provider.
-
-### Why keep GenerationAgent unchanged?
-
-This sprint focuses on prompt adaptation. Keeping GenerationAgent stable preserves the existing FLUX workflow and reduces integration risk.
-
-### Why skeleton adapters for GPT Image and SDXL?
-
-The architecture can be validated before adding actual provider APIs.
-## Sprint27 Decisions
-
-### Why separate ProviderRouter and ProviderPromptAdapter?
-
-ProviderRouter chooses the provider. ProviderPromptAdapter transforms prompt for that provider. Keeping these separate improves extensibility.
-
-### Why only FLUX in available_providers?
-
-Only FLUX is currently connected to actual generation. Other providers are planned but unavailable, so routing falls back to FLUX.
-
-### Why rule-based routing first?
-
-Rule-based routing is predictable and easy to test before introducing LLM-based provider selection.
-## Sprint29 Decisions
-
-### Why place PromptCriticAgent before Generation?
-
-Prompt quality problems are cheaper to detect before image generation. A rule-based critic can catch duplicated quality tags, missing layout details, weak character interaction, or overly long prompts before the provider adapter and generation tool run.
-
-### Why keep PromptCriticAgent separate from PromptAssembler?
-
-`PromptAssembler` is responsible for building the canonical prompt. `PromptCriticAgent` is responsible for reviewing that prompt. Separating build and critique responsibilities keeps the workflow easier to debug and prepares the project for future LLM-based or provider-specific critics.
-
-## Sprint30A Decisions
-
-### Why standardize on `run(state) -> dict`?
-
-As the number of agents grows, ExecutionEngine should not know every agent's argument list. A state-based interface lets each agent read the context it needs and return only the state updates it owns.
-
-### Why not convert every agent at once?
-
-Full conversion would touch BLIP, FLUX, CLIP, memory, retry, and UI paths at the same time. Sprint30A converts only upper-layer orchestration agents so the E2E workflow remains stable.
-
-### Why preserve backward compatibility?
-
-Existing tests, direct calls, and older workflow paths still use argument-based calls. Supporting both modes reduces refactor risk and makes the migration incremental.
-
-## Sprint31 Decisions
-
-### Why add PromptOptimizer after PromptCritic?
-
-PromptCritic makes prompt quality visible, but visibility alone does not improve generation input. PromptOptimizer turns the critique report into concrete prompt repair before provider routing and generation.
-
-### Why start with a rule-based optimizer?
-
-Rule-based optimization is deterministic, easy to debug, and does not add model dependencies. It is a safe first version of the Critic-Optimizer pattern.
-
-### Why optimize before ProviderPromptAdapter?
-
-ProviderPromptAdapter should receive a cleaner canonical prompt. This keeps provider-specific formatting separate from general prompt repair.
-
-### Why remove internal context terms?
-
-Generation prompts should describe the desired image, not workflow metadata. Removing terms such as memory hints, agent trace, and prompt quality score prevents internal debugging language from leaking into image generation.
-
-## Sprint33 Decisions
-
-### Why start with an interface before a real LLM API?
-
-The workflow needs a stable extension point before adding credentials, latency, cost, and provider-specific failures. Interface-first design lets the project validate state flow and fallback behavior first.
-
-### Why support disabled, mock, and fallback modes?
-
-The optimizer should never break the image generation workflow. Disabled mode preserves the current prompt, mock mode allows local testing, and future LLM mode can fallback when API access is unavailable.
-
-### Why add LLMPromptOptimizerAgent after PromptOptimizerAgent?
-
-The rule-based optimizer remains deterministic and debuggable. The LLM optimizer is an optional reasoning layer on top of the safer baseline.
-
-### Why avoid external API calls in this Sprint?
-
-This Sprint is about architecture, not vendor integration. Avoiding API calls keeps the project runnable without keys and prevents accidental credential handling.
-
-## Sprint36 Decisions
-
-### Why keep Debug Report separate from memory/history?
-
-Memory history is optimized for lightweight retrieval across runs. Debug reports are larger observability artifacts for one specific run. Keeping them separate prevents memory from becoming too heavy while still linking paths from history.
-
-### Why save both prompt_preview.txt and report.json?
-
-`report.json` is structured and machine-readable. `prompt_preview.txt` is readable during interviews, debugging, and manual prompt comparison.
-
-### Why save reports best-effort?
-
-Observability should not break generation. If report serialization or image copying fails, the workflow should continue and record a trace warning.
-## Sprint39 Decisions
-
-### Why introduce ContextProgramBuilder?
-
-Prompt orchestration had many specialist outputs, but the system still moved quickly from sections to a long text prompt. `ContextProgramBuilder` creates a structured intermediate representation so the framework can reason about context before compiling provider prompts.
-
-### Why keep Context Program provider-independent?
-
-FLUX, GPT Image, and SDXL have different prompt constraints. A provider-independent context program keeps agent planning reusable, while `ProviderPromptAdapter` handles provider-specific formatting.
-
-### Why should PromptAssembler and ProviderPromptAdapter reference Context Program instead of copying it?
-
-The context program contains framework state and semantic structure. Generation prompts should contain only visual instructions. Copying the whole object would leak internal context and make prompts longer, noisier, and harder for providers to follow.
+- Keep decisions short and architecture-level.
+- Move detailed sprint notes to `docs/sprint_book/`.

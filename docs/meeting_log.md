@@ -1,144 +1,48 @@
 # Meeting Log
 
-## 2026-06-27 Sprint 7
+## Sprint 19: Dynamic Execution
 
-이번 Sprint에서는 Reflection 구조를 채택했습니다. 이유는 생성 결과가 낮은 score를 받았을 때 단순히 실패로 끝내지 않고, 실패 원인을 분석하고 다음 prompt 개선 방향을 만들기 위해서입니다.
+Decision: Introduce `DynamicExecutionEngine`.
 
-논의된 구조는 다음과 같습니다.
+Reason: The workflow needed a central runtime instead of direct sequential calls.
 
-```text
-Evaluation -> Reflection -> Retry Decision -> Memory
-```
+## Sprint 22: Prompt Orchestration
 
-이번 단계에서는 실제 regeneration loop는 만들지 않았습니다. 대신 reflection 결과, retry 판단, memory 저장까지 연결해 다음 Sprint에서 loop를 안전하게 붙일 수 있는 기반을 만들었습니다.
+Decision: Split prompt construction into specialist agents.
 
-## 2026-06-27 Memory Engineering Follow-up
+Reason: Character, style, layout, lighting, and negative prompts have different responsibilities.
 
-이번 논의에서는 memory를 단순 파일 저장이 아니라 `MemoryManager` interface로 분리하기로 했습니다.
+## Sprint 26-28: Provider Layer
 
-채택 이유:
+Decision: Add ProviderPromptAdapter, ProviderRouter, and provider config.
 
-- Orchestrator가 시작 시 과거 실행을 load할 수 있어야 합니다.
-- 종료 시 현재 실행을 save해야 합니다.
-- 전체 history 조회와 초기화가 가능한 interface가 필요합니다.
-- 향후 database나 vector store로 바꿔도 orchestrator 코드를 크게 바꾸지 않는 구조가 필요합니다.
+Reason: Provider selection and provider-specific prompt formatting should be extensible.
 
-## 2026-06-27 Sprint 8 Retry Loop
+## Sprint 34: AgentState
 
-이번 논의에서는 retry loop를 도입하되 1회로 제한하기로 결정했습니다. 목적은 reflection 결과가 실제 second attempt로 이어지는 self-improving flow를 검증하는 것입니다.
+Decision: Add shared state object.
 
-`RetryAgent`는 retry 여부만 판단하고, `OrchestratorAgent`가 generation/evaluation 재실행과 best result selection을 담당합니다.
+Reason: dict state was becoming hard to manage.
 
-## 2026-06-27 Sprint 9 Gradio UI
+## Sprint 35: FastAPI
 
-이번 논의에서는 multi-agent workflow를 Gradio UI에 연결하기로 결정했습니다. UI는 직접 agent를 호출하지 않고 `MultimodalPipeline`만 호출합니다.
+Decision: Add API service layer while keeping Gradio.
 
-목표는 사용자가 image와 prompt를 입력하고, caption, prompt, output image, score, reflection, retry 결과, agent trace를 한 화면에서 확인할 수 있게 만드는 것입니다.
+Reason: Gradio is for demos, FastAPI is for programmatic access.
 
-## 2026-06-27 Sprint 10 Real BLIP
+## Sprint 36-38: Observability
 
-이번 논의에서는 mock caption을 실제 BLIP 기반 captioning으로 전환하기로 결정했습니다. 단, `VisionAgent`는 model internals를 몰라야 하므로 실제 모델 로딩과 inference는 `BlipTool`이 담당합니다.
+Decision: Add debug reports, benchmark runner, and comparison reports.
 
-모델 로딩 실패가 전체 workflow를 중단하지 않도록 fallback caption을 유지하기로 했습니다.
+Reason: Multi-agent workflows need traceability and repeatable evaluation.
 
-## 2026-06-27 Sprint 11 Real FLUX
+## Sprint 39: Context Program
 
-이번 논의에서는 mock generation을 실제 FLUX generation 구조로 확장하기로 결정했습니다. 단, 로컬 GPU 의존성을 줄이기 위해 Hugging Face Inference API 기반으로 먼저 통합합니다.
+Decision: Add provider-independent Context Program.
 
-`HF_TOKEN`이 없거나 API가 실패하면 fallback mock image를 생성해 demo와 workflow 검증이 계속 가능하도록 했습니다.
+Reason: Context Engineering and provider prompt compilation needed a clean boundary.
 
-## 2026-06-27 Sprint 12 Real CLIP
+## Future Work
 
-이번 논의에서는 mock score를 실제 CLIP 기반 image-text similarity score로 전환하기로 결정했습니다.
-
-`EvaluationAgent`는 평가 흐름만 담당하고, CLIP model loading과 embedding similarity 계산은 `ClipTool`이 담당하도록 분리했습니다.
-
-## 2026-06-27 Sprint 13 Integration & Validation
-
-이번 논의에서는 새 기능 추가보다 End-to-End 검증을 우선하기로 결정했습니다.
-
-이미 BLIP, FLUX, CLIP, Reflection, Retry, Memory, UI가 연결되어 있으므로 portfolio demo 준비를 위해 testing docs, known issues, demo script를 정리했습니다.
-
-## 2026-06-30 Sprint 15 PlannerAgent
-
-이번 논의에서는 fixed workflow 위에 planning layer를 추가하기로 결정했습니다.
-
-PlannerAgent는 user prompt와 image 제공 여부를 바탕으로 execution plan을 만들고, OrchestratorAgent는 기존 workflow를 유지하면서 planner_result를 기록합니다. dynamic execution engine은 다음 단계로 미뤘습니다.
-
-## 2026-06-30 Sprint 16 ToolRegistry
-
-이번 논의에서는 Orchestrator가 Agent를 직접 호출하는 구조를 registry 기반 호출 구조로 확장하기로 결정했습니다.
-
-ToolRegistry는 `memory_load`, `vision`, `prompt`, `generation`, `evaluation`, `reflection`, `retry`, `memory_save`를 이름으로 등록하고 호출합니다. 완전한 dynamic execution engine은 다음 단계로 미뤘습니다.
-
-## 2026-06-30 Sprint 17 Context Engineering
-
-이번 논의에서는 PromptAgent를 단순 caption/user prompt 결합기에서 context-aware prompt builder로 확장하기로 결정했습니다.
-
-PromptAgent는 Memory나 Planner를 직접 읽지 않고, OrchestratorAgent가 planner_result와 last_run을 모아 context dict로 전달합니다.
-## Sprint 18 Meeting Log
-
-이번 Sprint에서는 context를 많이 넣는 방식에서 필요한 context만 선택하고 압축하는 방식으로 설계를 변경했습니다. Reflection과 Memory가 확장될수록 prompt가 길어지므로, PromptCompressor를 별도 책임으로 분리하는 방향을 채택했습니다.
-## Sprint 19 Meeting Log
-
-이번 Sprint에서는 PlannerAgent가 만든 plan이 실제 실행을 이끌도록 Dynamic Execution Engine을 도입하기로 결정했습니다. OrchestratorAgent는 coordination에 집중하고, step execution은 별도 engine으로 분리하는 방향을 채택했습니다.
-## Sprint 20 Meeting Log
-
-이번 Sprint에서는 Prompt 생성 과정에 내부 지식을 연결하기 위해 Knowledge Layer를 도입하기로 결정했습니다. Vector DB를 바로 붙이기보다 JSON Store와 KnowledgeManager를 먼저 만들고, RetrievalAgent가 이를 사용하는 구조를 채택했습니다.
-## Sprint 21 Meeting Log
-
-이번 Sprint에서는 MemoryManager를 단순 저장소에서 검색 가능한 memory layer로 확장하기로 결정했습니다. Vector DB는 도입하지 않고 JSON 기반 keyword similarity로 먼저 interface와 workflow 위치를 검증했습니다.
-## Sprint 22 Meeting Log
-
-이번 Sprint에서는 PromptAgent 하나가 모든 prompt engineering을 담당하는 구조에서 벗어나, 역할별 prompt agent가 협업하는 Prompt Orchestration Framework를 도입하기로 결정했습니다.
-## Sprint22 Detailed Meeting Log
-
-The project generalized a long photobooth-style user request into a Prompt Orchestration Framework. The decision was to split prompt generation into section agents and keep PromptAssembler responsible only for final image prompt assembly.
-## Sprint23 Meeting Log
-
-The project generalized the goal of multi-character reference-based style transfer into Character Reference Handling. The decision was to build internal schema first before changing UI.
-## Sprint24 Meeting Log
-
-The project decided to treat layout as a planning problem rather than a keyword selection problem. LayoutAgent now owns composition planning and PromptAssembler owns prompt conversion.
-## Sprint25 Meeting Log
-
-The project reframed image generation from prompt writing to scene planning. The team chose to add ScenePlanningAgent as a structured interpretation layer before layout, pose, expression, and prompt assembly.
-## Sprint26 Meeting Log
-
-The project decided to avoid sending one canonical prompt directly to every image provider. Provider-specific adaptation was separated into ProviderPromptAdapter.
-## Sprint27 Meeting Log
-
-The project introduced ProviderRouter to separate provider selection from provider-specific prompt adaptation.
-
-## Sprint30A Meeting Log
-
-As the number of agents increased, the team decided that each agent should gradually move toward a standard `run(state) -> dict` interface. The first migration targets upper-layer prompt and provider agents while preserving the existing E2E workflow.
-
-## Sprint31 Meeting Log
-
-The team decided to add PromptOptimizerAgent because PromptCriticAgent only diagnosed prompt quality issues. Sprint31 connects diagnosis to repair by updating the canonical prompt before provider routing and generation.
-
-## Sprint33 Meeting Log
-
-The project decided to extend prompt optimization with an LLM-ready interface. The implementation starts with disabled and mock modes so the architecture can be validated without external API calls.
-
-## Sprint36 Meeting Log
-
-The project prioritized observability before deployment hardening. Debug reports make it easier to explain, compare, and improve generation runs before adding Docker or production infrastructure.
-## Sprint39 Meeting Log
-
-### Topic
-
-Context Program Builder를 도입해 Prompt Orchestration 결과를 provider-independent 중간 표현으로 정리한다.
-
-### Decision
-
-Specialist Agent 결과를 바로 prompt로 합치지 않고 `ContextProgramBuilder`가 먼저 structured context program을 만든다.
-
-### Reason
-
-Agent가 많아지면서 prompt assembly가 점점 복잡해졌고, provider-specific prompt formatting과 context planning이 섞이기 시작했다. Context Program Layer를 두면 context planning, prompt assembly, provider adaptation을 분리할 수 있다.
-
-### Follow-up
-
-Context Program schema validation과 provider-specific compiler test를 추가한다.
+- Keep meeting notes decision-focused.
+- Move sprint details to sprint book.

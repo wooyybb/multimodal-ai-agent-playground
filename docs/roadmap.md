@@ -1,432 +1,66 @@
 # Roadmap
 
-## Sprint 0: Project Skeleton - Done
-
-- 기본 폴더 구조 생성
-- Python package 초기화
-- TODO skeleton 파일 생성
-
-## Sprint 1: VisionAgent - Done
-
-- `VisionAgent` 구현
-- `BlipTool` mock caption 연결
-- 이미지 입력에서 caption 반환 흐름 구성
-
-## Sprint 2: PromptAgent - Done
-
-- `PromptAgent` 구현
-- caption과 user prompt 조합
-- final prompt 생성
-
-## Sprint 3: OrchestratorAgent - Done
-
-- `OrchestratorAgent` 추가
-- `VisionAgent`와 `PromptAgent` 조율
-- `agent_trace` 반환
-
-## Sprint 4: GenerationAgent Mock - Done
-
-- `GenerationAgent` mock 구현
-- final prompt를 받아 PIL mock image 생성
-- `outputs/output_mock.png` 저장 경로 반환
-
-## Sprint 5: EvaluationAgent Mock - Done
-
-- `EvaluationAgent` mock 구현
-- 생성 결과와 prompt를 받아 mock score 반환
-
-## Sprint 6: Reflection + Retry Loop - Done
-
-- `ReflectionAgent` 개선 제안 로직 확장
-- `RetryAgent`를 통해 낮은 score일 때 prompt 개선 및 재시도 흐름 구성
-
-## Sprint 7: Memory
-
-- `MemoryManager` 구현 - Done
-- `load_last_run()`, `save_run()`, `get_history()`, `clear_history()` 구현 - Done
-- caption, prompt, score, reflection, retry, output image path 저장 - Done
-- 향후 prompt 개선에 활용할 memory layer 설계
-
-## Sprint 8: Real BLIP/FLUX/CLIP Integration
-
-- `BlipTool`에 실제 BLIP 연결
-- `FluxTool`에 실제 FLUX 또는 image generation API 연결
-- `ClipTool`에 실제 CLIP 기반 evaluation 연결
-
-## Sprint 8: One-Step Retry Loop - Done
-
-- initial generation/evaluation 이후 reflection 실행
-- retry가 필요한 경우 suggested prompt로 second attempt 실행
-- initial/retry 중 best score 선택
-- full retry record를 memory에 저장
-
-## Sprint 9: Gradio UI Integration - Done
-
-- Gradio Blocks 기반 UI 구현
-- image input과 user prompt 입력 연결
-- multi-agent workflow 결과 표시
-- agent trace 시각화
-
-## Sprint 10: Real BLIP Integration - Done
-
-- `BlipTool`에 `Salesforce/blip-image-captioning-base` 연결
-- lazy loading 기반 BLIP model/processor 로딩
-- fallback caption 처리
-- `VisionAgent` interface 유지
-
-## Sprint 11: Real FLUX Integration - Done
-
-- `FluxTool`에 Hugging Face `InferenceClient` 기반 FLUX generation 구조 추가
-- Hugging Face token 환경변수 기반 API 호출
-- API 실패 또는 token 부재 시 fallback mock image 생성
-- timestamp 기반 output file 저장
-
-## Sprint 12: Real CLIP Evaluation - Done
-
-- `ClipTool`에 `openai/clip-vit-base-patch32` 기반 evaluation 구조 추가
-- generated image와 final prompt의 image-text similarity 계산
-- cosine similarity를 0.0~1.0 score로 변환
-- CLIP 실패 시 fallback score `0.0` 반환
-
-## Sprint 13: Integration & Validation - Done
-
-- E2E workflow validation 문서화
-- known issues 정리
-- demo script 작성
-- UI output stability 개선
-- memory save failure 방어 처리
-
-## Demo Documentation - Done
-
-- README project overview 정리
-- current workflow와 setup/run 방법 문서화
-- `.env` 설정 방법 안내
-- demo assets는 `assets/demo/`에 선별 보관하는 방향 정리
-- future work 업데이트
-
-## Sprint 15: PlannerAgent - Done
-
-- rule-based PlannerAgent 구현
-- execution plan 생성
-- OrchestratorAgent 시작 단계에서 planner 호출
-- result dict에 planner_result 포함
-- 기존 E2E workflow 유지
-
-## Sprint Book System - Done
-
-- `docs/templates/`에 Sprint 문서 템플릿 생성
-- `docs/sprint_book/`에 Sprint00~Sprint14 문서 생성
-- Sprint Book README에 project vision, phase, sprint index, architecture evolution 정리
-- 향후 모든 Sprint를 같은 형식으로 문서화하는 기반 마련
-
-## Sprint 16: Tool Registry & Tool Calling - Done
-
-- `ToolRegistry` 구현
-- OrchestratorAgent 내부 Agent/Memory 호출을 registry 기반으로 감싸기
-- Planner execution_plan step 이름과 registry tool 이름 정렬
-- 기존 E2E workflow 유지
-
-## Next Sprint Proposal
-
-- Context Engineering
-- Dynamic Execution Engine
-- LLM-based tool selection
-
-## Sprint 17: Context Engineering - Done
-
-- PromptAgent에 optional context 인자 추가
-- OrchestratorAgent가 planner/memory 기반 context 구성
-- previous best prompt와 score를 제한적으로 prompt에 반영
-- 기존 E2E workflow와 backward compatibility 유지
-
-## Next Sprint Proposal
-
-- RAG Style Library
-- Semantic Memory
-- Context schema validation
-## Sprint 18: Prompt Compression & Context Budget Management - Done
-
-- `PromptCompressor` 추가
-- raw context를 compressed hint로 변환
-- `PromptAgent`가 `compressed_context`만 사용하도록 변경
-- prompt length budget을 적용해 CLIP 77 token 문제를 완화
-
-## Next Sprint Proposal
-
-- RAG Style Library
-- Semantic Memory
-- tokenizer-aware Prompt Budget Manager
-## Sprint 19: Dynamic Execution Engine - Done
-
-- `DynamicExecutionEngine` 추가
-- PlannerAgent `execution_plan` 기반 runtime dispatch 구현
-- OrchestratorAgent 직접 실행 로직 분리
-- state dict 기반 agent state management 도입
-
-## Next Sprint Proposal
-
-- RAG Style Library
-- Semantic Memory
-- conditional workflow branch
-## Sprint 20: Knowledge Manager & Retrieval Agent - Done
-
-- JSON Knowledge Store 추가
-- `KnowledgeManager` 추가
-- `RetrievalAgent` 추가
-- Planner/ExecutionEngine에 `retrieval` step 추가
-- PromptCompressor가 retrieved context를 compressed hint로 반영
-
-## Next Sprint Proposal
-
-- Semantic Memory
-- RAG Style Library expansion
-- Vector DB adapter design
-## Sprint 21: Semantic-like Memory Retrieval - Done
-
-- JSON history 기반 keyword similarity search 추가
-- `memory_retrieval` step 추가
-- `memory_context`를 compressed prompt hint로 반영
-- Vector DB migration을 위한 MemoryManager interface 확장
-
-## Next Sprint Proposal
-
-- ChromaDB 기반 Semantic Memory
-- LLM Planner
-- typed state schema
-## Sprint 22: Multi-Agent Prompt Orchestration Framework - Done
-
-- CharacterAgent 추가
-- StyleAgent 추가
-- LayoutAgent 추가
-- LightingAgent 추가
-- NegativePromptAgent 추가
-- PromptAssembler 추가
-- ExecutionEngine prompt orchestration step 지원
-
-## Next Sprint Proposal
-
-- PromptRouter
-- typed prompt fragment schema
-- LLM-based prompt specialist agents
-## Sprint22 Detailed Update - Done
-
-- PoseAgent added
-- ExpressionAgent added
-- PromptAssembler returns `generation_prompt`, `negative_prompt`, `prompt_sections`
-- Negative prompt stored separately in state
-## Sprint23: Character Reference Handling - Done
-
-- Multi-character schema in CharacterAgent
-- Character preservation rules in PromptAssembler
-- Single-image fallback maintained
-- Future multi-image UI prepared
-
-## Next Sprint Proposal
-
-- Photobooth Layout Agent
-- Multi-image UI
-- Identity similarity evaluation
-## Sprint24: Layout Planning Agent - Done
-
-- Layout Plan schema added
-- Camera view planning added
-- Subject placement planning added
-- PromptAssembler layout conversion added
-
-## Next Sprint Proposal
-
-- Photobooth Layout Agent
-- Composition evaluator
-- Multi-image UI layout mapping
-## Sprint25: Scene Planning Agent - Done
-
-- ScenePlanningAgent added
-- scene_plan state added
-- Layout/Pose/Expression agents reflect scene_plan
-- PromptAssembler reflects scene narrative and rules
-
-## Next Sprint Proposal
-
-- Character Relationship Agent
-- Provider-specific Prompt Adapter
-- LLM-based Scene Planner
-## Sprint26: Provider Prompt Adapter - Done
-
-- ProviderPromptAdapter added
-- FLUX provider prompt connected
-- GPT Image / SDXL skeletons added
-- Canonical prompt separated from provider prompt
-
-## Next Sprint Proposal
-
-- Provider Routing
-- Multi-Provider Evaluation
-- Provider-specific negative prompt routing
-## Sprint27: Provider Router - Done
-
-- ProviderRouter added
-- provider_router execution step added
-- selected_provider stored in state
-- ProviderPromptAdapter uses selected provider
-
-## Next Sprint Proposal
-
-- Multi-Provider Evaluation
-- Provider Capability Config
-- Cost/latency-aware routing
-
-## Sprint28: Provider Capability Config - Done
-
-- `config/providers.json` added
-- Provider capabilities moved out of `ProviderRouter`
-- Router now loads enabled providers from config
-- FLUX remains the default enabled provider
-
-## Next Sprint Proposal
-
-- Multi-Provider Evaluation
-- Cost/latency-aware routing
-- UI provider selection
-
-## Sprint29: Prompt Critic Agent - Done
-
-- PromptCriticAgent added
-- Prompt critique inserted before provider routing
-- Prompt quality score stored in workflow state
-- Prompt report exposed through Orchestrator result
-
-## Next Sprint Proposal
-
-- LLM-based Prompt Critic
-- Provider-specific Prompt Critic
-- Automatic prompt revision before generation
-
-## Sprint30A: Standard Agent Interface - Done
-
-- `ToolRegistry.run_with_state()` added
-- Selected agents support `run(state) -> dict`
-- ExecutionEngine uses state-based execution for selected prompt/provider steps
-- Backward compatibility preserved
-
-## Next Sprint Proposal
-
-- AgentState dataclass
-- PromptOptimizerAgent
-- More agents migrated to state-based interface
-
-## Sprint31: Prompt Optimizer Agent - Done
-
-- PromptOptimizerAgent added
-- Critic report now drives prompt repair
-- Optimized prompt updates canonical and final prompt
-- ProviderPromptAdapter records optimized prompt usage
-
-## Next Sprint Proposal
-
-- LLM Prompt Optimizer
-- AgentState dataclass
-- Provider-specific prompt optimization
-
-## Sprint32: Intelligent Prompt Optimizer - Done
-
-- PromptOptimizer now performs report-driven reasoning
-- Optimization report includes reasoning steps and estimated improvement
-- Prompt Preview added before generation
-- Critic to Optimizer feedback loop strengthened
-
-## Next Sprint Proposal
-
-- LLM Optimizer
-- Provider-specific optimizer
-- AgentState dataclass
-
-## Sprint33: LLM Prompt Optimizer Interface - Done
-
-- LLMPromptOptimizerAgent added
-- disabled/mock/future llm modes added
-- no external API call required
-- fallback behavior preserved
-
-## Next Sprint Proposal
-
-- AgentState dataclass
-- Prompt benchmark
-- Real LLM optimizer integration
-
-## Sprint34: AgentState Framework Core - Done
-
-- AgentState dataclass added
-- ExecutionEngine validates state at workflow boundaries
-- ToolRegistry accepts dict and AgentState state inputs
-- Existing dict workflow preserved
-
-## Next Sprint Proposal
-
-- AgentState adoption inside more agents
-- Graph State
-- Multi-session state management
-
-## Sprint35: FastAPI Service Layer - Done
-
-- FastAPI app added
-- REST routes added
-- Service layer added
-- Swagger/OpenAPI available through FastAPI
-
-## Next Sprint Proposal
-
-- API authentication
-- Async job queue
-- Docker/FastAPI deployment
-
-## Sprint36: Prompt Debug Report and Trace Viewer - Done
-
-- DebugReportManager added
-- report.json and prompt_preview.txt saved per run
-- initial/retry/best images copied when available
-- memory history links to debug artifacts
-
-## Next Sprint Proposal
-
-- Benchmark Runner
-- UI Trace Viewer
-- Docker packaging
-
-## Sprint37: Benchmark Runner - Done
-
-- Prompt set JSON added
-- Benchmark runner added
-- Benchmark results saved as timestamped JSON files
-- Failure handling keeps the benchmark running after individual prompt errors
-
-## Next Sprint Proposal
-
-- Benchmark dashboard
-- Prompt A/B testing
-- Docker packaging
-
-## Sprint38: Run Comparison Report - Done
-
-- Markdown comparison report generator added
-- Static HTML comparison report generator added
-- Latest benchmark result is loaded automatically
-- CLIP score interpretation note added
-
-## Next Sprint Proposal
-
-- API Schema expansion
-- Docker packaging
-- Benchmark dashboard
-## Sprint39: Context Program Builder - Done
-
-- `ContextProgramBuilder` 추가
-- provider-independent `context_program` 생성
-- PromptAssembler가 Context Program을 참조
-- ProviderPromptAdapter가 provider별 prompt로 컴파일
-- Debug Report에 Context Program 저장
-
-## Next Sprint Proposal
-
-- Context Program schema validation
-- Provider-specific context compiler tests
-- Visual prompt contract tests
+## Completed Sprints
+
+- Sprint 01: VisionAgent and BLIP captioning interface
+- Sprint 02: PromptAgent
+- Sprint 03: OrchestratorAgent
+- Sprint 04: GenerationAgent and mock/FLUX generation path
+- Sprint 05: EvaluationAgent and mock/CLIP evaluation path
+- Sprint 06: Reflection and Retry agents
+- Sprint 07: MemoryManager
+- Sprint 08: One-step retry loop
+- Sprint 09: Gradio UI
+- Sprint 10: Real BLIP integration
+- Sprint 11: Real FLUX integration with fallback
+- Sprint 12: Real CLIP evaluation
+- Sprint 13: Integration validation
+- Sprint 14: PlannerAgent planned design
+- Sprint 15: PlannerAgent integration
+- Sprint 16: ToolRegistry
+- Sprint 17: Context Engineering
+- Sprint 18: Prompt compression and budget management
+- Sprint 19: DynamicExecutionEngine
+- Sprint 20: Knowledge Manager and RetrievalAgent
+- Sprint 21: Semantic-like Memory Retrieval
+- Sprint 22: Multi-agent Prompt Orchestration
+- Sprint 23: Character Reference Handling
+- Sprint 24: Layout Planning
+- Sprint 25: Scene Planning
+- Sprint 26: ProviderPromptAdapter
+- Sprint 27: ProviderRouter
+- Sprint 28: Provider capability config
+- Sprint 29: PromptCriticAgent
+- Sprint 30A: Standard `run(state) -> dict` agent interface
+- Sprint 31: PromptOptimizerAgent
+- Sprint 32: Intelligent Prompt Optimizer
+- Sprint 33: LLMPromptOptimizer interface
+- Sprint 34: AgentState Framework Core
+- Sprint 35: FastAPI Service Layer
+- Sprint 36: Prompt Debug Report and Trace Viewer
+- Sprint 37: Benchmark Runner
+- Sprint 38: Run Comparison Report
+- Sprint 39: ContextProgramBuilder
+- Sprint 39.5: Documentation Refactoring
+
+## Planned Sprints
+
+- Sprint 40: Context Program v2
+- Sprint 41: Docker
+- Sprint 42: Docker Compose
+- Sprint 43: Queue
+- Sprint 44: Deploy
+- Sprint 45: Dashboard
+- Sprint 46: Benchmark Dashboard
+- Sprint 47: Multi-session
+- Sprint 48: Prompt Template Library
+- Sprint 49: Style Transfer
+- Sprint 50: Production
+
+## Future Work
+
+- Add schema validation for Context Program.
+- Add provider compiler regression tests.
+- Add Docker/FastAPI deployment guide.
+- Add persistent multi-session memory.
+- Add benchmark dashboard for visual comparison.

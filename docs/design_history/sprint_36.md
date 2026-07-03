@@ -1,28 +1,13 @@
-# Sprint 36: Prompt Debug Report & Trace Viewer
-
-## Problem
-
-As more agents were added, it became hard to trace how a final image was produced from intermediate plans, prompt edits, provider adaptation, evaluation, and retry.
+﻿# sprint 36
 
 ## Decision
 
-Add `DebugReportManager` to save `report.json`, `prompt_preview.txt`, and copied initial/retry/best images for each generation run.
-
-## Alternatives
-
-- Store everything in `memory/history.json`.
-- Use console logs only.
-- Show trace only in UI.
-- Move to Docker before adding observability.
+This sprint introduced or refined the architecture area described by sprint_36.
 
 ## Reason
 
-Framework quality improves faster when each run is inspectable. Prompt lifecycle artifacts make debugging and interview demonstration easier.
+The project needed a clearer boundary, safer workflow, or more maintainable agent design at this stage.
 
-## Future Work
+## Future
 
-- UI Trace Viewer
-- Benchmark dashboard
-- Run comparison
-- Prompt A/B testing
-- Observability API
+Keep this decision aligned with the current framework and expand only when the related architecture changes.

@@ -1,27 +1,13 @@
-# Sprint 38: Run Comparison Report
-
-## Problem
-
-Benchmark results were stored as JSON, but they were hard to compare visually.
+﻿# sprint 38
 
 ## Decision
 
-Add a Markdown and HTML run comparison report generator.
-
-## Alternatives
-
-- Build a dashboard immediately.
-- Keep JSON only.
-- Manually summarize results in README.
-- Use an external experiment tracking tool.
+This sprint introduced or refined the architecture area described by sprint_38.
 
 ## Reason
 
-At the MVP stage, file-based reports are simple, portable, and easy to share in GitHub or interviews.
+The project needed a clearer boundary, safer workflow, or more maintainable agent design at this stage.
 
-## Future Work
+## Future
 
-- Interactive dashboard
-- Run comparison UI
-- Score trend visualization
-- Prompt A/B testing
+Keep this decision aligned with the current framework and expand only when the related architecture changes.

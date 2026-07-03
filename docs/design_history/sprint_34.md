@@ -1,25 +1,13 @@
-# Sprint 34: AgentState Framework Core
-
-## Problem
-
-Dict state keys increased as the framework grew. This made typo prevention, state discovery, and validation harder.
+﻿# sprint 34
 
 ## Decision
 
-Introduce `AgentState` as a dataclass-based shared state object.
+This sprint introduced or refined the architecture area described by sprint_34.
 
 ## Reason
 
-AgentState creates a framework core layer while preserving compatibility with the current dict-based workflow.
-
-## Alternatives
-
-- Keep using plain dict state.
-- Convert every Agent immediately.
-- Introduce a third-party graph framework.
+The project needed a clearer boundary, safer workflow, or more maintainable agent design at this stage.
 
 ## Future
 
-- Graph State
-- Multi Session
-- Distributed Agent
+Keep this decision aligned with the current framework and expand only when the related architecture changes.

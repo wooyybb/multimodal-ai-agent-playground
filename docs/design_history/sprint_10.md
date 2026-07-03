@@ -1,24 +1,13 @@
-# Sprint 10: Real BLIP Integration
-
-## Problem
-
-`VisionAgent`가 mock caption만 반환하여 실제 VLM inference 경험을 보여주기 어려웠습니다.
+﻿# sprint 10
 
 ## Decision
 
-`Salesforce/blip-image-captioning-base`를 `BlipTool`에 통합합니다.
-
-## Alternatives
-
-- Mock caption 유지
-- LLaVA 사용
-- BLIP-2 사용
-- 외부 VLM API 사용
+This sprint introduced or refined the architecture area described by sprint_10.
 
 ## Reason
 
-BLIP base는 비교적 가볍고 image captioning MVP에 적합합니다. 또한 Hugging Face transformers를 통해 표준적인 방식으로 사용할 수 있습니다.
+The project needed a clearer boundary, safer workflow, or more maintainable agent design at this stage.
 
-## Future Work
+## Future
 
-BLIP-2, LLaVA, GPT-4o Vision 등으로 확장할 수 있습니다.
+Keep this decision aligned with the current framework and expand only when the related architecture changes.

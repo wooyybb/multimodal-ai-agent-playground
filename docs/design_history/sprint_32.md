@@ -1,25 +1,13 @@
-# Sprint 32: Intelligent Prompt Optimizer
-
-## Problem
-
-Optimizer did not use PromptReport deeply enough. It cleaned prompts broadly instead of reasoning from the critic output.
+﻿# sprint 32
 
 ## Decision
 
-Add PromptReport-based reasoning to PromptOptimizerAgent.
+This sprint introduced or refined the architecture area described by sprint_32.
 
 ## Reason
 
-Self-improving agents need feedback loops where critique directly controls the next action. Report-driven optimization makes edits more explainable and less destructive.
-
-## Alternatives
-
-- Keep the broad rule-based optimizer.
-- Move optimization into ProviderPromptAdapter.
-- Use an LLM optimizer immediately.
+The project needed a clearer boundary, safer workflow, or more maintainable agent design at this stage.
 
 ## Future
 
-- LLM Optimizer
-- Provider-specific Optimizer
-- Optimization quality tracking
+Keep this decision aligned with the current framework and expand only when the related architecture changes.

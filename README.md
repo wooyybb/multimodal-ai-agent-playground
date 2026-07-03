@@ -1,23 +1,36 @@
 # Multimodal AI Agent Playground
 
-## Project Overview
+Multimodal AI Agent Playground is a Python-based multi-agent image generation framework. It connects planning, retrieval, context engineering, prompt engineering, provider routing, generation, evaluation, reflection, retry, memory, debugging, and benchmark reporting into one inspectable workflow.
 
-This project is a **Multimodal AI Agent Playground** for experimenting with a multi-agent image generation framework.
+The project is built as an AI Agent Engineering portfolio project. The goal is not only to generate images, but to show how an agent system can be decomposed into clear roles, traced, evaluated, and improved over many sprints.
 
-It combines Planning, Retrieval, Prompt Orchestration, Provider Routing, Evaluation, Reflection, Retry, and Memory into one end-to-end workflow. The project started as a simple image-to-prompt-to-generation pipeline and has evolved into a Python class-based AI Agent Engineering playground.
+## Table of Contents
 
-Current focus:
+- [Project Goal](#project-goal)
+- [Architecture Diagram](#architecture-diagram)
+- [Pipeline](#pipeline)
+- [Core Features](#core-features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Project Roadmap](#project-roadmap)
+- [Screenshots](#screenshots)
+- [Documentation](#documentation)
+- [Future Work](#future-work)
+- [License](#license)
 
-- Build an inspectable multi-agent architecture.
-- Keep each agent role small and explainable.
-- Use mock or fallback behavior where needed so the workflow can still run during development.
-- Separate implemented features from future extensions.
+## Project Goal
 
-## Architecture
+- Build a modular multi-agent framework for multimodal image generation.
+- Separate planning, context building, prompt assembly, provider adaptation, generation, evaluation, retry, and memory.
+- Keep every agent role small enough to explain in interviews and debug reports.
+- Support real model integrations where available while keeping fallback paths for development.
+
+## Architecture Diagram
 
 ```text
 User
--> Gradio UI
+-> Gradio UI / FastAPI
 -> PlannerAgent
 -> DynamicExecutionEngine
 -> ToolRegistry
@@ -25,258 +38,198 @@ User
 -> Memory Retrieval
 -> Knowledge Retrieval
 -> ScenePlanningAgent
--> Character / Style / Layout / Pose / Expression / Lighting Agents
+-> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
 -> ContextProgramBuilder
 -> PromptAssembler
 -> PromptCritic
--> PromptOptimizer
--> LLMPromptOptimizerAgent optional interface
+-> PromptOptimizer / LLMPromptOptimizer interface
 -> ProviderRouter
 -> ProviderPromptAdapter
 -> GenerationAgent
 -> EvaluationAgent
 -> ReflectionAgent / RetryAgent
 -> MemoryManager
+-> DebugReport / BenchmarkReport
 ```
 
-The framework uses `ToolRegistry` and `DynamicExecutionEngine` to execute an agent plan. Several upper-layer agents now support a state-based interface:
+## Pipeline
+
+1. User uploads an image and enters a text request.
+2. `PlannerAgent` creates an execution plan.
+3. `DynamicExecutionEngine` runs registered agents through `ToolRegistry`.
+4. `VisionAgent` creates a caption with BLIP when available.
+5. Retrieval and memory modules add previous context and style knowledge.
+6. Specialist prompt agents create scene, character, layout, pose, expression, lighting, and negative sections.
+7. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
+8. `PromptAssembler` builds a canonical prompt.
+9. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
+10. `ProviderRouter` selects a generation provider from config.
+11. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
+12. `GenerationAgent` generates the image.
+13. `EvaluationAgent` scores the result with CLIP when available.
+14. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
+15. `MemoryManager` saves run history.
+16. Debug reports and benchmark reports make the run inspectable.
+
+## Core Features
+
+### Planner
+
+`PlannerAgent` produces an execution plan so the workflow is not hardcoded into one procedural script.
+
+### Execution Engine
+
+`DynamicExecutionEngine` dispatches each step and supports state-based agents through `run(state) -> dict`.
+
+### Memory
+
+`MemoryManager` stores run history and supports semantic-like retrieval from previous prompts, scores, reflections, retries, and output paths.
+
+### Retrieval
+
+Knowledge retrieval adds style and prompt context before prompt assembly.
+
+### Context Engineering
+
+`ContextProgramBuilder` creates a structured context program with task, user goal, scene, character, style, layout, pose, expression, lighting, negative, memory, retrieval, provider, and output sections.
+
+### Prompt Engineering
+
+The workflow separates canonical prompt, provider prompt, evaluation prompt, retry prompt, and context program.
+
+### Provider Routing
+
+`ProviderRouter` reads provider capability configuration from `config/providers.json`.
+
+### Provider Adapter
+
+`ProviderPromptAdapter` compiles the context/canonical prompt into provider-specific instructions for FLUX, GPT Image skeleton, or SDXL skeleton.
+
+### FastAPI
+
+The `api/` package exposes a REST service layer with `/`, `/health`, and `/generate`.
+
+### Gradio
+
+The `ui/` package provides the interactive local demo interface.
+
+### Benchmark
+
+`benchmark/benchmark_runner.py` runs multiple prompts and stores structured result JSON.
+
+### Debug Report
+
+`DebugReportManager` saves `report.json`, `prompt_preview.txt`, and available output image copies under `outputs/runs/`.
+
+## Project Structure
 
 ```text
-run(state: dict) -> dict
+agents/       Agent classes for planning, prompt orchestration, routing, generation flow
+api/          FastAPI service layer
+benchmark/    Benchmark runner, result JSON, comparison reports
+config/       Provider capability configuration
+docs/         Architecture, roadmap, decisions, sprint book, prompts, reviews
+knowledge/    Knowledge and style retrieval resources
+memory/       MemoryManager and run history
+registry/     ToolRegistry for agent/tool dispatch
+tools/        BLIP, FLUX, CLIP wrappers
+ui/           Gradio app
+workflow/     Execution engine, AgentState, debug report, pipeline
+outputs/      Runtime outputs only
 ```
 
-This makes the workflow closer to a graph-style agent system while still staying lightweight and framework-free.
+Do not commit `.env` or the full `outputs/` directory.
 
-## Current Features
-
-- BLIP captioning through `VisionAgent`
-- FLUX generation through `GenerationAgent`
-- CLIP evaluation through `EvaluationAgent`
-- RAG-style knowledge and style retrieval
-- Semantic-like memory retrieval from previous runs
-- Prompt compression for generation and CLIP-safe evaluation prompts
-- Multi-agent prompt orchestration
-- Scene, character, style, layout, pose, expression, lighting, and negative prompt agents
-- ContextProgramBuilder for provider-independent structured visual context
-- PromptAssembler for canonical prompt construction
-- PromptCritic for duplicate, missing-section, warning, and quality-score analysis
-- PromptOptimizer for report-driven prompt repair
-- Optional LLMPromptOptimizerAgent interface with disabled/mock fallback modes
-- ProviderRouter with config-driven provider capability loading
-- ProviderPromptAdapter for provider-specific prompt formatting
-- Reflection and retry decision flow
-- MemoryManager for run history
-- Gradio UI
-
-## Tech Stack
-
-- Python
-- PyTorch
-- Transformers
-- Gradio
-- Hugging Face
-- BLIP
-- FLUX
-- CLIP
-- GitHub
-- Codex
-
-## How to Run
-
-Install dependencies:
+## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a local `.env` file and set your Hugging Face token:
+Create a local `.env` file:
 
 ```text
 HF_TOKEN=your_local_token_here
 ```
 
-Do not commit `.env` or paste real token values into documentation.
+Never commit real token values.
 
-Optional LLM Prompt Optimizer flags can be configured locally:
+## Quick Start
 
-```text
-LLM_OPTIMIZER_ENABLED=false
-LLM_OPTIMIZER_MOCK=true
-LLM_OPTIMIZER_PROVIDER=openai
-```
-
-The current LLM optimizer is an interface-first extension. It does not call an external LLM API by default. Disabled mode keeps the existing optimized prompt, and mock mode runs a local deterministic mock optimizer. Do not put real API keys in README or committed files.
-
-Run the app:
+Run Gradio:
 
 ```bash
 python main.py
 ```
 
-This launches the Gradio UI. Upload an image, enter a prompt, and run the agent workflow.
-
-Run the FastAPI service layer:
+Run FastAPI:
 
 ```bash
 uvicorn api.app:app --reload
 ```
 
-Swagger UI:
+Swagger:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-FastAPI endpoints:
-
-```text
-GET  /
-GET  /health
-POST /generate
-```
-
-Run the benchmark runner:
+Run Benchmark:
 
 ```bash
 python -m benchmark.benchmark_runner
 ```
 
-Benchmark prompts are stored in:
-
-```text
-benchmark/prompts.json
-```
-
-Benchmark results are saved under:
-
-```text
-benchmark/results/benchmark_YYYYMMDD_HHMMSS.json
-```
-
-Each result records prompt id, provider, score, best score, retry status, image path, debug report path, prompt preview path, and prompt length.
-
-Generate a comparison report from the latest benchmark result:
+Run Report Generator:
 
 ```bash
 python -m benchmark.report_generator
 ```
 
-Reports are saved under:
+## Project Roadmap
 
-```text
-benchmark/reports/report_YYYYMMDD_HHMMSS.md
-benchmark/reports/report_YYYYMMDD_HHMMSS.html
-```
+- Sprint 1-39: Multi-agent framework, provider routing, debug reports, benchmark reports, context program
+- Sprint 40: Context Program v2
+- Sprint 41: Docker
+- Sprint 42: Docker Compose
+- Sprint 43: Queue
+- Sprint 44: Deploy
+- Sprint 45: Dashboard
+- Sprint 46: Benchmark Dashboard
+- Sprint 47: Multi-session
+- Sprint 48: Prompt Template Library
+- Sprint 49: Style Transfer
+- Sprint 50: Production hardening
 
-CLIP score is useful for prompt-image semantic similarity, but it should not be treated as absolute visual quality. Use benchmark reports together with debug reports and prompt previews.
+## Screenshots
 
-## Project Structure
+Placeholder: curated demo screenshots should be stored under `assets/demo/` in a future sprint. Do not use the full runtime `outputs/` folder as a demo asset archive.
 
-```text
-agents/      Specialized AI agents and orchestration roles
-tools/       Model/tool wrappers such as BLIP, FLUX, and CLIP
-workflow/    DynamicExecutionEngine and pipeline logic
-registry/    ToolRegistry for agent/tool lookup and execution
-memory/      MemoryManager and run history storage
-knowledge/   Knowledge and style retrieval resources
-config/      Provider capability configuration
-docs/        Architecture notes, sprint book, decisions, prompts, reviews
-ui/          Gradio application
-api/         FastAPI REST service layer
-benchmark/   Prompt benchmark runner and result JSON files
-outputs/     Runtime generated outputs
-```
+## Documentation
 
-`outputs/` is runtime output storage. Do not treat the whole folder as curated demo assets for Git.
+- [Architecture](docs/architecture.md)
+- [Roadmap](docs/roadmap.md)
+- [Development Log](docs/development_log.md)
+- [Concepts](docs/concepts.md)
+- [Prompt Engineering](docs/prompt_engineering.md)
+- [Design Decisions](docs/design_decisions.md)
+- [Interview Notes](docs/interview_notes.md)
+- [AI Usage](docs/ai_usage.md)
+- [Code Reviews](docs/code_reviews.md)
+- [Meeting Log](docs/meeting_log.md)
+- [Retrospective](docs/retrospective.md)
+- [Sprint Book](docs/sprint_book/README.md)
 
-## Debug Reports
+## Future Work
 
-Each generation run can save a debug report under:
-
-```text
-outputs/runs/run_*/report.json
-outputs/runs/run_*/prompt_preview.txt
-outputs/runs/run_*/initial.png
-outputs/runs/run_*/retry.png
-outputs/runs/run_*/best.png
-```
-
-`report.json` stores structured intermediate state such as scene plan, prompt sections, prompt critic report, optimized prompt, provider prompt, evaluation prompt, score, retry result, and agent trace.
-
-`prompt_preview.txt` is a human-readable summary for interviews and debugging. It shows the prompt lifecycle from user request to provider prompt and evaluation result.
-
-Runtime images are copied only when the corresponding source files exist. Do not commit the whole `outputs/` directory.
-
-## Context Program Layer
-
-Sprint 39 adds a provider-independent `context_program` between specialist agents and prompt generation.
-
-```text
-Specialist Agents
--> ContextProgramBuilder
--> PromptAssembler
--> ProviderPromptAdapter
--> GenerationAgent
-```
-
-The context program is a structured intermediate representation for subject, scene, style, layout, pose, expression, lighting, negative constraints, memory hints, retrieval hints, and provider constraints. It is not copied directly into the generation prompt. `PromptAssembler` and `ProviderPromptAdapter` read it and compile only the visual instructions each provider needs.
-
-This keeps Context Engineering separate from provider-specific Prompt Engineering.
-
-## Sprint History
-
-- Sprint 00: Project skeleton
-- Sprint 01: VisionAgent with BLIP interface
-- Sprint 02: PromptAgent
-- Sprint 03: OrchestratorAgent
-- Sprint 04: GenerationAgent and mock/FLUX generation path
-- Sprint 05: EvaluationAgent and CLIP evaluation
-- Sprint 06: Reflection and Retry agents
-- Sprint 07: MemoryManager
-- Sprint 08: Retry loop
-- Sprint 09: Gradio UI
-- Sprint 10: Real BLIP integration
-- Sprint 11: Real FLUX integration
-- Sprint 12: Real CLIP integration
-- Sprint 13: Integration validation
-- Sprint 14: PlannerAgent planning phase
-- Sprint 15: PlannerAgent integration
-- Sprint 16: ToolRegistry
-- Sprint 17: Context engineering
-- Sprint 18: Prompt compression
-- Sprint 19: DynamicExecutionEngine
-- Sprint 20: RAG style library
-- Sprint 21: Semantic-like memory retrieval
-- Sprint 22: Multi-agent prompt orchestration
-- Sprint 23: Character reference handling
-- Sprint 24: Layout planning
-- Sprint 25: Scene planning
-- Sprint 26: ProviderPromptAdapter
-- Sprint 27: ProviderRouter
-- Sprint 28: Provider capability config
-- Sprint 29: PromptCriticAgent
-- Sprint 30A: Standard `run(state) -> dict` interface migration
-- Sprint 31: PromptOptimizerAgent
-- Sprint 32: Intelligent Prompt Optimizer
-- Sprint 33: LLM Prompt Optimizer Interface
-- Sprint 34: AgentState Framework Core
-- Sprint 35: FastAPI Service Layer
-- Sprint 36: Prompt Debug Report and Trace Viewer
-- Sprint 37: Benchmark Runner
-- Sprint 38: Run Comparison Report
-- Sprint 39: ContextProgramBuilder and provider-independent context program
-
-## Roadmap
-
-Planned future work:
-
-- Real LLM Prompt Optimizer integration
-- Typed state validation expansion beyond the current `AgentState` core
+- Context Program schema validation
+- Real LLM prompt optimizer
 - Multi-provider generation
-- Reference image handling improvements
+- Reference image handling
 - Image editing workflow
-- Docker / FastAPI deployment hardening
+- Docker/FastAPI deployment
+- Benchmark dashboard
 
-## Notes
+## License
 
-Some parts of the system use real model integrations when local dependencies and credentials are configured. Fallback or mock behavior may still exist to keep the workflow runnable during development.
+TODO: Add a project license before public release.
