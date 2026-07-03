@@ -53,10 +53,11 @@
 - Sprint 49: Adaptive Planning Loop
 - Sprint 50: Character Program Builder
 - Sprint 51: Goal-oriented Planning
+- Sprint 53: Strategy Selector
 
 ## Planned Sprints
 
-- Sprint 52: Production hardening
+- Sprint 54: Production hardening
 
 ## Future Work
 

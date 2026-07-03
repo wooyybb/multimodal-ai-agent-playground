@@ -10,9 +10,10 @@ class AdaptivePlanner:
 
         failure_analysis = self._failure_analysis(score, text)
         hypothesis = self._hypothesis(score, text)
-        strategy = self._strategy(score, text)
-        context_updates = self._context_updates(score, text)
-        priority_change = self._priority_change(score, text)
+        selected_strategy = state.get("selected_strategy") or {}
+        strategy = selected_strategy.get("title") or self._strategy(score, text)
+        context_updates = self._context_updates(score, text, selected_strategy)
+        priority_change = self._priority_change(score, text, selected_strategy)
         confidence = self._confidence(score, context_updates)
 
         print(f"[AdaptivePlanner] Failure: {failure_analysis}")
@@ -23,6 +24,7 @@ class AdaptivePlanner:
                 "failure_analysis": failure_analysis,
                 "hypothesis": hypothesis,
                 "strategy": strategy,
+                "selected_strategy": selected_strategy,
                 "context_updates": context_updates,
                 "priority_change": priority_change,
                 "confidence": confidence,
@@ -73,8 +75,10 @@ class AdaptivePlanner:
             strategies.append("focus retry prompt on subject, composition, and caption fidelity")
         return "; ".join(dict.fromkeys(strategies))
 
-    def _context_updates(self, score, text):
+    def _context_updates(self, score, text, selected_strategy=None):
         updates = []
+        selected_strategy = selected_strategy or {}
+        strategy_id = selected_strategy.get("id")
         if score < 0.70:
             updates.extend(
                 [
@@ -89,12 +93,22 @@ class AdaptivePlanner:
             updates.append("use eye-level camera and balanced framing")
         if "style" in text and "conflict" in text:
             updates.append("keep style secondary to subject clarity")
+        if strategy_id == "S1":
+            updates.append("increase preserve prompt for identity details")
+        elif strategy_id == "S2":
+            updates.append("change camera to clearer centered framing")
+        elif strategy_id == "S3":
+            updates.append("strengthen coherent lighting and reduce harsh contrast")
+        elif strategy_id == "S4":
+            updates.append("reduce style weight while keeping requested style visible")
         if not updates and score < 0.75:
             updates.append("improve prompt-image alignment with clearer visual hierarchy")
         return list(dict.fromkeys(updates))
 
-    def _priority_change(self, score, text):
+    def _priority_change(self, score, text, selected_strategy=None):
         changes = []
+        selected_strategy = selected_strategy or {}
+        strategy_id = selected_strategy.get("id")
         if score < 0.70:
             changes.extend(["character +2", "layout +1", "style -1"])
         if "character" in text or "subject" in text or "caption" in text:
@@ -103,6 +117,14 @@ class AdaptivePlanner:
             changes.append("camera +1")
         if "style" in text and "conflict" in text:
             changes.append("style -2")
+        if strategy_id == "S1":
+            changes.extend(["identity +2", "style -1"])
+        elif strategy_id == "S2":
+            changes.extend(["composition +2", "camera +1"])
+        elif strategy_id == "S3":
+            changes.extend(["lighting +2", "contrast -1"])
+        elif strategy_id == "S4":
+            changes.extend(["style -1", "identity +1"])
         if not changes and score < 0.75:
             changes.append("alignment +1")
         return list(dict.fromkeys(changes))

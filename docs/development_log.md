@@ -142,6 +142,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - ExecutionEngine stores Goal Tree and injects goal priorities into Context Program before prompt compilation.
 - Debug reports now include `goal_tree`.
 
+## Sprint 53
+
+- Added `StrategySelector`.
+- StrategySelector generates candidate strategies and selects the highest-scoring option.
+- AdaptivePlanner now reads `selected_strategy` when building the adaptive plan.
+- ExecutionEngine injects selected strategy into Context Program before prompt compilation.
+- Debug reports now include `candidate_strategies` and `selected_strategy`.
+
 ## Future Work
 
 - Keep this file short.

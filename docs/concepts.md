@@ -120,6 +120,14 @@ Priority Planning은 anime, cinematic, portrait 같은 user intent에 따라 ide
 
 Adaptive Planning은 evaluation과 reflection 이후 다음 generation 전략을 다시 세우는 loop입니다. 단순 Retry는 score만 보고 한 번 더 생성하지만, Adaptive Planner는 failure analysis, hypothesis, strategy, context updates, priority change를 만들어 prompt compiler 이전 context를 보강합니다.
 
+## Strategy Selection
+
+Strategy Selection은 reflection과 hypothesis를 바탕으로 여러 candidate strategy를 만들고, rule 기반 score가 가장 높은 전략을 선택하는 단계입니다. 선택된 전략은 Adaptive Planning과 Context Program에 반영됩니다.
+
+## Candidate Strategy
+
+Candidate Strategy는 가능한 해결 방향입니다. 예를 들어 identity 보존 강화, camera/composition 단순화, lighting coherence 강화, style과 identity 균형 조정 같은 후보가 될 수 있습니다.
+
 ## Re-Planning
 
 Re-Planning은 기존 prompt를 그대로 재사용하지 않고 실패 원인에 맞춰 character priority, layout simplicity, style weight, camera framing 같은 planning 요소를 수정하는 과정입니다.

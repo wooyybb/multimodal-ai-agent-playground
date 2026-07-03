@@ -106,7 +106,8 @@ flowchart TD
     PPA --> G[GenerationAgent]
     G --> EV[EvaluationAgent]
     EV --> RF[ReflectionAgent]
-    RF --> AP[AdaptivePlanner]
+    RF --> SS[StrategySelector]
+    SS --> AP[AdaptivePlanner]
     AP --> PCMP
     AP --> RT[RetryAgent]
     RT --> MM[MemoryManager]
@@ -137,10 +138,11 @@ flowchart TD
 19. GenerationAgent creates image output.
 20. EvaluationAgent scores generated output.
 21. ReflectionAgent analyzes failure signals.
-22. AdaptivePlanner creates a re-planning strategy and updates context before retry.
-23. RetryAgent decides whether to run the second attempt.
-24. MemoryManager saves history.
-25. DebugReport and Benchmark tools record observability artifacts.
+22. StrategySelector generates candidate strategies and selects the highest-scoring option.
+23. AdaptivePlanner creates a re-planning strategy and updates context before retry.
+24. RetryAgent decides whether to run the second attempt.
+25. MemoryManager saves history.
+26. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
@@ -160,6 +162,7 @@ flowchart TD
 - PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
 - PromptCompiler owns context-program-to-provider-package compilation.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
+- StrategySelector owns candidate strategy generation and explainable selection before adaptive planning.
 - AdaptivePlanner owns rule-based failure analysis and re-planning between reflection and retry.
 - Generation, evaluation, memory, benchmark, and debug report stay separated.
 

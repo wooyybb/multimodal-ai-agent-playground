@@ -264,6 +264,17 @@ A. Reflection은 실패 원인을 설명하지만 실행 가능한 planning upda
 Q. Adaptive Planning은 무엇을 수정하나요?
 A. 현재는 rule 기반으로 context_program의 character preservation rules, layout composition rules, style rendering rules, quality keywords를 보강하고 priority_change를 기록합니다. retry가 필요하면 prompt compiler와 provider adapter가 이 업데이트를 반영합니다.
 
+## Strategy Selection
+
+Q. Strategy Selector를 만든 이유는?
+A. AdaptivePlanner가 하나의 전략만 만들면 대안 비교가 어렵습니다. StrategySelector는 여러 candidate strategy를 만들고 score로 선택해 의사결정 과정을 설명 가능하게 만듭니다.
+
+Q. Hypothesis와 Strategy의 차이는?
+A. Hypothesis는 실패 원인에 대한 가설입니다. Strategy는 그 가설을 바탕으로 다음 generation에서 실제로 바꿀 행동 계획입니다.
+
+Q. Adaptive Planning은 Strategy를 어떻게 활용하나요?
+A. AdaptivePlanner는 selected_strategy를 읽어 context_updates와 priority_change를 만들고, ExecutionEngine은 이를 Context Program에 반영한 뒤 prompt compiler를 다시 실행합니다.
+
 ## Future Work
 
 - Context Program v2 schema validation

@@ -53,6 +53,7 @@ Image / Text
 -> Generation
 -> Evaluation
 -> Reflection
+-> Strategy Selection
 -> Adaptive Planning
 -> Retry
 -> Memory
@@ -131,6 +132,7 @@ PlannerAgent
 -> GenerationAgent
 -> EvaluationAgent
 -> ReflectionAgent
+-> StrategySelector
 -> AdaptivePlanner
 -> RetryAgent
 -> MemoryManager
@@ -147,6 +149,7 @@ PlannerAgent
 | Execution Engine | Runs a planner-produced workflow through a registry-based dynamic execution engine. |
 | Memory | Stores previous prompts, scores, reflections, retries, and output paths for future context retrieval. |
 | Reflection | Analyzes evaluation results and produces improvement direction. |
+| Strategy Selection | Generates candidate strategies from reflection signals and selects the highest-scoring strategy. |
 | Adaptive Planning | Turns reflection into re-planning before retry by updating context priorities and strategy. |
 | Prompt Compiler | Converts provider-independent Context Program into provider-specific prompt packages. |
 | Prompt Critic | Reviews prompt quality, missing sections, conflicts, and provider suitability. |
@@ -291,6 +294,7 @@ Example run trace:
 [GenerationAgent] Running...
 [EvaluationAgent] Score:
 [ReflectionAgent] Running...
+[StrategySelector] Generating strategies...
 [AdaptivePlanner] Running...
 [RetryAgent] Score below threshold. Retry needed.
 [DebugReport] Report saved:

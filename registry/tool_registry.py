@@ -20,6 +20,9 @@ class ToolRegistry:
             from agents.goal_planner import GoalPlanner
 
             self.register("goal_planner", GoalPlanner())
+            from agents.strategy_selector import StrategySelector
+
+            self.register("strategy_selector", StrategySelector())
         except Exception as error:
             print(f"[ToolRegistry] Default tool registration skipped: {error}")
 

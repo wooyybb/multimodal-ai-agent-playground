@@ -102,6 +102,8 @@ class DebugReportManager:
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "initial_output_image_path": self._safe(state.get("output_image_path")),
             "initial_score": self._safe(state.get("score")),
+            "candidate_strategies": self._safe(state.get("candidate_strategies")),
+            "selected_strategy": self._safe(state.get("selected_strategy")),
             "adaptive_plan": self._safe(state.get("adaptive_plan")),
             "retry_needed": self._safe(state.get("retry_needed")),
             "raw_suggested_prompt": self._safe(state.get("raw_suggested_prompt")),
@@ -161,6 +163,14 @@ class DebugReportManager:
             self._llm_prompt_critic_preview(state.get("llm_prompt_critic_report")),
         )
         self._append_block(lines, "OPTIMIZED PROMPT", state.get("optimized_prompt"))
+        self._append_block(
+            lines,
+            "STRATEGY",
+            self._strategy_preview(
+                state.get("candidate_strategies"),
+                state.get("selected_strategy"),
+            ),
+        )
         self._append_block(
             lines,
             "ADAPTIVE PLAN",
@@ -230,6 +240,15 @@ class DebugReportManager:
             "Context Updates": plan.get("context_updates", []),
             "Priority Change": plan.get("priority_change", []),
             "Confidence": plan.get("confidence"),
+        }
+
+    def _strategy_preview(self, candidates, selected):
+        selected = selected or {}
+        return {
+            "Candidates": candidates or [],
+            "Selected": selected,
+            "Reason": selected.get("reason"),
+            "Expected Effect": selected.get("expected_effect"),
         }
 
     def _character_program_preview(self, program):

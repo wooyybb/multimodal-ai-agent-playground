@@ -32,6 +32,7 @@ class DynamicExecutionEngine:
         "generation",
         "evaluation",
         "reflection",
+        "strategy_selector",
         "adaptive_planner",
         "retry",
         "memory_save",
@@ -417,6 +418,7 @@ class DynamicExecutionEngine:
         try:
             self._apply_goal_tree_context(state)
             self._apply_character_program_context(state)
+            self._apply_strategy_context(state)
             self._run_state_step(registry, state, "prompt_compiler")
             state["agent_trace"].append("PromptCompiler compiled prompt package")
             print("[ExecutionEngine] PromptCompiler compiled prompt package")
@@ -495,6 +497,26 @@ class DynamicExecutionEngine:
                 "confidence": 0.0,
             }
             state["agent_trace"].append("AdaptivePlanner skipped after error")
+
+    def _run_strategy_selector(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "strategy_selector")
+            self._apply_strategy_context(state)
+            state["agent_trace"].append("StrategySelector selected adaptive strategy")
+            print("[ExecutionEngine] StrategySelector selected adaptive strategy")
+        except Exception as error:
+            print(f"[ExecutionEngine] StrategySelector failed: {error}")
+            fallback = {
+                "id": "S0",
+                "title": "Fallback adaptive strategy",
+                "reason": str(error),
+                "expected_effect": "Continue with AdaptivePlanner fallback behavior.",
+                "risk": "Strategy selection unavailable.",
+                "score": 0.0,
+            }
+            state["candidate_strategies"] = [fallback]
+            state["selected_strategy"] = fallback
+            state["agent_trace"].append("StrategySelector used fallback strategy")
 
     def _run_retry(self, registry, state):
         retry_needed = registry.call("retry", state.get("score", 0.0))
@@ -610,6 +632,7 @@ class DynamicExecutionEngine:
             return
 
         print("[ExecutionEngine] Applying adaptive re-planning before retry.")
+        self._apply_strategy_context(state)
         self._apply_adaptive_context_updates(state)
         try:
             self._run_prompt_compiler(registry, state)
@@ -670,6 +693,47 @@ class DynamicExecutionEngine:
             ["adaptive re-planning", *priorities],
         )
         context_program["adaptive_plan"] = adaptive_plan
+        state["context_program"] = context_program
+
+    def _apply_strategy_context(self, state):
+        selected_strategy = state.get("selected_strategy") or {}
+        context_program = state.get("context_program")
+        if not selected_strategy or not isinstance(context_program, dict):
+            return
+
+        context_program["selected_strategy"] = selected_strategy
+        context_program["candidate_strategies"] = state.get("candidate_strategies") or []
+        strategy_id = selected_strategy.get("id")
+        quality = context_program.setdefault("quality", {})
+        self._extend_unique(
+            quality.setdefault("quality_keywords", []),
+            [f"selected strategy: {selected_strategy.get('title', '')}".strip()],
+        )
+
+        if strategy_id == "S1":
+            characters = context_program.setdefault("characters", {})
+            self._extend_unique(
+                characters.setdefault("preservation_rules", []),
+                ["selected strategy increases identity preservation"],
+            )
+        elif strategy_id == "S2":
+            layout = context_program.setdefault("layout", {})
+            self._extend_unique(
+                layout.setdefault("composition_rules", []),
+                ["selected strategy simplifies camera and composition"],
+            )
+        elif strategy_id == "S3":
+            lighting = context_program.setdefault("lighting", {})
+            self._extend_unique(
+                lighting.setdefault("lighting_keywords", []),
+                ["selected strategy strengthens lighting coherence"],
+            )
+        elif strategy_id == "S4":
+            style = context_program.setdefault("style", {})
+            self._extend_unique(
+                style.setdefault("rendering_rules", []),
+                ["selected strategy balances style against identity"],
+            )
         state["context_program"] = context_program
 
     def _apply_character_program_context(self, state):
@@ -848,12 +912,14 @@ class DynamicExecutionEngine:
 
     def _normalize_plan(self, plan):
         normalized = list(plan)
-        if "memory_retrieval" in normalized:
-            return normalized
 
-        if "vision" in normalized:
+        if "memory_retrieval" not in normalized and "vision" in normalized:
             insert_at = normalized.index("vision") + 1
             normalized.insert(insert_at, "memory_retrieval")
+
+        if "strategy_selector" not in normalized and "adaptive_planner" in normalized:
+            insert_at = normalized.index("adaptive_planner")
+            normalized.insert(insert_at, "strategy_selector")
         return normalized
 
     def _run_state_step(self, registry, state, step):
