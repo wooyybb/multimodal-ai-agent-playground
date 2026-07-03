@@ -43,3 +43,7 @@ The shared LLM client layer removes duplicated mock behavior from LLM-style agen
 ## Sprint45 Review
 
 PromptCompiler was added between ProviderRouter and ProviderPromptAdapter. It creates `compiled_prompt_package` without changing generation tools. ProviderPromptAdapter now prefers the compiled package and falls back to the previous canonical/context path when no package exists.
+
+## Sprint46 Review
+
+AIModelService was added below LLMClient. Provider skeletons do not call external APIs and currently fallback to MockProvider behavior. This keeps provider integration isolated from LLM agents.

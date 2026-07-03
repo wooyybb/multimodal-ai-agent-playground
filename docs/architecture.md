@@ -17,6 +17,7 @@ UI Layer
 
 Semantic Planning Layer
 -> LLMClient
+-> AIModelService
 -> MockLLM
 -> LLMContextReasoner
 
@@ -65,7 +66,9 @@ flowchart TD
     U --> API[FastAPI]
     UI --> LC[LLMClient]
     API --> LC
-    LC --> ML[MockLLM]
+    LC --> AMS[AIModelService]
+    AMS --> REG[Provider Registry]
+    REG --> ML[Mock Provider]
     ML --> LR[LLMContextReasoner]
     LR --> E[DynamicExecutionEngine]
     E --> P[PlannerAgent]
@@ -119,6 +122,7 @@ flowchart TD
 
 - UI/API should not know individual agent internals.
 - LLMClient owns provider abstraction for reason, critic, and optimize calls.
+- AIModelService owns provider dispatch below LLMClient.
 - LLMContextReasoner owns semantic intent interpretation before prompt construction.
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.

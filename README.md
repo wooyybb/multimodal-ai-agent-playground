@@ -32,6 +32,7 @@ The project is built as an AI Agent Engineering portfolio project. The goal is n
 User
 -> Gradio UI / FastAPI
 -> LLMClient / MockLLM
+-> AIModelService
 -> LLMContextReasoner
 -> PlannerAgent
 -> DynamicExecutionEngine
@@ -98,10 +99,14 @@ The shared `llm/` layer provides a provider abstraction for LLM-style reasoning,
 LLMContextReasoner -> LLMClient.reason()
 LLMPromptCriticAgent -> LLMClient.critic()
 LLMPromptOptimizerAgent -> LLMClient.optimize()
-LLMClient -> LLMProviderRegistry -> MockLLM
+LLMClient -> AIModelService -> LLMProviderRegistry -> MockProvider
 ```
 
-`LLM_PROVIDER=mock` is the default. Future provider names such as `openai`, `gemini`, `claude`, and `ollama` are recognized as future integration points, but only `MockLLM` is implemented now. No external LLM API is called by default.
+`LLM_PROVIDER=mock` is the default. Future provider names such as `openai`, `gemini`, `claude`, and `ollama` are recognized as integration points, but only `MockProvider` performs real local behavior now. No external LLM API is called by default.
+
+### AI Model Layer
+
+`AIModelService` is the shared model service boundary below `LLMClient`. Agents do not call OpenAI, Gemini, Claude, or Ollama directly. Provider skeletons live under `llm/providers/`, and all non-mock providers currently fall back to mock behavior without external API calls.
 
 ### Execution Engine
 
@@ -238,6 +243,7 @@ python -m benchmark.report_generator
 - Sprint 41: LLM Context Reasoner
 - Sprint 43: LLM Prompt Critic
 - Sprint 45: Prompt Compiler
+- Sprint 46: AI Model Service Layer
 - Sprint 41: Docker
 - Sprint 42: Docker Compose
 - Sprint 43: Queue

@@ -72,6 +72,14 @@ Reason: Context Program is provider-independent, while generation providers need
 
 Future: Add provider-specific compiler tests and prompt template library support.
 
+## AI Model Service
+
+Decision: Add `AIModelService` below `LLMClient`.
+
+Reason: LLM agents should not know concrete model providers. `AIModelService` owns the service boundary, while Provider Registry maps provider names to provider implementations.
+
+Future: Add real OpenAI, Gemini, Claude, and Ollama providers behind the same interface.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

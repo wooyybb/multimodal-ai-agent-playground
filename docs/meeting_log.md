@@ -60,6 +60,12 @@ Decision: Add PromptCompiler between ProviderRouter and ProviderPromptAdapter.
 
 Reason: Context Program should compile into provider-specific prompt packages before the adapter creates final provider inputs.
 
+## Sprint 46: AI Model Service
+
+Decision: Add AIModelService below LLMClient.
+
+Reason: LLM agents should remain independent from concrete providers such as OpenAI, Gemini, Claude, and Ollama.
+
 ## Future Work
 
 - Keep meeting notes decision-focused.

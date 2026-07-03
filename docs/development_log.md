@@ -99,6 +99,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added `compiled_prompt_package` with positive prompt, negative prompt, prompt blocks, compiler notes, and prompt budget.
 - ProviderPromptAdapter now uses compiled prompt packages when available.
 
+## Sprint 46
+
+- Added `AIModelService`.
+- Added provider skeletons for mock, OpenAI, Gemini, Claude, and Ollama.
+- Updated `LLMClient` to call AIModelService instead of providers directly.
+- Kept all external API calls disabled.
+
 ## Future Work
 
 - Keep this file short.

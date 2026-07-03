@@ -32,6 +32,10 @@ The project introduced dependency inversion for LLM-style agents. Moving mock be
 
 PromptCompiler clarified the boundary between Context Program and ProviderPromptAdapter. The workflow now has a clearer compile step before final provider input formatting.
 
+## Sprint 46
+
+AIModelService added a cleaner provider boundary under LLMClient. The system is now ready for future real provider integrations without changing LLM agents.
+
 ## What Went Well
 
 - Clear sprint prompts reduced scope creep.
