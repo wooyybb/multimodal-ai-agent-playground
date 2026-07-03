@@ -113,6 +113,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added no-key, client-error, request-error, and JSON-parse fallback behavior.
 - Preserved agent isolation: agents still call `LLMClient`, not OpenAI directly.
 
+## Sprint 48
+
+- Added `tools/vlm/` as a VLM Adapter Layer.
+- Refactored `VisionAgent` to use `VLMRouter` instead of depending directly on `BlipTool`.
+- Added BLIPVLM as the default provider plus Florence-2 and Qwen-VL skeleton providers.
+- Debug reports now include structured `vision_result` metadata when available.
+
 ## Future Work
 
 - Keep this file short.

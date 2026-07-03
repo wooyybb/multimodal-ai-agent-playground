@@ -65,6 +65,8 @@ User
 3. `PlannerAgent` creates an execution plan.
 4. `DynamicExecutionEngine` runs registered agents through `ToolRegistry`.
 5. `VisionAgent` creates a caption with BLIP when available.
+   Sprint 48 adds a `VLMRouter` so the default BLIP path can later be replaced
+   by Florence-2, Qwen-VL, or another vision-language model.
 6. Retrieval and memory modules add previous context and style knowledge.
 7. Specialist prompt agents create scene, character, layout, pose, expression, lighting, and negative sections.
 8. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
@@ -103,6 +105,22 @@ LLMClient -> AIModelService -> LLMProviderRegistry -> MockProvider
 ```
 
 `LLM_PROVIDER=mock` is the default. Future provider names such as `openai`, `gemini`, `claude`, and `ollama` are recognized as integration points, but only `MockProvider` performs real local behavior now. No external LLM API is called by default.
+
+### VLM Adapter Layer
+
+`VisionAgent` now calls `VLMRouter` instead of depending directly on BLIP. The default provider is BLIP, while Florence-2 and Qwen-VL are represented as skeleton/fallback providers for future integration.
+
+```text
+VisionAgent -> VLMRouter -> BLIPVLM / FlorenceVLM / QwenVLM
+```
+
+PowerShell example:
+
+```powershell
+$env:VLM_PROVIDER="blip"
+```
+
+The vision layer returns both a caption and structured `vision_result` metadata for debug reports.
 
 ### AI Model Layer
 
@@ -194,7 +212,7 @@ knowledge/    Knowledge and style retrieval resources
 llm/          Shared LLM client abstraction and mock provider
 memory/       MemoryManager and run history
 registry/     ToolRegistry for agent/tool dispatch
-tools/        BLIP, FLUX, CLIP wrappers
+tools/        BLIP, FLUX, CLIP wrappers and VLM adapter providers
 ui/           Gradio app
 workflow/     Execution engine, AgentState, debug report, pipeline
 outputs/      Runtime outputs only

@@ -69,6 +69,7 @@ class DebugReportManager:
             "run_id": self.run_id,
             "timestamp": self.timestamp,
             "user_prompt": self._safe(state.get("user_prompt")),
+            "vision_result": self._safe(self._vision_result(state)),
             "provider": self._safe(state.get("provider")),
             "planner_result": self._safe(state.get("planner_result")),
             "context_reasoning": self._safe(state.get("context_reasoning")),
@@ -115,6 +116,11 @@ class DebugReportManager:
     def _build_prompt_preview(self, state):
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
+        self._append_block(
+            lines,
+            "VISION RESULT",
+            self._vision_result_preview(self._vision_result(state)),
+        )
         self._append_block(lines, "CONTEXT REASONING", state.get("context_reasoning"))
         self._append_block(lines, "SCENE PLAN", state.get("scene_plan"))
         self._append_block(
@@ -199,6 +205,24 @@ class DebugReportManager:
             "negative_prompt": package.get("negative_prompt"),
             "prompt_blocks": package.get("prompt_blocks", {}),
             "compiler_notes": package.get("compiler_notes", []),
+        }
+
+    def _vision_result(self, state):
+        vision_result = state.get("vision_result")
+        if vision_result:
+            return vision_result
+        caption = state.get("caption")
+        return getattr(caption, "vision_result", None)
+
+    def _vision_result_preview(self, vision_result):
+        vision_result = vision_result or {}
+        return {
+            "model": vision_result.get("model"),
+            "caption": vision_result.get("caption"),
+            "detailed_description": vision_result.get("detailed_description"),
+            "objects": vision_result.get("objects", []),
+            "style_hints": vision_result.get("style_hints", []),
+            "character_hints": vision_result.get("character_hints", {}),
         }
 
     def _safe(self, value):

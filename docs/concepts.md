@@ -80,6 +80,22 @@ Reflection은 evaluation result를 바탕으로 실패 원인과 suggested promp
 
 Memory는 이전 run의 prompt, score, reflection, retry, output path를 저장합니다. Working Memory는 현재 실행 context이고, Episodic Memory는 과거 실행 기록입니다.
 
+## VLM Adapter
+
+VLM Adapter는 VisionAgent가 특정 vision-language model에 직접 묶이지 않도록 하는 abstraction layer입니다. 현재 기본 provider는 BLIP이고, Florence-2와 Qwen-VL은 skeleton provider로 준비되어 있습니다.
+
+## Vision Provider Abstraction
+
+Vision Provider Abstraction은 `analyze(image, prompt=None) -> dict` 인터페이스를 통해 caption, detailed_description, objects, style_hints, character_hints를 같은 형태로 반환하게 합니다.
+
+## Multimodal Understanding
+
+Multimodal Understanding은 이미지와 텍스트 intent를 함께 해석하는 단계입니다. 현재는 BLIP caption 중심이지만, `vision_result` 구조를 통해 더 자세한 scene/object parsing으로 확장할 수 있습니다.
+
+## Reference Image Understanding
+
+Reference Image Understanding은 업로드된 이미지를 단순 caption이 아니라 character, style, layout reference로 사용하는 방향입니다. Sprint 48은 이 확장을 위한 provider boundary를 먼저 만들었습니다.
+
 ## Future Work
 
 - Context Program schema validation

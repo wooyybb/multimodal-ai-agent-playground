@@ -49,11 +49,11 @@
 - Sprint 45: Prompt Compiler
 - Sprint 46: AI Model Service Layer
 - Sprint 47: Real OpenAI Provider Integration
+- Sprint 48: Multi-VLM Adapter
 
 ## Planned Sprints
 
-- Sprint 48: Prompt Template Library or Docker
-- Sprint 49: Benchmark Dashboard
+- Sprint 49: Detailed Vision Parsing or Multi-Metric Evaluation
 - Sprint 50: Production
 
 ## Future Work

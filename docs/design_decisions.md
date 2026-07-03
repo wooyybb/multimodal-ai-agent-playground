@@ -88,6 +88,14 @@ Reason: Real provider calls should be isolated from agents. This keeps LLMContex
 
 Future: Add response schema tests, retry/backoff, and provider-specific calibration.
 
+## VLM Adapter
+
+Decision: Add `VLMRouter` and provider classes under `tools/vlm/`.
+
+Reason: VisionAgent should not be permanently coupled to BLIP. A VLM adapter keeps the existing BLIP workflow stable while creating a clear extension point for Florence-2, Qwen-VL, and future multimodal models.
+
+Future: Replace skeleton providers with real Florence/Qwen integrations and add richer object, style, and character parsing.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

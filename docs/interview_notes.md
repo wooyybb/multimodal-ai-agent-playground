@@ -217,6 +217,20 @@ A. Task, Architecture, Workspace, Allowed Files, Forbidden Files, Requirements, 
 Q. 본인이 한 역할은 무엇인가요?
 A. architecture 방향, sprint goal, file boundary, 검증 기준을 정하고 결과를 리뷰했습니다. Codex는 구현과 문서 초안 생성을 도왔습니다.
 
+## Vision Provider
+
+Q. 왜 BLIP만 직접 연결하지 않고 VLM Adapter를 만들었나요?
+A. BLIP는 captioning에는 충분하지만 object, character, style, relationship parsing에는 한계가 있습니다. VisionAgent가 BLIP에 직접 의존하면 Florence-2나 Qwen-VL로 교체할 때 agent 코드를 계속 바꿔야 하므로, VLMRouter와 provider interface로 분리했습니다.
+
+Q. BLIP의 한계는 무엇인가요?
+A. 짧은 caption 생성에는 강하지만 자세한 scene graph, character attributes, layout hints, reference-image understanding을 안정적으로 구조화하기는 어렵습니다.
+
+Q. Florence/Qwen 같은 VLM으로 어떻게 확장할 수 있나요?
+A. `BaseVLM.analyze()` 인터페이스만 구현하면 됩니다. provider가 달라져도 VisionAgent는 `caption`과 `vision_result`를 같은 구조로 받습니다.
+
+Q. vision_result와 caption의 차이는 무엇인가요?
+A. caption은 downstream 호환을 위한 짧은 문자열이고, vision_result는 detailed_description, objects, style_hints, character_hints, model, fallback 여부를 담는 구조화된 vision context입니다.
+
 ## Future Work
 
 - Context Program v2 schema validation
