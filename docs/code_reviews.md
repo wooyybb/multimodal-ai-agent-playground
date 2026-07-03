@@ -35,3 +35,11 @@ Add per-sprint review links when the project starts using pull requests.
 ## Sprint43 Review
 
 LLMPromptCriticAgent was added as a report-only critic. It does not mutate prompts, does not call external APIs, and preserves the existing rule-based PromptCriticAgent path. The main risk is score calibration, which should be tested when a real LLM backend is connected.
+
+## Sprint44 Review
+
+The shared LLM client layer removes duplicated mock behavior from LLM-style agents. Current implementation keeps `MockLLM` as the only concrete provider and avoids external API calls. Future provider implementations should be tested behind the same `BaseLLM` interface.
+
+## Sprint45 Review
+
+PromptCompiler was added between ProviderRouter and ProviderPromptAdapter. It creates `compiled_prompt_package` without changing generation tools. ProviderPromptAdapter now prefers the compiled package and falls back to the previous canonical/context path when no package exists.

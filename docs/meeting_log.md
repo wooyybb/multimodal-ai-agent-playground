@@ -48,6 +48,18 @@ Decision: Add an optional mock/fallback LLM prompt critic interface.
 
 Reason: Prompt validation needs semantic critique for conflicts, priority issues, and provider suitability without replacing the deterministic rule-based critic.
 
+## Sprint 44: LLM Provider Abstraction
+
+Decision: Add a shared LLM client layer.
+
+Reason: LLMContextReasoner, LLMPromptCriticAgent, and LLMPromptOptimizerAgent should share provider selection and mock behavior instead of each owning separate logic.
+
+## Sprint 45: Prompt Compiler
+
+Decision: Add PromptCompiler between ProviderRouter and ProviderPromptAdapter.
+
+Reason: Context Program should compile into provider-specific prompt packages before the adapter creates final provider inputs.
+
 ## Future Work
 
 - Keep meeting notes decision-focused.

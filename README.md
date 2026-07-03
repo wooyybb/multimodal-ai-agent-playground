@@ -31,6 +31,7 @@ The project is built as an AI Agent Engineering portfolio project. The goal is n
 ```text
 User
 -> Gradio UI / FastAPI
+-> LLMClient / MockLLM
 -> LLMContextReasoner
 -> PlannerAgent
 -> DynamicExecutionEngine
@@ -47,6 +48,7 @@ User
 -> LLMPromptCritic
 -> PromptOptimizer / LLMPromptOptimizer interface
 -> ProviderRouter
+-> PromptCompiler
 -> ProviderPromptAdapter
 -> GenerationAgent
 -> EvaluationAgent
@@ -70,12 +72,13 @@ User
 11. `PromptCritic` and `LLMPromptCriticAgent` review prompt quality and semantic issues.
 12. `PromptOptimizer` repairs the prompt.
 13. `ProviderRouter` selects a generation provider from config.
-14. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
-15. `GenerationAgent` generates the image.
-16. `EvaluationAgent` scores the result with CLIP when available.
-17. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
-18. `MemoryManager` saves run history.
-19. Debug reports and benchmark reports make the run inspectable.
+14. `PromptCompiler` compiles Context Program into a provider-specific prompt package.
+15. `ProviderPromptAdapter` converts the compiled package into final provider input.
+16. `GenerationAgent` generates the image.
+17. `EvaluationAgent` scores the result with CLIP when available.
+18. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
+19. `MemoryManager` saves run history.
+20. Debug reports and benchmark reports make the run inspectable.
 
 ## Core Features
 
@@ -86,6 +89,19 @@ User
 ### LLM Intelligence Layer
 
 `LLMContextReasoner` is a mock LLM interface for semantic planning. It does not create prompts or call an external API. It interprets user intent into user goal, scene goal, composition goal, interaction goal, style goal, and priority order.
+
+### LLM Architecture
+
+The shared `llm/` layer provides a provider abstraction for LLM-style reasoning, critique, and optimization.
+
+```text
+LLMContextReasoner -> LLMClient.reason()
+LLMPromptCriticAgent -> LLMClient.critic()
+LLMPromptOptimizerAgent -> LLMClient.optimize()
+LLMClient -> LLMProviderRegistry -> MockLLM
+```
+
+`LLM_PROVIDER=mock` is the default. Future provider names such as `openai`, `gemini`, `claude`, and `ollama` are recognized as future integration points, but only `MockLLM` is implemented now. No external LLM API is called by default.
 
 ### Execution Engine
 
@@ -129,6 +145,10 @@ Do not commit real API keys or token values.
 
 `ProviderPromptAdapter` compiles the context/canonical prompt into provider-specific instructions for FLUX, GPT Image skeleton, or SDXL skeleton.
 
+### Prompt Compiler
+
+`PromptCompiler` converts provider-independent `context_program` into a provider-specific `compiled_prompt_package`. FLUX receives a short dense positive prompt, SDXL keeps positive and negative prompts separated, and GPT Image keeps structured prompt blocks for longer instructions.
+
 ### FastAPI
 
 The `api/` package exposes a REST service layer with `/`, `/health`, and `/generate`.
@@ -154,6 +174,7 @@ benchmark/    Benchmark runner, result JSON, comparison reports
 config/       Provider capability configuration
 docs/         Architecture, roadmap, decisions, sprint book, prompts, reviews
 knowledge/    Knowledge and style retrieval resources
+llm/          Shared LLM client abstraction and mock provider
 memory/       MemoryManager and run history
 registry/     ToolRegistry for agent/tool dispatch
 tools/        BLIP, FLUX, CLIP wrappers
@@ -216,6 +237,7 @@ python -m benchmark.report_generator
 - Sprint 40: Context Program Validator
 - Sprint 41: LLM Context Reasoner
 - Sprint 43: LLM Prompt Critic
+- Sprint 45: Prompt Compiler
 - Sprint 41: Docker
 - Sprint 42: Docker Compose
 - Sprint 43: Queue

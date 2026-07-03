@@ -16,6 +16,8 @@ UI Layer
 -> FastAPI
 
 Semantic Planning Layer
+-> LLMClient
+-> MockLLM
 -> LLMContextReasoner
 
 Execution Layer
@@ -35,9 +37,11 @@ Agent Layer
 -> PromptCritic
 -> LLMPromptCriticAgent
 -> PromptOptimizer
+-> LLMPromptOptimizerAgent
 
 Provider Layer
 -> ProviderRouter
+-> PromptCompiler
 -> ProviderPromptAdapter
 -> GenerationAgent
 
@@ -59,8 +63,10 @@ Persistence and Observability
 flowchart TD
     U[User] --> UI[Gradio UI]
     U --> API[FastAPI]
-    UI --> LR[LLMContextReasoner]
-    API --> LR
+    UI --> LC[LLMClient]
+    API --> LC
+    LC --> ML[MockLLM]
+    ML --> LR[LLMContextReasoner]
     LR --> E[DynamicExecutionEngine]
     E --> P[PlannerAgent]
     E --> R[ToolRegistry]
@@ -75,7 +81,8 @@ flowchart TD
     PC --> LPC[LLMPromptCriticAgent]
     LPC --> PO[PromptOptimizer]
     PO --> PR[ProviderRouter]
-    PR --> PPA[ProviderPromptAdapter]
+    PR --> PCMP[PromptCompiler]
+    PCMP --> PPA[ProviderPromptAdapter]
     PPA --> G[GenerationAgent]
     G --> EV[EvaluationAgent]
     EV --> RF[ReflectionAgent]
@@ -100,16 +107,18 @@ flowchart TD
 11. LLMPromptCriticAgent performs optional semantic prompt critique.
 12. PromptOptimizer reviews and improves prompt quality.
 13. ProviderRouter selects provider from config.
-14. ProviderPromptAdapter compiles provider-specific prompt.
-15. GenerationAgent creates image output.
-16. EvaluationAgent scores generated output.
-17. ReflectionAgent and RetryAgent decide retry.
-18. MemoryManager saves history.
-19. DebugReport and Benchmark tools record observability artifacts.
+14. PromptCompiler converts Context Program into a provider-specific prompt package.
+15. ProviderPromptAdapter turns the compiled package into final provider input.
+16. GenerationAgent creates image output.
+17. EvaluationAgent scores generated output.
+18. ReflectionAgent and RetryAgent decide retry.
+19. MemoryManager saves history.
+20. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
 - UI/API should not know individual agent internals.
+- LLMClient owns provider abstraction for reason, critic, and optimize calls.
 - LLMContextReasoner owns semantic intent interpretation before prompt construction.
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.
@@ -117,6 +126,7 @@ flowchart TD
 - ContextProgramValidator owns context schema and provider compatibility checks.
 - PromptAssembler owns canonical prompt construction.
 - PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
+- PromptCompiler owns context-program-to-provider-package compilation.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
 - Generation, evaluation, memory, benchmark, and debug report stay separated.
 

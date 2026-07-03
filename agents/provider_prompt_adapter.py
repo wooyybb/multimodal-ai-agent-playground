@@ -19,6 +19,8 @@ class ProviderPromptAdapter:
     ) -> dict:
         if isinstance(state_or_canonical_prompt, dict):
             state = state_or_canonical_prompt
+            if state.get("compiled_prompt_package"):
+                return self._from_compiled_package(state)
             result = self._run_legacy(
                 state.get("canonical_prompt") or state.get("final_prompt", ""),
                 negative_prompt=state.get("negative_prompt"),
@@ -91,6 +93,20 @@ class ProviderPromptAdapter:
             scene_plan,
             context_program,
         )
+
+    def _from_compiled_package(self, state):
+        package = state.get("compiled_prompt_package") or {}
+        provider_prompt = package.get("positive_prompt") or state.get("final_prompt") or ""
+        provider_negative_prompt = package.get("negative_prompt") or state.get("negative_prompt") or ""
+        notes = list(package.get("compiler_notes") or [])
+        notes.append("used compiled prompt package")
+        return {
+            "provider": package.get("provider") or state.get("provider") or "flux",
+            "provider_prompt": provider_prompt,
+            "provider_negative_prompt": provider_negative_prompt,
+            "adapter_notes": self._with_optimized_note(notes, state),
+            "final_prompt": provider_prompt,
+        }
         if fallback_used:
             result["adapter_notes"].append("unknown provider fallback to flux")
         return result

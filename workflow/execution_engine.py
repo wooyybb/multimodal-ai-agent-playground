@@ -25,6 +25,7 @@ class DynamicExecutionEngine:
             "prompt_optimizer",
             "llm_prompt_optimizer",
             "provider_router",
+            "prompt_compiler",
             "provider_prompt_adapter",
             "generation",
         "evaluation",
@@ -368,6 +369,16 @@ class DynamicExecutionEngine:
         trace = f"ProviderRouter selected provider: {state['provider']}"
         state["agent_trace"].append(trace)
         print(f"[ExecutionEngine] {trace}")
+
+    def _run_prompt_compiler(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "prompt_compiler")
+            state["agent_trace"].append("PromptCompiler compiled prompt package")
+            print("[ExecutionEngine] PromptCompiler compiled prompt package")
+        except Exception as error:
+            print(f"[ExecutionEngine] PromptCompiler failed: {error}")
+            state["compiled_prompt_package"] = None
+            state["agent_trace"].append("PromptCompiler skipped after error")
 
     def _run_provider_prompt_adapter(self, registry, state):
         try:

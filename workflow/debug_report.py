@@ -94,6 +94,7 @@ class DebugReportManager:
             "optimization_report": self._safe(state.get("optimization_report")),
             "llm_optimizer_report": self._safe(state.get("llm_optimizer_report")),
             "provider_prompt": self._safe(state.get("provider_prompt")),
+            "compiled_prompt_package": self._safe(state.get("compiled_prompt_package")),
             "provider_negative_prompt": self._safe(state.get("provider_negative_prompt")),
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "initial_output_image_path": self._safe(state.get("output_image_path")),
@@ -145,6 +146,11 @@ class DebugReportManager:
             self._llm_prompt_critic_preview(state.get("llm_prompt_critic_report")),
         )
         self._append_block(lines, "OPTIMIZED PROMPT", state.get("optimized_prompt"))
+        self._append_block(
+            lines,
+            "COMPILED PROMPT PACKAGE",
+            self._compiled_prompt_package_preview(state.get("compiled_prompt_package")),
+        )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
         self._append_block(
@@ -183,6 +189,16 @@ class DebugReportManager:
             "provider suitability": report.get("provider_suitability_issues", []),
             "suggestions": report.get("suggestions", []),
             "summary": report.get("reasoning_summary"),
+        }
+
+    def _compiled_prompt_package_preview(self, package):
+        package = package or {}
+        return {
+            "provider": package.get("provider"),
+            "positive_prompt": package.get("positive_prompt"),
+            "negative_prompt": package.get("negative_prompt"),
+            "prompt_blocks": package.get("prompt_blocks", {}),
+            "compiler_notes": package.get("compiler_notes", []),
         }
 
     def _safe(self, value):

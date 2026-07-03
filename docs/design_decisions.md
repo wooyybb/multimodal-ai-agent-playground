@@ -56,6 +56,22 @@ Reason: Rule-based checks catch duplicates, missing sections, and length problem
 
 Future: Connect OpenAI or local LLM behind the same interface, calibrate critic scores, and add provider-specific critic tests.
 
+## LLM Provider Abstraction
+
+Decision: Add `LLMClient`, `BaseLLM`, `MockLLM`, and `LLMProviderRegistry`.
+
+Reason: LLMContextReasoner, LLMPromptCriticAgent, and LLMPromptOptimizerAgent should depend on a shared LLM interface rather than each owning provider/mock logic.
+
+Future: Add OpenAI, Gemini, Claude, and Ollama implementations behind the same client interface.
+
+## Prompt Compiler
+
+Decision: Add `PromptCompiler` between ProviderRouter and ProviderPromptAdapter.
+
+Reason: Context Program is provider-independent, while generation providers need different prompt package shapes. Separating compilation from adapter formatting keeps provider rules easier to test.
+
+Future: Add provider-specific compiler tests and prompt template library support.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

@@ -18,6 +18,7 @@ from agents.provider_prompt_adapter import ProviderPromptAdapter
 from agents.provider_router import ProviderRouter
 from agents.prompt_compressor import PromptCompressor
 from agents.prompt_agent import PromptAgent
+from agents.prompt_compiler import PromptCompiler
 from agents.reflection_agent import ReflectionAgent
 from agents.retrieval_agent import RetrievalAgent
 from agents.retry_agent import RetryAgent
@@ -53,6 +54,7 @@ class OrchestratorAgent:
         self.retrieval_agent = RetrievalAgent()
         self.vision_agent = VisionAgent()
         self.prompt_agent = PromptAgent()
+        self.prompt_compiler = PromptCompiler()
         self.generation_agent = GenerationAgent()
         self.evaluation_agent = EvaluationAgent()
         self.reflection_agent = ReflectionAgent()
@@ -87,6 +89,7 @@ class OrchestratorAgent:
         self.registry.register("prompt_optimizer", self.prompt_optimizer_agent)
         self.registry.register("llm_prompt_optimizer", self.llm_prompt_optimizer_agent)
         self.registry.register("provider_router", self.provider_router)
+        self.registry.register("prompt_compiler", self.prompt_compiler)
         self.registry.register("provider_prompt_adapter", self.provider_prompt_adapter)
         self.registry.register("prompt", self.prompt_agent)
         self.registry.register("generation", self.generation_agent)
@@ -159,6 +162,7 @@ class OrchestratorAgent:
             "llm_optimizer_report": final_state.get("llm_optimizer_report"),
             "provider_routing": final_state.get("provider_routing"),
             "provider": final_state.get("provider"),
+            "compiled_prompt_package": final_state.get("compiled_prompt_package"),
             "provider_prompt": final_state.get("provider_prompt"),
             "provider_negative_prompt": final_state.get("provider_negative_prompt"),
             "adapter_notes": final_state.get("adapter_notes"),

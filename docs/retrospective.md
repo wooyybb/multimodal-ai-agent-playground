@@ -24,6 +24,14 @@ Documentation was refactored from append-only sprint notes into README-first pro
 
 The project added an LLM-style semantic critic without introducing external API dependency. The split between critic report and optimizer mutation keeps the workflow easier to debug.
 
+## Sprint 44
+
+The project introduced dependency inversion for LLM-style agents. Moving mock behavior into `MockLLM` reduced duplication and prepared the codebase for future OpenAI/local LLM integrations.
+
+## Sprint 45
+
+PromptCompiler clarified the boundary between Context Program and ProviderPromptAdapter. The workflow now has a clearer compile step before final provider input formatting.
+
 ## What Went Well
 
 - Clear sprint prompts reduced scope creep.

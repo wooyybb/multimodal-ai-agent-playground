@@ -87,3 +87,21 @@ Prompt critique is split into two layers:
 - Semantic mock/future LLM critique checks conflicts, priority issues, provider suitability, and intent mismatch.
 
 The critic does not rewrite prompts. It creates structured reports so optimizer agents can decide what to change.
+
+## LLM Client Layer
+
+Prompt-related LLM behavior now flows through `LLMClient`.
+
+- Reasoning uses `LLMClient.reason()`.
+- Semantic critique uses `LLMClient.critic()`.
+- Prompt optimization uses `LLMClient.optimize()`.
+
+This keeps prompt engineering agents independent from concrete LLM providers.
+
+## Prompt Compiler
+
+PromptCompiler sits between ProviderRouter and ProviderPromptAdapter.
+
+- Context Program is the provider-independent meaning layer.
+- Compiled prompt package is the provider-specific prompt package.
+- ProviderPromptAdapter turns the package into the final provider input.

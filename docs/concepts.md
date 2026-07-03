@@ -16,6 +16,14 @@ Prompt Engineering은 structured context를 모델 입력 문장으로 변환하
 
 LLM Prompt Critique는 prompt를 직접 수정하지 않고 semantic issue, conflict, priority issue, provider suitability issue를 structured report로 진단하는 단계입니다.
 
+## LLM Provider Abstraction
+
+LLM Provider Abstraction은 Agent가 OpenAI, Gemini, Claude, Ollama 같은 provider를 직접 알지 않도록 `LLMClient`와 `BaseLLM` interface 뒤로 숨기는 구조입니다. 현재 구현체는 `MockLLM`뿐입니다.
+
+## Prompt Compiler
+
+Prompt Compiler는 provider-independent Context Program을 provider-specific compiled prompt package로 변환하는 단계입니다. FLUX는 짧고 밀도 높은 positive prompt를 사용하고, SDXL은 positive/negative prompt 분리를 유지하며, GPT Image는 structured instruction block을 유지할 수 있습니다.
+
 ## Semantic Prompt Validation
 
 Semantic Prompt Validation은 rule-based 중복/누락 검사를 넘어 user intent, scene goal, layout, style priority가 서로 충돌하지 않는지 확인합니다.

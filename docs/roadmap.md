@@ -45,14 +45,14 @@
 - Sprint 40: Context Program Validator
 - Sprint 41: LLM Context Reasoner
 - Sprint 43: LLM Prompt Critic
+- Sprint 44: LLM Provider Abstraction Layer
+- Sprint 45: Prompt Compiler
 
 ## Planned Sprints
 
-- Sprint 44: LLMPromptOptimizer v2 or Prompt Compiler
-- Sprint 45: Docker
-- Sprint 46: Docker Compose
-- Sprint 47: Queue
-- Sprint 48: Dashboard
+- Sprint 46: OpenAI Client Integration or Prompt Template Library
+- Sprint 47: Docker
+- Sprint 48: Queue
 - Sprint 49: Benchmark Dashboard
 - Sprint 50: Production
 

@@ -85,6 +85,20 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added disabled, mock, and future llm fallback modes without external API calls.
 - Debug reports now include `llm_prompt_critic_report` and `llm_prompt_critic_score`.
 
+## Sprint 44
+
+- Added shared `llm/` provider abstraction layer.
+- Added `BaseLLM`, `LLMClient`, `MockLLM`, and `LLMProviderRegistry`.
+- Refactored LLMContextReasoner, LLMPromptCriticAgent, and LLMPromptOptimizerAgent to call LLMClient.
+- Kept external LLM API calls disabled; only MockLLM is implemented.
+
+## Sprint 45
+
+- Added `PromptCompiler`.
+- Inserted `prompt_compiler` after `provider_router` and before `provider_prompt_adapter`.
+- Added `compiled_prompt_package` with positive prompt, negative prompt, prompt blocks, compiler notes, and prompt budget.
+- ProviderPromptAdapter now uses compiled prompt packages when available.
+
 ## Future Work
 
 - Keep this file short.
