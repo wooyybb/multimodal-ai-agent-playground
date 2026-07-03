@@ -36,6 +36,7 @@ All work must stay inside `project3`. Sensitive files such as `.env` and runtime
 - Clear file boundaries make AI-assisted coding safer.
 - Architecture prompts work better than vague feature prompts.
 - Documentation should be refactored regularly, not only appended.
+- LLM interfaces can be designed and tested with mock/fallback behavior before real API integration.
 
 ## Future Work
 

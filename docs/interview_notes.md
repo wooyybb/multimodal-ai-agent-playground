@@ -87,6 +87,21 @@ A. provider에 종속되지 않은 기본 generation prompt입니다.
 Q. Provider Prompt는 무엇인가요?
 A. 특정 provider가 이해하기 좋은 형태로 변환된 prompt입니다.
 
+Q. LLMPromptCriticAgent는 왜 필요한가요?
+A. rule-based critic은 중복, 누락, 길이 문제에 강하지만 semantic conflict나 provider suitability를 충분히 보지 못합니다. LLMPromptCriticAgent는 이런 의미 기반 문제를 structured report로 진단합니다.
+
+Q. Rule-based Critic과 LLM Critic의 차이는 무엇인가요?
+A. Rule-based Critic은 deterministic check이고, LLM Critic은 의도 충돌, 우선순위, scene/layout/style 적합성을 보는 reasoning layer입니다.
+
+Q. 왜 prompt를 바로 수정하지 않고 critique report만 생성하나요?
+A. Critic과 Optimizer 책임을 분리하기 위해서입니다. Critic은 문제를 진단하고, Optimizer가 수정 여부와 방법을 결정합니다.
+
+Q. semantic conflict는 어떻게 감지하나요?
+A. 현재 mock mode에서는 user prompt와 canonical prompt의 keyword 충돌을 rule로 감지합니다. 예를 들어 photobooth intent와 battle/combat tone이 같이 있으면 conflict로 기록합니다.
+
+Q. 실제 LLM API를 붙이지 않고 mock으로 시작한 이유는?
+A. API key, 비용, 네트워크, provider 실패 없이 interface와 state flow를 먼저 검증하기 위해서입니다.
+
 Q. Evaluation Prompt는 왜 따로 있나요?
 A. CLIP token budget을 넘지 않도록 generation prompt보다 짧고 평가 중심으로 설계합니다.
 

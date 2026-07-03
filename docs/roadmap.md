@@ -44,17 +44,16 @@
 - Sprint 39.5: Documentation Refactoring
 - Sprint 40: Context Program Validator
 - Sprint 41: LLM Context Reasoner
+- Sprint 43: LLM Prompt Critic
 
 ## Planned Sprints
 
-- Sprint 42: Docker
-- Sprint 43: Docker Compose
-- Sprint 44: Queue
-- Sprint 45: Deploy
-- Sprint 46: Dashboard
-- Sprint 47: Benchmark Dashboard
-- Sprint 48: Multi-session
-- Sprint 49: Prompt Template Library / Style Transfer
+- Sprint 44: LLMPromptOptimizer v2 or Prompt Compiler
+- Sprint 45: Docker
+- Sprint 46: Docker Compose
+- Sprint 47: Queue
+- Sprint 48: Dashboard
+- Sprint 49: Benchmark Dashboard
 - Sprint 50: Production
 
 ## Future Work

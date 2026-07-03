@@ -78,6 +78,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Reasoner outputs user goal, scene goal, composition goal, interaction goal, style goal, and priority list.
 - Debug reports now include `context_reasoning`.
 
+## Sprint 43
+
+- Added `LLMPromptCriticAgent`.
+- Inserted LLM prompt critique after rule-based `PromptCriticAgent` and before `PromptOptimizerAgent`.
+- Added disabled, mock, and future llm fallback modes without external API calls.
+- Debug reports now include `llm_prompt_critic_report` and `llm_prompt_critic_score`.
+
 ## Future Work
 
 - Keep this file short.

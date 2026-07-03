@@ -21,6 +21,7 @@ class DynamicExecutionEngine:
             "context_program_validator",
             "prompt_assembler",
             "prompt_critic",
+            "llm_prompt_critic",
             "prompt_optimizer",
             "llm_prompt_optimizer",
             "provider_router",
@@ -172,6 +173,28 @@ class DynamicExecutionEngine:
             state["prompt_report"] = None
             state["prompt_quality_score"] = 100
             state["agent_trace"].append("PromptCriticAgent skipped after error")
+
+    def _run_llm_prompt_critic(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "llm_prompt_critic")
+            state["agent_trace"].append("LLMPromptCriticAgent reviewed prompt")
+            print("[ExecutionEngine] LLMPromptCriticAgent reviewed prompt")
+        except Exception as error:
+            print(f"[ExecutionEngine] LLMPromptCritic failed: {error}")
+            state["llm_prompt_critic_report"] = {
+                "mode": "fallback",
+                "critic_score": state.get("prompt_quality_score", 100),
+                "semantic_issues": [],
+                "conflicts": [],
+                "priority_issues": [],
+                "provider_suitability_issues": [],
+                "suggestions": ["LLM prompt critic failed; kept rule-based critic result"],
+                "priority_fix": [],
+                "reasoning_summary": str(error),
+                "used_fallback": True,
+            }
+            state["llm_prompt_critic_score"] = state["llm_prompt_critic_report"]["critic_score"]
+            state["agent_trace"].append("LLMPromptCriticAgent skipped after error")
 
     def _run_prompt_optimizer(self, registry, state):
         try:

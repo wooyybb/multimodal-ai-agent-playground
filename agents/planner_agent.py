@@ -28,6 +28,7 @@ class PlannerAgent:
             "context_program_validator",
             "prompt_assembler",
             "prompt_critic",
+            "llm_prompt_critic",
             "prompt_optimizer",
             "llm_prompt_optimizer",
             "provider_router",

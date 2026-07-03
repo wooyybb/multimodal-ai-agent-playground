@@ -44,6 +44,7 @@ User
 -> ContextProgramValidator
 -> PromptAssembler
 -> PromptCritic
+-> LLMPromptCritic
 -> PromptOptimizer / LLMPromptOptimizer interface
 -> ProviderRouter
 -> ProviderPromptAdapter
@@ -66,14 +67,15 @@ User
 8. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
 9. `ContextProgramValidator` checks schema and provider compatibility.
 10. `PromptAssembler` builds a canonical prompt.
-11. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
-12. `ProviderRouter` selects a generation provider from config.
-13. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
-14. `GenerationAgent` generates the image.
-15. `EvaluationAgent` scores the result with CLIP when available.
-16. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
-17. `MemoryManager` saves run history.
-18. Debug reports and benchmark reports make the run inspectable.
+11. `PromptCritic` and `LLMPromptCriticAgent` review prompt quality and semantic issues.
+12. `PromptOptimizer` repairs the prompt.
+13. `ProviderRouter` selects a generation provider from config.
+14. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
+15. `GenerationAgent` generates the image.
+16. `EvaluationAgent` scores the result with CLIP when available.
+17. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
+18. `MemoryManager` saves run history.
+19. Debug reports and benchmark reports make the run inspectable.
 
 ## Core Features
 
@@ -106,6 +108,18 @@ Knowledge retrieval adds style and prompt context before prompt assembly.
 ### Prompt Engineering
 
 The workflow separates canonical prompt, provider prompt, evaluation prompt, retry prompt, and context program.
+
+`LLMPromptCriticAgent` is an optional mock/fallback semantic critic. It does not modify prompts and does not call an external LLM API by default. It creates a structured critique report for semantic issues, conflicts, priority issues, and provider suitability.
+
+Optional local flags:
+
+```text
+LLM_PROMPT_CRITIC_ENABLED=false
+LLM_PROMPT_CRITIC_MOCK=true
+LLM_PROMPT_CRITIC_PROVIDER=openai
+```
+
+Do not commit real API keys or token values.
 
 ### Provider Routing
 
@@ -201,6 +215,7 @@ python -m benchmark.report_generator
 - Sprint 1-39: Multi-agent framework, provider routing, debug reports, benchmark reports, context program
 - Sprint 40: Context Program Validator
 - Sprint 41: LLM Context Reasoner
+- Sprint 43: LLM Prompt Critic
 - Sprint 41: Docker
 - Sprint 42: Docker Compose
 - Sprint 43: Queue

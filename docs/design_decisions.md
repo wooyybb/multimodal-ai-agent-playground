@@ -48,6 +48,14 @@ Reason: LLM reasoning is useful for interpreting user intent, but direct prompt 
 
 Future: Connect a real LLM API behind the same interface and keep rule-based fallback behavior.
 
+## LLM Prompt Critic
+
+Decision: Add `LLMPromptCriticAgent` after rule-based `PromptCriticAgent` and before prompt optimization.
+
+Reason: Rule-based checks catch duplicates, missing sections, and length problems. Semantic issues such as scene/style conflict, priority mismatch, and provider suitability need a separate critic report before optimization. The critic does not modify prompts directly.
+
+Future: Connect OpenAI or local LLM behind the same interface, calibrate critic scores, and add provider-specific critic tests.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

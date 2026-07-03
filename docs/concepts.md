@@ -12,6 +12,26 @@ Semantic Planning은 prompt 이전 단계에서 user intent를 user goal, scene 
 
 Prompt Engineering은 structured context를 모델 입력 문장으로 변환하는 작업입니다. canonical prompt, provider prompt, evaluation prompt, retry prompt를 분리합니다.
 
+## LLM Prompt Critique
+
+LLM Prompt Critique는 prompt를 직접 수정하지 않고 semantic issue, conflict, priority issue, provider suitability issue를 structured report로 진단하는 단계입니다.
+
+## Semantic Prompt Validation
+
+Semantic Prompt Validation은 rule-based 중복/누락 검사를 넘어 user intent, scene goal, layout, style priority가 서로 충돌하지 않는지 확인합니다.
+
+## Conflict Detection
+
+Conflict Detection은 photobooth와 battle scene처럼 동시에 만족하기 어려운 intent 충돌을 찾습니다.
+
+## Hybrid Critic
+
+Hybrid Critic은 deterministic rule-based critic과 mock/future LLM critic을 함께 사용합니다. 안정적인 rule과 semantic reasoning을 분리합니다.
+
+## Provider Suitability Critique
+
+Provider Suitability Critique는 prompt가 FLUX, SDXL, GPT Image 같은 provider 제약에 적합한지 점검합니다.
+
 ## Execution Engine
 
 `DynamicExecutionEngine`은 execution plan을 읽고 각 step을 실행합니다. Agent가 많아져도 workflow order를 한 곳에서 관리할 수 있습니다.

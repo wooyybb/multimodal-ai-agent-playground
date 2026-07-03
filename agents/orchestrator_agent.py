@@ -11,6 +11,7 @@ from agents.pose_agent import PoseAgent
 from agents.expression_agent import ExpressionAgent
 from agents.prompt_assembler import PromptAssembler
 from agents.prompt_critic_agent import PromptCriticAgent
+from agents.llm_prompt_critic_agent import LLMPromptCriticAgent
 from agents.llm_prompt_optimizer_agent import LLMPromptOptimizerAgent
 from agents.prompt_optimizer_agent import PromptOptimizerAgent
 from agents.provider_prompt_adapter import ProviderPromptAdapter
@@ -42,6 +43,7 @@ class OrchestratorAgent:
         self.context_program_validator = ContextProgramValidator()
         self.prompt_assembler = PromptAssembler()
         self.prompt_critic_agent = PromptCriticAgent()
+        self.llm_prompt_critic_agent = LLMPromptCriticAgent()
         self.prompt_optimizer_agent = PromptOptimizerAgent()
         self.llm_prompt_optimizer_agent = LLMPromptOptimizerAgent()
         self.provider_router = ProviderRouter()
@@ -81,6 +83,7 @@ class OrchestratorAgent:
         self.registry.register("context_program_validator", self.context_program_validator)
         self.registry.register("prompt_assembler", self.prompt_assembler)
         self.registry.register("prompt_critic", self.prompt_critic_agent)
+        self.registry.register("llm_prompt_critic", self.llm_prompt_critic_agent)
         self.registry.register("prompt_optimizer", self.prompt_optimizer_agent)
         self.registry.register("llm_prompt_optimizer", self.llm_prompt_optimizer_agent)
         self.registry.register("provider_router", self.provider_router)
@@ -148,6 +151,8 @@ class OrchestratorAgent:
             "canonical_prompt": final_state.get("canonical_prompt"),
             "prompt_report": final_state.get("prompt_report"),
             "prompt_quality_score": final_state.get("prompt_quality_score"),
+            "llm_prompt_critic_report": final_state.get("llm_prompt_critic_report"),
+            "llm_prompt_critic_score": final_state.get("llm_prompt_critic_score"),
             "optimized_prompt": final_state.get("optimized_prompt"),
             "optimization_report": final_state.get("optimization_report"),
             "llm_optimized_prompt": final_state.get("llm_optimized_prompt"),

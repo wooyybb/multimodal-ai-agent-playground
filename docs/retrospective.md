@@ -20,6 +20,10 @@ The project added prompt optimization, AgentState, FastAPI, debug reports, bench
 
 Documentation was refactored from append-only sprint notes into README-first project documentation. Core docs now focus on current architecture and maintainability.
 
+## Sprint 43
+
+The project added an LLM-style semantic critic without introducing external API dependency. The split between critic report and optimizer mutation keeps the workflow easier to debug.
+
 ## What Went Well
 
 - Clear sprint prompts reduced scope creep.

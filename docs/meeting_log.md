@@ -42,6 +42,12 @@ Decision: Add provider-independent Context Program.
 
 Reason: Context Engineering and provider prompt compilation needed a clean boundary.
 
+## Sprint 43: LLM Prompt Critic
+
+Decision: Add an optional mock/fallback LLM prompt critic interface.
+
+Reason: Prompt validation needs semantic critique for conflicts, priority issues, and provider suitability without replacing the deterministic rule-based critic.
+
 ## Future Work
 
 - Keep meeting notes decision-focused.

@@ -33,6 +33,7 @@ Agent Layer
 -> ContextProgramValidator
 -> PromptAssembler
 -> PromptCritic
+-> LLMPromptCriticAgent
 -> PromptOptimizer
 
 Provider Layer
@@ -71,7 +72,8 @@ flowchart TD
     CP --> CV[ContextProgramValidator]
     CV --> PA[PromptAssembler]
     PA --> PC[PromptCritic]
-    PC --> PO[PromptOptimizer]
+    PC --> LPC[LLMPromptCriticAgent]
+    LPC --> PO[PromptOptimizer]
     PO --> PR[ProviderRouter]
     PR --> PPA[ProviderPromptAdapter]
     PPA --> G[GenerationAgent]
@@ -94,14 +96,16 @@ flowchart TD
 7. ContextProgramBuilder creates a provider-independent context program.
 8. ContextProgramValidator checks schema, section types, and provider compatibility.
 9. PromptAssembler creates a canonical prompt.
-10. PromptCritic and PromptOptimizer review and improve prompt quality.
-11. ProviderRouter selects provider from config.
-12. ProviderPromptAdapter compiles provider-specific prompt.
-13. GenerationAgent creates image output.
-14. EvaluationAgent scores generated output.
-15. ReflectionAgent and RetryAgent decide retry.
-16. MemoryManager saves history.
-17. DebugReport and Benchmark tools record observability artifacts.
+10. PromptCritic performs rule-based prompt review.
+11. LLMPromptCriticAgent performs optional semantic prompt critique.
+12. PromptOptimizer reviews and improves prompt quality.
+13. ProviderRouter selects provider from config.
+14. ProviderPromptAdapter compiles provider-specific prompt.
+15. GenerationAgent creates image output.
+16. EvaluationAgent scores generated output.
+17. ReflectionAgent and RetryAgent decide retry.
+18. MemoryManager saves history.
+19. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
@@ -112,6 +116,7 @@ flowchart TD
 - ContextProgramBuilder owns structured context.
 - ContextProgramValidator owns context schema and provider compatibility checks.
 - PromptAssembler owns canonical prompt construction.
+- PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
 - Generation, evaluation, memory, benchmark, and debug report stay separated.
 

@@ -78,3 +78,12 @@ Task
 - Provider-specific prompt tests
 - LLM prompt optimizer integration
 - Context Program v2 prompt compiler
+
+## Prompt Critique
+
+Prompt critique is split into two layers:
+
+- Rule-based critique checks duplicate keywords, missing sections, warnings, and quality score.
+- Semantic mock/future LLM critique checks conflicts, priority issues, provider suitability, and intent mismatch.
+
+The critic does not rewrite prompts. It creates structured reports so optimizer agents can decide what to change.

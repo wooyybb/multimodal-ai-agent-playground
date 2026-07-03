@@ -89,6 +89,8 @@ class DebugReportManager:
             "canonical_prompt": self._safe(state.get("canonical_prompt")),
             "prompt_report": self._safe(state.get("prompt_report")),
             "prompt_quality_score": self._safe(state.get("prompt_quality_score")),
+            "llm_prompt_critic_report": self._safe(state.get("llm_prompt_critic_report")),
+            "llm_prompt_critic_score": self._safe(state.get("llm_prompt_critic_score")),
             "optimization_report": self._safe(state.get("optimization_report")),
             "llm_optimizer_report": self._safe(state.get("llm_optimizer_report")),
             "provider_prompt": self._safe(state.get("provider_prompt")),
@@ -137,6 +139,11 @@ class DebugReportManager:
         )
         self._append_block(lines, "CANONICAL PROMPT", state.get("canonical_prompt"))
         self._append_block(lines, "PROMPT CRITIC", state.get("prompt_report"))
+        self._append_block(
+            lines,
+            "LLM PROMPT CRITIC",
+            self._llm_prompt_critic_preview(state.get("llm_prompt_critic_report")),
+        )
         self._append_block(lines, "OPTIMIZED PROMPT", state.get("optimized_prompt"))
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
@@ -164,6 +171,19 @@ class DebugReportManager:
         if safe_value is None:
             return ""
         return str(safe_value)
+
+    def _llm_prompt_critic_preview(self, report):
+        report = report or {}
+        return {
+            "mode": report.get("mode"),
+            "score": report.get("critic_score"),
+            "semantic issues": report.get("semantic_issues", []),
+            "conflicts": report.get("conflicts", []),
+            "priority issues": report.get("priority_issues", []),
+            "provider suitability": report.get("provider_suitability_issues", []),
+            "suggestions": report.get("suggestions", []),
+            "summary": report.get("reasoning_summary"),
+        }
 
     def _safe(self, value):
         if value is None or isinstance(value, (str, int, float, bool)):

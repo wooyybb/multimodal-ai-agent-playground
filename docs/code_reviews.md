@@ -31,3 +31,7 @@ Code review focuses on behavioral regressions, unclear boundaries, missing valid
 ## TODO
 
 Add per-sprint review links when the project starts using pull requests.
+
+## Sprint43 Review
+
+LLMPromptCriticAgent was added as a report-only critic. It does not mutate prompts, does not call external APIs, and preserves the existing rule-based PromptCriticAgent path. The main risk is score calibration, which should be tested when a real LLM backend is connected.
