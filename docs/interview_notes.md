@@ -60,6 +60,15 @@ A. 여러 agent output을 provider-independent structured intermediate represent
 Q. ContextProgramBuilder는 왜 만들었나요?
 A. agent state와 generation prompt가 섞이지 않게 하기 위해서입니다. 먼저 context를 구조화하고, 이후 prompt로 컴파일합니다.
 
+Q. Context Program Validator는 왜 필요한가요?
+A. Context Program이 prompt assembly 전에 필요한 section을 모두 갖췄는지, 타입이 맞는지, provider와 충돌하지 않는지 확인하기 위해서입니다.
+
+Q. Schema validation이 AI Agent Framework에서 중요한 이유는?
+A. Agent가 많아질수록 state shape이 불안정해질 수 있습니다. schema validation은 generation 전에 오류를 빨리 발견하고 debug report에 남기는 안전장치입니다.
+
+Q. Provider compatibility는 어떻게 검사하나요?
+A. provider별 제약을 rule로 확인합니다. 예를 들어 FLUX는 long prompt와 negative prompt 직접 반영에 warning을 내고, SDXL은 negative section 존재를 확인합니다.
+
 Q. Prompt Engineering과 Context Engineering 차이는?
 A. Context Engineering은 정보를 구조화하는 일이고, Prompt Engineering은 그 정보를 모델 입력 문장으로 변환하는 일입니다.
 

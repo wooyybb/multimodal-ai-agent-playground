@@ -18,6 +18,7 @@ class DynamicExecutionEngine:
             "lighting",
             "negative_prompt",
             "context_program_builder",
+            "context_program_validator",
             "prompt_assembler",
             "prompt_critic",
             "prompt_optimizer",
@@ -261,6 +262,23 @@ class DynamicExecutionEngine:
             state["context_program_summary"] = "context program unavailable"
             state["context_program_version"] = "v1"
             state["agent_trace"].append("ContextProgramBuilder skipped after error")
+
+    def _run_context_program_validator(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "context_program_validator")
+            state["agent_trace"].append("ContextProgramValidator validated context program")
+            print("[ExecutionEngine] ContextProgramValidator validated context program")
+        except Exception as error:
+            print(f"[ExecutionEngine] ContextProgramValidator failed: {error}")
+            state["context_validation"] = {
+                "valid": False,
+                "missing_keys": [],
+                "type_warnings": [str(error)],
+                "provider_warnings": [],
+                "suggestions": ["validator failed; inspect context_program manually"],
+                "score": 0,
+            }
+            state["agent_trace"].append("ContextProgramValidator skipped after error")
 
     def _run_prompt_assembler(self, registry, state):
         self._run_state_step(registry, state, "prompt_assembler")

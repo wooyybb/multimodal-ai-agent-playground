@@ -1,5 +1,6 @@
 from agents.character_agent import CharacterAgent
 from agents.context_program_builder import ContextProgramBuilder
+from agents.context_program_validator import ContextProgramValidator
 from agents.evaluation_agent import EvaluationAgent
 from agents.generation_agent import GenerationAgent
 from agents.layout_agent import LayoutAgent
@@ -38,6 +39,7 @@ class OrchestratorAgent:
         self.lighting_agent = LightingAgent()
         self.negative_prompt_agent = NegativePromptAgent()
         self.context_program_builder = ContextProgramBuilder()
+        self.context_program_validator = ContextProgramValidator()
         self.prompt_assembler = PromptAssembler()
         self.prompt_critic_agent = PromptCriticAgent()
         self.prompt_optimizer_agent = PromptOptimizerAgent()
@@ -76,6 +78,7 @@ class OrchestratorAgent:
         self.registry.register("lighting", self.lighting_agent)
         self.registry.register("negative_prompt", self.negative_prompt_agent)
         self.registry.register("context_program_builder", self.context_program_builder)
+        self.registry.register("context_program_validator", self.context_program_validator)
         self.registry.register("prompt_assembler", self.prompt_assembler)
         self.registry.register("prompt_critic", self.prompt_critic_agent)
         self.registry.register("prompt_optimizer", self.prompt_optimizer_agent)
@@ -141,6 +144,7 @@ class OrchestratorAgent:
             "context_program": final_state.get("context_program"),
             "context_program_summary": final_state.get("context_program_summary"),
             "context_program_version": final_state.get("context_program_version"),
+            "context_validation": final_state.get("context_validation"),
             "canonical_prompt": final_state.get("canonical_prompt"),
             "prompt_report": final_state.get("prompt_report"),
             "prompt_quality_score": final_state.get("prompt_quality_score"),

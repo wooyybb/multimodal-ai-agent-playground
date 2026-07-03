@@ -42,24 +42,24 @@
 - Sprint 38: Run Comparison Report
 - Sprint 39: ContextProgramBuilder
 - Sprint 39.5: Documentation Refactoring
+- Sprint 40: Context Program Validator
 
 ## Planned Sprints
 
-- Sprint 40: Context Program v2
-- Sprint 41: Docker
-- Sprint 42: Docker Compose
-- Sprint 43: Queue
-- Sprint 44: Deploy
-- Sprint 45: Dashboard
-- Sprint 46: Benchmark Dashboard
-- Sprint 47: Multi-session
-- Sprint 48: Prompt Template Library
-- Sprint 49: Style Transfer
+- Sprint 41: LLM Optimizer Integration or AgentState full migration
+- Sprint 42: Docker
+- Sprint 43: Docker Compose
+- Sprint 44: Queue
+- Sprint 45: Deploy
+- Sprint 46: Dashboard
+- Sprint 47: Benchmark Dashboard
+- Sprint 48: Multi-session
+- Sprint 49: Prompt Template Library / Style Transfer
 - Sprint 50: Production
 
 ## Future Work
 
-- Add schema validation for Context Program.
+- Add Context Program v2 schema enforcement.
 - Add provider compiler regression tests.
 - Add Docker/FastAPI deployment guide.
 - Add persistent multi-session memory.

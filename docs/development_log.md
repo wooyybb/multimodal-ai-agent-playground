@@ -64,6 +64,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Reduced duplicated explanations across core docs.
 - Updated roadmap, architecture, concepts, interview notes, and prompt engineering docs.
 
+## Sprint 40
+
+- Added `ContextProgramValidator`.
+- Inserted validation between `ContextProgramBuilder` and `PromptAssembler`.
+- Validation records missing keys, type warnings, provider warnings, suggestions, and score.
+- Debug reports now include `context_validation`.
+
 ## Future Work
 
 - Keep this file short.

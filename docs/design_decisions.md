@@ -32,6 +32,14 @@ Reason: Context Engineering and Prompt Engineering needed a clean boundary. Cont
 
 Future: Context Program v2 schema and provider compiler tests.
 
+## Context Program Validation
+
+Decision: Add `ContextProgramValidator` after `ContextProgramBuilder`.
+
+Reason: Structured context should be checked before prompt assembly and generation. Missing sections, type mismatches, and provider compatibility warnings are easier to debug before they become prompt or generation failures.
+
+Future: Replace rule-based checks with formal schema validation and provider-specific compiler tests.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

@@ -27,6 +27,7 @@ Agent Layer
 -> ScenePlanningAgent
 -> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
 -> ContextProgramBuilder
+-> ContextProgramValidator
 -> PromptAssembler
 -> PromptCritic
 -> PromptOptimizer
@@ -63,7 +64,8 @@ flowchart TD
     R --> K[Knowledge Retrieval]
     R --> S[Scene and Prompt Specialist Agents]
     S --> CP[ContextProgramBuilder]
-    CP --> PA[PromptAssembler]
+    CP --> CV[ContextProgramValidator]
+    CV --> PA[PromptAssembler]
     PA --> PC[PromptCritic]
     PC --> PO[PromptOptimizer]
     PO --> PR[ProviderRouter]
@@ -85,15 +87,16 @@ flowchart TD
 4. Vision, memory, and retrieval add context.
 5. Specialist agents build visual sections.
 6. ContextProgramBuilder creates a provider-independent context program.
-7. PromptAssembler creates a canonical prompt.
-8. PromptCritic and PromptOptimizer review and improve prompt quality.
-9. ProviderRouter selects provider from config.
-10. ProviderPromptAdapter compiles provider-specific prompt.
-11. GenerationAgent creates image output.
-12. EvaluationAgent scores generated output.
-13. ReflectionAgent and RetryAgent decide retry.
-14. MemoryManager saves history.
-15. DebugReport and Benchmark tools record observability artifacts.
+7. ContextProgramValidator checks schema, section types, and provider compatibility.
+8. PromptAssembler creates a canonical prompt.
+9. PromptCritic and PromptOptimizer review and improve prompt quality.
+10. ProviderRouter selects provider from config.
+11. ProviderPromptAdapter compiles provider-specific prompt.
+12. GenerationAgent creates image output.
+13. EvaluationAgent scores generated output.
+14. ReflectionAgent and RetryAgent decide retry.
+15. MemoryManager saves history.
+16. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
@@ -101,6 +104,7 @@ flowchart TD
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.
 - ContextProgramBuilder owns structured context.
+- ContextProgramValidator owns context schema and provider compatibility checks.
 - PromptAssembler owns canonical prompt construction.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
 - Generation, evaluation, memory, benchmark, and debug report stay separated.

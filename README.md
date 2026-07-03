@@ -40,6 +40,7 @@ User
 -> ScenePlanningAgent
 -> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
 -> ContextProgramBuilder
+-> ContextProgramValidator
 -> PromptAssembler
 -> PromptCritic
 -> PromptOptimizer / LLMPromptOptimizer interface
@@ -61,15 +62,16 @@ User
 5. Retrieval and memory modules add previous context and style knowledge.
 6. Specialist prompt agents create scene, character, layout, pose, expression, lighting, and negative sections.
 7. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
-8. `PromptAssembler` builds a canonical prompt.
-9. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
-10. `ProviderRouter` selects a generation provider from config.
-11. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
-12. `GenerationAgent` generates the image.
-13. `EvaluationAgent` scores the result with CLIP when available.
-14. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
-15. `MemoryManager` saves run history.
-16. Debug reports and benchmark reports make the run inspectable.
+8. `ContextProgramValidator` checks schema and provider compatibility.
+9. `PromptAssembler` builds a canonical prompt.
+10. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
+11. `ProviderRouter` selects a generation provider from config.
+12. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
+13. `GenerationAgent` generates the image.
+14. `EvaluationAgent` scores the result with CLIP when available.
+15. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
+16. `MemoryManager` saves run history.
+17. Debug reports and benchmark reports make the run inspectable.
 
 ## Core Features
 
@@ -92,6 +94,8 @@ Knowledge retrieval adds style and prompt context before prompt assembly.
 ### Context Engineering
 
 `ContextProgramBuilder` creates a structured context program with task, user goal, scene, character, style, layout, pose, expression, lighting, negative, memory, retrieval, provider, and output sections.
+
+`ContextProgramValidator` checks required sections, basic section types, and provider compatibility warnings before prompt assembly.
 
 ### Prompt Engineering
 
@@ -189,7 +193,7 @@ python -m benchmark.report_generator
 ## Project Roadmap
 
 - Sprint 1-39: Multi-agent framework, provider routing, debug reports, benchmark reports, context program
-- Sprint 40: Context Program v2
+- Sprint 40: Context Program Validator
 - Sprint 41: Docker
 - Sprint 42: Docker Compose
 - Sprint 43: Queue
@@ -222,7 +226,7 @@ Placeholder: curated demo screenshots should be stored under `assets/demo/` in a
 
 ## Future Work
 
-- Context Program schema validation
+- Context Program v2
 - Real LLM prompt optimizer
 - Multi-provider generation
 - Reference image handling

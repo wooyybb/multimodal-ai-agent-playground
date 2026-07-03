@@ -77,6 +77,7 @@ class DebugReportManager:
             "context_program": self._safe(state.get("context_program")),
             "context_program_summary": self._safe(state.get("context_program_summary")),
             "context_program_version": self._safe(state.get("context_program_version")),
+            "context_validation": self._safe(state.get("context_validation")),
             "character_section": self._safe(state.get("character_section")),
             "style_section": self._safe(state.get("style_section")),
             "layout_section": self._safe(state.get("layout_section")),
@@ -117,6 +118,7 @@ class DebugReportManager:
             {
                 "version": state.get("context_program_version"),
                 "summary": state.get("context_program_summary"),
+                "validation": state.get("context_validation"),
                 "program": state.get("context_program"),
             },
         )
