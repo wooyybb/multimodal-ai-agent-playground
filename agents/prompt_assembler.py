@@ -86,7 +86,7 @@ class PromptAssembler:
             expression_bits = visual["expression"]
             lighting_bits = visual["lighting"]
             retrieved_lighting = visual["retrieved_lighting"]
-            negative_prompt = ", ".join(visual["negative"])
+            negative_prompt = self._join_prompt_parts(visual["negative"])
         else:
             character_bits = self._character_prompt_bits(character_section, caption)
             scene_bits = self._scene_prompt_bits(scene_plan)
@@ -97,26 +97,28 @@ class PromptAssembler:
             expression_bits = (expression_section or {}).get("expression_rules", [])
             lighting_bits = self._lighting_prompt_bits(lighting_section)
             retrieved_lighting = (compressed_context or {}).get("retrieved_lighting_hint")
-            negative_prompt = ", ".join((negative_section or {}).get("negative_prompt", []))
+            negative_prompt = self._join_prompt_parts(
+                (negative_section or {}).get("negative_prompt", [])
+            )
 
         parts = [
             "high quality",
             f"detailed image of {caption}",
-            ", ".join(scene_bits),
-            ", ".join(character_bits),
-            ", ".join(style_bits),
-            ", ".join(rendering_bits),
-            ", ".join(layout_bits),
-            ", ".join(pose_bits),
-            ", ".join(expression_bits),
-            ", ".join(lighting_bits),
+            scene_bits,
+            character_bits,
+            style_bits,
+            rendering_bits,
+            layout_bits,
+            pose_bits,
+            expression_bits,
+            lighting_bits,
             retrieved_lighting,
         ]
 
         if user_prompt and str(user_prompt).strip():
             parts.append(f"user request: {str(user_prompt).strip()}")
 
-        generation_prompt = ", ".join(part for part in parts if part)
+        generation_prompt = self._join_prompt_parts(parts)
         generation_prompt = self._limit_words(generation_prompt, max_words=120)
 
         result = {
@@ -146,6 +148,54 @@ class PromptAssembler:
         if len(words) <= max_words:
             return prompt
         return " ".join(words[:max_words]).rstrip(" ,.")
+
+    def _join_prompt_parts(self, values):
+        prompt_parts = self._flatten_prompt_parts(values)
+        prompt_parts = [str(value) for value in prompt_parts]
+        prompt_parts = [value.strip() for value in prompt_parts if value.strip()]
+        return ", ".join(prompt_parts)
+
+    def _flatten_prompt_parts(self, value):
+        prompt_parts = []
+        self._append_prompt_value(prompt_parts, value)
+        return prompt_parts
+
+    def _append_prompt_value(self, prompt_parts, value):
+        if value is None:
+            return
+        if isinstance(value, str):
+            if value.strip():
+                prompt_parts.append(value)
+            return
+        if isinstance(value, list):
+            for item in value:
+                self._append_prompt_value(prompt_parts, item)
+            return
+        if isinstance(value, tuple):
+            for item in value:
+                self._append_prompt_value(prompt_parts, item)
+            return
+        if isinstance(value, dict):
+            readable = self._dict_to_prompt_text(value)
+            if readable:
+                prompt_parts.append(readable)
+            return
+        prompt_parts.append(value)
+
+    def _dict_to_prompt_text(self, value):
+        readable_values = []
+        for item in value.values():
+            if item is None:
+                continue
+            if isinstance(item, (str, int, float, bool)):
+                readable_values.append(str(item))
+            elif isinstance(item, (list, tuple)):
+                readable_values.extend(
+                    str(entry)
+                    for entry in self._flatten_prompt_parts(item)
+                    if str(entry).strip()
+                )
+        return ", ".join(readable_values)
 
     def _dict_values(self, section):
         values = []
@@ -179,7 +229,7 @@ class PromptAssembler:
             camera_phrase,
             placement_phrase,
             background_style,
-            ", ".join(composition_rules[:4]),
+            self._join_prompt_parts(composition_rules[:4]),
         ]
         return [bit for bit in bits if bit]
 
@@ -256,7 +306,7 @@ class PromptAssembler:
         narrative = scene_plan.get("narrative")
         camera_intent = scene_plan.get("camera_intent")
         scene_rules = scene_plan.get("scene_rules") or []
-        bits = [narrative, camera_intent, ", ".join(scene_rules[:3])]
+        bits = [narrative, camera_intent, self._join_prompt_parts(scene_rules[:3])]
         return [bit for bit in bits if bit]
 
     def _lighting_prompt_bits(self, lighting_section):
@@ -264,10 +314,7 @@ class PromptAssembler:
             return []
         values = []
         for value in lighting_section.values():
-            if isinstance(value, list):
-                values.extend(str(item) for item in value if item)
-            elif value:
-                values.append(str(value))
+            self._append_prompt_value(values, value)
         return values
 
     def _visual_from_context_program(self, context_program, caption):
@@ -293,10 +340,7 @@ class PromptAssembler:
 
         character_bits = [
             f"{characters.get('character_count', 1) or 1} recognizable character",
-            ", ".join(
-                str(item)
-                for item in characters.get("preservation_rules", [])[:3]
-            ),
+            self._join_prompt_parts(characters.get("preservation_rules", [])[:3]),
             str(caption or "main subject"),
         ]
 
@@ -334,4 +378,4 @@ class PromptAssembler:
         }
 
     def _clean_bits(self, values):
-        return [str(value) for value in (values or []) if value]
+        return self._flatten_prompt_parts(values)
