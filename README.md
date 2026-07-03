@@ -133,6 +133,26 @@ GET  /health
 POST /generate
 ```
 
+Run the benchmark runner:
+
+```bash
+python -m benchmark.benchmark_runner
+```
+
+Benchmark prompts are stored in:
+
+```text
+benchmark/prompts.json
+```
+
+Benchmark results are saved under:
+
+```text
+benchmark/results/benchmark_YYYYMMDD_HHMMSS.json
+```
+
+Each result records prompt id, provider, score, best score, retry status, image path, debug report path, prompt preview path, and prompt length.
+
 ## Project Structure
 
 ```text
@@ -146,6 +166,7 @@ config/      Provider capability configuration
 docs/        Architecture notes, sprint book, decisions, prompts, reviews
 ui/          Gradio application
 api/         FastAPI REST service layer
+benchmark/   Prompt benchmark runner and result JSON files
 outputs/     Runtime generated outputs
 ```
 
@@ -207,6 +228,7 @@ Runtime images are copied only when the corresponding source files exist. Do not
 - Sprint 33: LLM Prompt Optimizer Interface
 - Sprint 35: FastAPI Service Layer
 - Sprint 36: Prompt Debug Report and Trace Viewer
+- Sprint 37: Benchmark Runner
 
 ## Roadmap
 

@@ -317,3 +317,10 @@
 - Added `outputs/runs/run_*/prompt_preview.txt`.
 - Added best-effort copying for initial, retry, and best images.
 - Memory history now stores debug report paths when available.
+
+## Sprint37: Benchmark Runner
+
+- Added `benchmark/prompts.json`.
+- Added `benchmark/benchmark_runner.py`.
+- Added benchmark result output under `benchmark/results/`.
+- Benchmark records score, best score, retry status, provider, prompt length, image path, and debug report paths.

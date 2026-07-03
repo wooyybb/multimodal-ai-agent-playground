@@ -523,3 +523,14 @@ A. 먼저 prompt_preview에서 canonical/provider/evaluation prompt를 보고, r
 
 Q. 이 구조가 실제 서비스 운영과 어떻게 연결되나요?
 A. 서비스에서는 장애나 품질 저하를 run 단위로 추적해야 합니다. Debug report는 향후 UI Trace Viewer, benchmark dashboard, observability API로 확장할 수 있습니다.
+
+## Sprint37 Interview Notes
+
+Q. Benchmark Runner는 왜 필요한가요?
+A. 한두 개 prompt의 결과만 보면 agent framework의 품질을 판단하기 어렵습니다. 여러 prompt를 반복 실행하고 score, retry, provider, debug report path를 저장하면 개선 효과를 비교할 수 있습니다.
+
+Q. 실패한 prompt는 어떻게 처리하나요?
+A. 한 prompt가 실패해도 전체 benchmark는 계속 진행합니다. 실패 항목은 `success=false`와 error message로 결과 JSON에 저장합니다.
+
+Q. Debug Report와 Benchmark는 어떻게 연결되나요?
+A. Benchmark 결과에는 각 run의 `debug_report_path`와 `prompt_preview_path`가 포함됩니다. 점수가 낮은 항목은 해당 report를 열어 prompt lifecycle을 추적할 수 있습니다.

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "anime_basic",
+    "user_prompt": "anime style, cinematic lighting",
+    "provider": "flux"
+  },
+  {
+    "id": "photobooth",
+    "user_prompt": "Korean photobooth memory collage, soft webtoon style",
+    "provider": "flux"
+  },
+  {
+    "id": "portrait",
+    "user_prompt": "soft character portrait, clean line art, warm lighting",
+    "provider": "flux"
+  }
+]

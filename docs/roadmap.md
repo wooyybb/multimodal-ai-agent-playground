@@ -391,3 +391,16 @@
 - Benchmark Runner
 - UI Trace Viewer
 - Docker packaging
+
+## Sprint37: Benchmark Runner - Done
+
+- Prompt set JSON added
+- Benchmark runner added
+- Benchmark results saved as timestamped JSON files
+- Failure handling keeps the benchmark running after individual prompt errors
+
+## Next Sprint Proposal
+
+- Benchmark dashboard
+- Prompt A/B testing
+- Docker packaging
