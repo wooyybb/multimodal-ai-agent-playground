@@ -24,6 +24,10 @@ LLM Provider Abstraction은 Agent가 OpenAI, Gemini, Claude, Ollama 같은 provi
 
 AIModelService는 LLMClient 아래의 service layer입니다. Agent 요청을 받아 Provider Registry를 통해 Mock/OpenAI/Gemini/Claude/Ollama provider로 위임합니다. 현재 외부 API 호출은 없고 MockProvider만 실제 동작을 담당합니다.
 
+## OpenAI Provider
+
+OpenAIProvider는 AIModelService 아래의 provider implementation입니다. `OPENAI_API_KEY`가 있을 때 OpenAI API 호출을 시도하고, key가 없거나 응답 parsing에 실패하면 MockProvider fallback을 사용합니다.
+
 ## Prompt Compiler
 
 Prompt Compiler는 provider-independent Context Program을 provider-specific compiled prompt package로 변환하는 단계입니다. FLUX는 짧고 밀도 높은 positive prompt를 사용하고, SDXL은 positive/negative prompt 분리를 유지하며, GPT Image는 structured instruction block을 유지할 수 있습니다.

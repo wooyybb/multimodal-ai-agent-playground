@@ -120,6 +120,15 @@ A. reason, critic, optimize 요청을 공통 model service boundary에서 처리
 Q. Provider Registry와 AIModelService의 차이는?
 A. AIModelService는 reason/critic/optimize 요청을 받는 service layer이고, Provider Registry는 provider 이름을 실제 provider 객체로 매핑하는 factory 역할입니다.
 
+Q. 왜 Provider를 Agent에서 직접 호출하지 않았나요?
+A. Agent가 OpenAI 같은 특정 provider를 직접 호출하면 교체와 테스트가 어려워집니다. Agent는 LLMClient만 호출하고, 실제 provider 호출은 AIModelService와 ProviderRegistry 뒤에 둡니다.
+
+Q. OpenAI API key가 없으면 어떻게 되나요?
+A. OpenAIProvider는 crash하지 않고 warning을 출력한 뒤 MockProvider fallback 결과를 반환합니다. API key는 로그나 문서에 노출하지 않습니다.
+
+Q. OpenAI 응답이 JSON이 아니면 어떻게 처리하나요?
+A. raw_text를 저장하고 fallback structure를 반환하며 `used_fallback=true`로 표시합니다.
+
 Q. Evaluation Prompt는 왜 따로 있나요?
 A. CLIP token budget을 넘지 않도록 generation prompt보다 짧고 평가 중심으로 설계합니다.
 

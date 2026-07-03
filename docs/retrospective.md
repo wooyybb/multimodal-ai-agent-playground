@@ -36,6 +36,10 @@ PromptCompiler clarified the boundary between Context Program and ProviderPrompt
 
 AIModelService added a cleaner provider boundary under LLMClient. The system is now ready for future real provider integrations without changing LLM agents.
 
+## Sprint 47
+
+OpenAIProvider integration was added without changing agents. The fallback-first design kept the framework runnable even when API keys or network access are unavailable.
+
 ## What Went Well
 
 - Clear sprint prompts reduced scope creep.

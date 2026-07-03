@@ -106,6 +106,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Updated `LLMClient` to call AIModelService instead of providers directly.
 - Kept all external API calls disabled.
 
+## Sprint 47
+
+- Implemented optional real OpenAIProvider integration.
+- Added `OPENAI_API_KEY`, `OPENAI_MODEL`, and `LLM_PROVIDER=openai` support.
+- Added no-key, client-error, request-error, and JSON-parse fallback behavior.
+- Preserved agent isolation: agents still call `LLMClient`, not OpenAI directly.
+
 ## Future Work
 
 - Keep this file short.

@@ -48,11 +48,11 @@
 - Sprint 44: LLM Provider Abstraction Layer
 - Sprint 45: Prompt Compiler
 - Sprint 46: AI Model Service Layer
+- Sprint 47: Real OpenAI Provider Integration
 
 ## Planned Sprints
 
-- Sprint 47: OpenAI Client Integration or Prompt Template Library
-- Sprint 48: Docker
+- Sprint 48: Prompt Template Library or Docker
 - Sprint 49: Benchmark Dashboard
 - Sprint 50: Production
 

@@ -106,7 +106,19 @@ LLMClient -> AIModelService -> LLMProviderRegistry -> MockProvider
 
 ### AI Model Layer
 
-`AIModelService` is the shared model service boundary below `LLMClient`. Agents do not call OpenAI, Gemini, Claude, or Ollama directly. Provider skeletons live under `llm/providers/`, and all non-mock providers currently fall back to mock behavior without external API calls.
+`AIModelService` is the shared model service boundary below `LLMClient`. Agents do not call OpenAI, Gemini, Claude, or Ollama directly. Provider implementations live under `llm/providers/`.
+
+OpenAI can be selected through environment variables. If the key or client is unavailable, the provider falls back to mock behavior without crashing.
+
+PowerShell example:
+
+```powershell
+$env:OPENAI_API_KEY="your_key_here"
+$env:LLM_PROVIDER="openai"
+$env:OPENAI_MODEL="gpt-5.5"
+```
+
+Never commit real API keys, `.env` files, or token values.
 
 ### Execution Engine
 

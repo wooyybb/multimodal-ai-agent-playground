@@ -80,6 +80,14 @@ Reason: LLM agents should not know concrete model providers. `AIModelService` ow
 
 Future: Add real OpenAI, Gemini, Claude, and Ollama providers behind the same interface.
 
+## OpenAI Provider Integration
+
+Decision: Implement OpenAIProvider behind AIModelService.
+
+Reason: Real provider calls should be isolated from agents. This keeps LLMContextReasoner, LLMPromptCriticAgent, and LLMPromptOptimizerAgent dependent only on LLMClient.
+
+Future: Add response schema tests, retry/backoff, and provider-specific calibration.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

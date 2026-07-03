@@ -69,7 +69,12 @@ flowchart TD
     LC --> AMS[AIModelService]
     AMS --> REG[Provider Registry]
     REG --> ML[Mock Provider]
+    REG --> OAI[OpenAI Provider]
+    REG --> GEM[Gemini Provider Skeleton]
+    REG --> CLA[Claude Provider Skeleton]
+    REG --> OLL[Ollama Provider Skeleton]
     ML --> LR[LLMContextReasoner]
+    OAI --> LR
     LR --> E[DynamicExecutionEngine]
     E --> P[PlannerAgent]
     E --> R[ToolRegistry]
@@ -123,6 +128,7 @@ flowchart TD
 - UI/API should not know individual agent internals.
 - LLMClient owns provider abstraction for reason, critic, and optimize calls.
 - AIModelService owns provider dispatch below LLMClient.
+- OpenAIProvider owns optional real OpenAI calls and falls back to MockProvider when unavailable.
 - LLMContextReasoner owns semantic intent interpretation before prompt construction.
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.

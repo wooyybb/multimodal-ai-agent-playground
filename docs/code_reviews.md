@@ -47,3 +47,7 @@ PromptCompiler was added between ProviderRouter and ProviderPromptAdapter. It cr
 ## Sprint46 Review
 
 AIModelService was added below LLMClient. Provider skeletons do not call external APIs and currently fallback to MockProvider behavior. This keeps provider integration isolated from LLM agents.
+
+## Sprint47 Review
+
+OpenAIProvider now attempts real OpenAI calls only when `OPENAI_API_KEY` is available. It never logs keys, parses JSON responses defensively, and falls back to MockProvider on missing key, client failure, request failure, or parse failure.

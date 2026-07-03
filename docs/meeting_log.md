@@ -66,6 +66,12 @@ Decision: Add AIModelService below LLMClient.
 
 Reason: LLM agents should remain independent from concrete providers such as OpenAI, Gemini, Claude, and Ollama.
 
+## Sprint 47: OpenAI Provider
+
+Decision: Connect OpenAIProvider behind AIModelService.
+
+Reason: Real LLM integration belongs in provider layer, not inside agents. Missing credentials or invalid responses should fallback safely.
+
 ## Future Work
 
 - Keep meeting notes decision-focused.
