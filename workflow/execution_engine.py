@@ -39,6 +39,12 @@ class DynamicExecutionEngine:
         agent_state.validate()
         state = agent_state.to_dict()
         state.setdefault("agent_trace", [])
+        planner_reasoning = (state.get("planner_result") or {}).get("context_reasoning")
+        if planner_reasoning and not state.get("context_reasoning"):
+            state["context_reasoning"] = planner_reasoning
+            state["agent_trace"].append("LLMContextReasoner created semantic plan")
+        else:
+            self._run_llm_context_reasoner(registry, state)
         plan = self._normalize_plan(execution_plan or self.DEFAULT_PLAN)
 
         for step in plan:
@@ -67,6 +73,28 @@ class DynamicExecutionEngine:
 
     def _run_memory_load(self, registry, state):
         state["last_run"] = registry.call("memory_load")
+
+    def _run_llm_context_reasoner(self, registry, state):
+        if not hasattr(registry, "has_tool") or not registry.has_tool("llm_context_reasoner"):
+            print("[ExecutionEngine] LLMContextReasoner not registered. Skipping.")
+            return
+
+        try:
+            self._run_state_step(registry, state, "llm_context_reasoner")
+            state["agent_trace"].append("LLMContextReasoner created semantic plan")
+            print("[ExecutionEngine] LLMContextReasoner created semantic plan")
+        except Exception as error:
+            print(f"[ExecutionEngine] LLMContextReasoner failed: {error}")
+            state["context_reasoning"] = {
+                "user_goal": state.get("user_prompt", ""),
+                "scene_goal": "semantic planning unavailable",
+                "composition_goal": "semantic planning unavailable",
+                "interaction_goal": "semantic planning unavailable",
+                "style_goal": "semantic planning unavailable",
+                "priority": ["character", "emotion", "layout", "style"],
+                "mode": "fallback",
+            }
+            state["agent_trace"].append("LLMContextReasoner skipped after error")
 
     def _run_vision(self, registry, state):
         state["caption"] = registry.call("vision", state.get("image"))

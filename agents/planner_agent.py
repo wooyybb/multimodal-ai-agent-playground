@@ -1,6 +1,15 @@
+from agents.llm_context_reasoner import LLMContextReasoner
+
+
 class PlannerAgent:
     def run(self, user_prompt: str, image_provided: bool) -> dict:
         print("[PlannerAgent] Running...")
+        context_reasoning = LLMContextReasoner().run(
+            {
+                "user_prompt": user_prompt,
+                "image_provided": image_provided,
+            }
+        ).get("context_reasoning")
 
         execution_plan = [
             "memory_load",
@@ -42,6 +51,7 @@ class PlannerAgent:
             "requires_retry": True,
             "execution_plan": execution_plan,
             "reason": self._build_reason(user_prompt, image_provided),
+            "context_reasoning": context_reasoning,
         }
 
         print(f"[PlannerAgent] Execution plan: {execution_plan}")

@@ -71,6 +71,7 @@ class DebugReportManager:
             "user_prompt": self._safe(state.get("user_prompt")),
             "provider": self._safe(state.get("provider")),
             "planner_result": self._safe(state.get("planner_result")),
+            "context_reasoning": self._safe(state.get("context_reasoning")),
             "scene_plan": self._safe(state.get("scene_plan")),
             "memory_context": self._safe(state.get("memory_context")),
             "retrieved_context": self._safe(state.get("retrieved_context")),
@@ -111,6 +112,7 @@ class DebugReportManager:
     def _build_prompt_preview(self, state):
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
+        self._append_block(lines, "CONTEXT REASONING", state.get("context_reasoning"))
         self._append_block(lines, "SCENE PLAN", state.get("scene_plan"))
         self._append_block(
             lines,

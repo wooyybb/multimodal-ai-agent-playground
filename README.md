@@ -31,6 +31,7 @@ The project is built as an AI Agent Engineering portfolio project. The goal is n
 ```text
 User
 -> Gradio UI / FastAPI
+-> LLMContextReasoner
 -> PlannerAgent
 -> DynamicExecutionEngine
 -> ToolRegistry
@@ -56,28 +57,33 @@ User
 ## Pipeline
 
 1. User uploads an image and enters a text request.
-2. `PlannerAgent` creates an execution plan.
-3. `DynamicExecutionEngine` runs registered agents through `ToolRegistry`.
-4. `VisionAgent` creates a caption with BLIP when available.
-5. Retrieval and memory modules add previous context and style knowledge.
-6. Specialist prompt agents create scene, character, layout, pose, expression, lighting, and negative sections.
-7. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
-8. `ContextProgramValidator` checks schema and provider compatibility.
-9. `PromptAssembler` builds a canonical prompt.
-10. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
-11. `ProviderRouter` selects a generation provider from config.
-12. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
-13. `GenerationAgent` generates the image.
-14. `EvaluationAgent` scores the result with CLIP when available.
-15. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
-16. `MemoryManager` saves run history.
-17. Debug reports and benchmark reports make the run inspectable.
+2. `LLMContextReasoner` creates a mock semantic planning layer from user intent.
+3. `PlannerAgent` creates an execution plan.
+4. `DynamicExecutionEngine` runs registered agents through `ToolRegistry`.
+5. `VisionAgent` creates a caption with BLIP when available.
+6. Retrieval and memory modules add previous context and style knowledge.
+7. Specialist prompt agents create scene, character, layout, pose, expression, lighting, and negative sections.
+8. `ContextProgramBuilder` converts agent outputs into a provider-independent context program.
+9. `ContextProgramValidator` checks schema and provider compatibility.
+10. `PromptAssembler` builds a canonical prompt.
+11. `PromptCritic` and `PromptOptimizer` review and repair the prompt.
+12. `ProviderRouter` selects a generation provider from config.
+13. `ProviderPromptAdapter` converts the canonical/context prompt into provider-specific text.
+14. `GenerationAgent` generates the image.
+15. `EvaluationAgent` scores the result with CLIP when available.
+16. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
+17. `MemoryManager` saves run history.
+18. Debug reports and benchmark reports make the run inspectable.
 
 ## Core Features
 
 ### Planner
 
 `PlannerAgent` produces an execution plan so the workflow is not hardcoded into one procedural script.
+
+### LLM Intelligence Layer
+
+`LLMContextReasoner` is a mock LLM interface for semantic planning. It does not create prompts or call an external API. It interprets user intent into user goal, scene goal, composition goal, interaction goal, style goal, and priority order.
 
 ### Execution Engine
 
@@ -194,6 +200,7 @@ python -m benchmark.report_generator
 
 - Sprint 1-39: Multi-agent framework, provider routing, debug reports, benchmark reports, context program
 - Sprint 40: Context Program Validator
+- Sprint 41: LLM Context Reasoner
 - Sprint 41: Docker
 - Sprint 42: Docker Compose
 - Sprint 43: Queue

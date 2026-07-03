@@ -4,6 +4,15 @@ from workflow.agent_state import AgentState
 class ToolRegistry:
     def __init__(self):
         self._tools = {}
+        self._register_default_tools()
+
+    def _register_default_tools(self):
+        try:
+            from agents.llm_context_reasoner import LLMContextReasoner
+
+            self.register("llm_context_reasoner", LLMContextReasoner())
+        except Exception as error:
+            print(f"[ToolRegistry] Default tool registration skipped: {error}")
 
     def register(self, name: str, callable_obj):
         print(f"[ToolRegistry] Registering tool: {name}")

@@ -40,6 +40,14 @@ Reason: Structured context should be checked before prompt assembly and generati
 
 Future: Replace rule-based checks with formal schema validation and provider-specific compiler tests.
 
+## LLM Context Reasoner
+
+Decision: Add `LLMContextReasoner` as a mock semantic planning layer before prompt construction.
+
+Reason: LLM reasoning is useful for interpreting user intent, but direct prompt generation can blur the boundary between semantic planning and provider prompt compilation. Keeping the LLM layer as structured reasoning makes the system easier to inspect and replace.
+
+Future: Connect a real LLM API behind the same interface and keep rule-based fallback behavior.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

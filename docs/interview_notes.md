@@ -54,6 +54,15 @@ A. specialist output을 canonical prompt로 조립하는 책임을 분리하기 
 Q. Context Engineering이란?
 A. Agent가 사용할 task, memory, retrieval, scene, provider constraint를 구조화하는 작업입니다.
 
+Q. 왜 LLM을 Prompt 생성에 쓰지 않고 Reasoning에 먼저 사용했나요?
+A. Prompt를 바로 생성하게 하면 내부 의도 해석과 provider prompt가 섞이기 쉽습니다. 먼저 semantic planning을 구조화하면 rule-based agent와 prompt compiler가 더 안정적으로 사용할 수 있습니다.
+
+Q. Semantic Planning Layer란 무엇인가요?
+A. user intent를 scene goal, composition goal, interaction goal, style goal, priority 같은 구조화된 계획으로 바꾸는 prompt 이전 단계입니다.
+
+Q. Rule-based Agent와 LLM Agent를 왜 분리했나요?
+A. LLM은 의도 해석에 강하고, rule-based agent는 안정적인 구조화와 fallback에 강합니다. 둘을 분리하면 디버깅과 교체가 쉬워집니다.
+
 Q. Context Program이란?
 A. 여러 agent output을 provider-independent structured intermediate representation으로 정리한 객체입니다.
 

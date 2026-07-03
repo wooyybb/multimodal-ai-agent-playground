@@ -71,6 +71,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Validation records missing keys, type warnings, provider warnings, suggestions, and score.
 - Debug reports now include `context_validation`.
 
+## Sprint 41
+
+- Added `LLMContextReasoner`.
+- Added a mock LLM interface for semantic planning without external API calls.
+- Reasoner outputs user goal, scene goal, composition goal, interaction goal, style goal, and priority list.
+- Debug reports now include `context_reasoning`.
+
 ## Future Work
 
 - Keep this file short.

@@ -4,6 +4,10 @@
 
 Context Engineering은 Agent가 사용할 정보를 구조화하는 작업입니다. 이 프로젝트에서는 user prompt, caption, memory, retrieval, scene plan, provider constraint를 Context Program으로 정리합니다.
 
+## Semantic Planning
+
+Semantic Planning은 prompt 이전 단계에서 user intent를 user goal, scene goal, composition goal, interaction goal, style goal, priority로 해석하는 과정입니다. `LLMContextReasoner`는 현재 mock LLM interface로 동작하며 실제 API를 호출하지 않습니다.
+
 ## Prompt Engineering
 
 Prompt Engineering은 structured context를 모델 입력 문장으로 변환하는 작업입니다. canonical prompt, provider prompt, evaluation prompt, retry prompt를 분리합니다.

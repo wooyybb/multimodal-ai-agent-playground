@@ -15,6 +15,9 @@ UI Layer
 -> Gradio
 -> FastAPI
 
+Semantic Planning Layer
+-> LLMContextReasoner
+
 Execution Layer
 -> PlannerAgent
 -> DynamicExecutionEngine
@@ -55,8 +58,9 @@ Persistence and Observability
 flowchart TD
     U[User] --> UI[Gradio UI]
     U --> API[FastAPI]
-    UI --> E[DynamicExecutionEngine]
-    API --> E
+    UI --> LR[LLMContextReasoner]
+    API --> LR
+    LR --> E[DynamicExecutionEngine]
     E --> P[PlannerAgent]
     E --> R[ToolRegistry]
     R --> V[VisionAgent]
@@ -82,25 +86,27 @@ flowchart TD
 ## Runtime Flow
 
 1. UI or API receives image and user prompt.
-2. Planner creates an execution plan.
-3. ExecutionEngine dispatches steps through ToolRegistry.
-4. Vision, memory, and retrieval add context.
-5. Specialist agents build visual sections.
-6. ContextProgramBuilder creates a provider-independent context program.
-7. ContextProgramValidator checks schema, section types, and provider compatibility.
-8. PromptAssembler creates a canonical prompt.
-9. PromptCritic and PromptOptimizer review and improve prompt quality.
-10. ProviderRouter selects provider from config.
-11. ProviderPromptAdapter compiles provider-specific prompt.
-12. GenerationAgent creates image output.
-13. EvaluationAgent scores generated output.
-14. ReflectionAgent and RetryAgent decide retry.
-15. MemoryManager saves history.
-16. DebugReport and Benchmark tools record observability artifacts.
+2. LLMContextReasoner creates semantic planning fields without generating a prompt.
+3. Planner creates an execution plan.
+4. ExecutionEngine dispatches steps through ToolRegistry.
+5. Vision, memory, and retrieval add context.
+6. Specialist agents build visual sections.
+7. ContextProgramBuilder creates a provider-independent context program.
+8. ContextProgramValidator checks schema, section types, and provider compatibility.
+9. PromptAssembler creates a canonical prompt.
+10. PromptCritic and PromptOptimizer review and improve prompt quality.
+11. ProviderRouter selects provider from config.
+12. ProviderPromptAdapter compiles provider-specific prompt.
+13. GenerationAgent creates image output.
+14. EvaluationAgent scores generated output.
+15. ReflectionAgent and RetryAgent decide retry.
+16. MemoryManager saves history.
+17. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
 - UI/API should not know individual agent internals.
+- LLMContextReasoner owns semantic intent interpretation before prompt construction.
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.
 - ContextProgramBuilder owns structured context.
