@@ -1,3 +1,4 @@
+from agents.goal_planner import GoalPlanner
 from agents.llm_context_reasoner import LLMContextReasoner
 
 
@@ -10,10 +11,19 @@ class PlannerAgent:
                 "image_provided": image_provided,
             }
         ).get("context_reasoning")
+        goal_tree = GoalPlanner().run(
+            {
+                "user_prompt": user_prompt,
+                "image_provided": image_provided,
+            }
+        ).get("goal_tree")
 
         execution_plan = [
+            "goal_planner",
             "memory_load",
             "vision",
+            "character_program_builder",
+            "memory_retrieval",
             "retrieval",
             "prompt_compressor",
             "scene_planning",
@@ -55,6 +65,7 @@ class PlannerAgent:
             "execution_plan": execution_plan,
             "reason": self._build_reason(user_prompt, image_provided),
             "context_reasoning": context_reasoning,
+            "goal_tree": goal_tree,
         }
 
         print(f"[PlannerAgent] Execution plan: {execution_plan}")

@@ -127,6 +127,21 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Retry now applies adaptive context updates and re-runs prompt compiler/provider adapter before the second generation attempt.
 - Debug reports now include `adaptive_plan`.
 
+## Sprint 50
+
+- Added `CharacterProgramBuilder`.
+- Converted BLIP caption and vision result into structured character identity, appearance, style, pose, expression, colors, and identity rules.
+- ExecutionEngine now runs CharacterProgramBuilder after VisionAgent.
+- Context Program and PromptCompiler receive Character Program data through execution-engine context injection.
+- Debug reports now include `character_program`.
+
+## Sprint 51
+
+- Added `GoalPlanner`.
+- Planner now creates a Goal Tree with main goal, sub-goals, priority weights, and success criteria.
+- ExecutionEngine stores Goal Tree and injects goal priorities into Context Program before prompt compilation.
+- Debug reports now include `goal_tree`.
+
 ## Future Work
 
 - Keep this file short.

@@ -72,6 +72,7 @@ class DebugReportManager:
             "vision_result": self._safe(self._vision_result(state)),
             "provider": self._safe(state.get("provider")),
             "planner_result": self._safe(state.get("planner_result")),
+            "goal_tree": self._safe(state.get("goal_tree")),
             "context_reasoning": self._safe(state.get("context_reasoning")),
             "scene_plan": self._safe(state.get("scene_plan")),
             "memory_context": self._safe(state.get("memory_context")),
@@ -80,6 +81,7 @@ class DebugReportManager:
             "context_program_summary": self._safe(state.get("context_program_summary")),
             "context_program_version": self._safe(state.get("context_program_version")),
             "context_validation": self._safe(state.get("context_validation")),
+            "character_program": self._safe(state.get("character_program")),
             "character_section": self._safe(state.get("character_section")),
             "style_section": self._safe(state.get("style_section")),
             "layout_section": self._safe(state.get("layout_section")),
@@ -117,6 +119,7 @@ class DebugReportManager:
     def _build_prompt_preview(self, state):
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
+        self._append_block(lines, "GOAL TREE", state.get("goal_tree"))
         self._append_block(
             lines,
             "VISION RESULT",
@@ -133,6 +136,11 @@ class DebugReportManager:
                 "validation": state.get("context_validation"),
                 "program": state.get("context_program"),
             },
+        )
+        self._append_block(
+            lines,
+            "CHARACTER PROGRAM",
+            self._character_program_preview(state.get("character_program")),
         )
         self._append_block(lines, "CHARACTER", state.get("character_section"))
         self._append_block(lines, "STYLE", state.get("style_section"))
@@ -222,6 +230,18 @@ class DebugReportManager:
             "Context Updates": plan.get("context_updates", []),
             "Priority Change": plan.get("priority_change", []),
             "Confidence": plan.get("confidence"),
+        }
+
+    def _character_program_preview(self, program):
+        program = program or {}
+        return {
+            "Identity": program.get("identity", {}),
+            "Appearance": program.get("appearance", {}),
+            "Style": program.get("style", {}),
+            "Pose": program.get("pose"),
+            "Expression": program.get("expression"),
+            "Dominant Colors": program.get("dominant_colors", []),
+            "Identity Rules": program.get("identity_rules", []),
         }
 
     def _vision_result(self, state):

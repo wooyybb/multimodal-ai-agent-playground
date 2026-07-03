@@ -14,6 +14,12 @@ class ToolRegistry:
             from agents.adaptive_planner import AdaptivePlanner
 
             self.register("adaptive_planner", AdaptivePlanner())
+            from agents.character_program_builder import CharacterProgramBuilder
+
+            self.register("character_program_builder", CharacterProgramBuilder())
+            from agents.goal_planner import GoalPlanner
+
+            self.register("goal_planner", GoalPlanner())
         except Exception as error:
             print(f"[ToolRegistry] Default tool registration skipped: {error}")
 

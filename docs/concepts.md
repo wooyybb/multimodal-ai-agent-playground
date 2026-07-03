@@ -96,6 +96,26 @@ Multimodal Understanding은 이미지와 텍스트 intent를 함께 해석하는
 
 Reference Image Understanding은 업로드된 이미지를 단순 caption이 아니라 character, style, layout reference로 사용하는 방향입니다. Sprint 48은 이 확장을 위한 provider boundary를 먼저 만들었습니다.
 
+## Character Program
+
+Character Program은 caption을 prompt로 바로 쓰지 않고 character identity, appearance, style, pose, expression, dominant colors, identity rules로 구조화한 데이터입니다. Prompt가 아니라 Context Program에 포함되는 structured object이며, Character Preservation과 Style Transfer를 위한 중간 표현입니다.
+
+## Identity Representation
+
+Identity Representation은 gender, estimated age, species, role, outfit, accessories 같은 character consistency 정보를 유지하기 위한 구조입니다. 생성 prompt가 바뀌어도 동일 캐릭터의 핵심 단서를 보존하는 데 사용됩니다.
+
+## Goal-oriented Planning
+
+Goal-oriented Planning은 execution plan을 만들기 전에 "무엇을 해야 하는가"와 "무엇을 가장 중요하게 유지해야 하는가"를 정리하는 단계입니다. Goal Tree는 main goal, sub goals, priorities, success criteria를 포함합니다.
+
+## Goal Tree
+
+Goal Tree는 prompt가 아니라 planning object입니다. identity, style, composition, lighting, background 같은 priority를 구조화해 Context Program과 Prompt Compiler가 더 일관된 선택을 하도록 돕습니다.
+
+## Priority Planning
+
+Priority Planning은 anime, cinematic, portrait 같은 user intent에 따라 identity, style, lighting, composition의 중요도를 조정하는 과정입니다.
+
 ## Adaptive Planning
 
 Adaptive Planning은 evaluation과 reflection 이후 다음 generation 전략을 다시 세우는 loop입니다. 단순 Retry는 score만 보고 한 번 더 생성하지만, Adaptive Planner는 failure analysis, hypothesis, strategy, context updates, priority change를 만들어 prompt compiler 이전 context를 보강합니다.

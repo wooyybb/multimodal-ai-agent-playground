@@ -4,8 +4,10 @@ from workflow.debug_report import DebugReportManager
 
 class DynamicExecutionEngine:
     DEFAULT_PLAN = [
+        "goal_planner",
         "memory_load",
         "vision",
+        "character_program_builder",
         "memory_retrieval",
             "retrieval",
             "prompt_compressor",
@@ -42,6 +44,10 @@ class DynamicExecutionEngine:
         agent_state.validate()
         state = agent_state.to_dict()
         state.setdefault("agent_trace", [])
+        planner_goal_tree = (state.get("planner_result") or {}).get("goal_tree")
+        if planner_goal_tree and not state.get("goal_tree"):
+            state["goal_tree"] = planner_goal_tree
+            state["agent_trace"].append("GoalPlanner created goal tree")
         planner_reasoning = (state.get("planner_result") or {}).get("context_reasoning")
         if planner_reasoning and not state.get("context_reasoning"):
             state["context_reasoning"] = planner_reasoning
@@ -77,6 +83,30 @@ class DynamicExecutionEngine:
     def _run_memory_load(self, registry, state):
         state["last_run"] = registry.call("memory_load")
 
+    def _run_goal_planner(self, registry, state):
+        if state.get("goal_tree"):
+            print("[ExecutionEngine] Goal tree already available.")
+            return
+        try:
+            self._run_state_step(registry, state, "goal_planner")
+            state["agent_trace"].append("GoalPlanner created goal tree")
+            print("[ExecutionEngine] GoalPlanner created goal tree")
+        except Exception as error:
+            print(f"[ExecutionEngine] GoalPlanner failed: {error}")
+            state["goal_tree"] = {
+                "main_goal": "Generate a coherent high-quality image.",
+                "sub_goals": ["preserve subject identity", "maintain clear composition"],
+                "priorities": {
+                    "identity": 0.8,
+                    "style": 0.7,
+                    "composition": 0.7,
+                    "lighting": 0.6,
+                    "background": 0.5,
+                },
+                "success_criteria": ["generated image matches the user request"],
+            }
+            state["agent_trace"].append("GoalPlanner used fallback goal tree")
+
     def _run_llm_context_reasoner(self, registry, state):
         if not hasattr(registry, "has_tool") or not registry.has_tool("llm_context_reasoner"):
             print("[ExecutionEngine] LLMContextReasoner not registered. Skipping.")
@@ -101,6 +131,16 @@ class DynamicExecutionEngine:
 
     def _run_vision(self, registry, state):
         state["caption"] = registry.call("vision", state.get("image"))
+
+    def _run_character_program_builder(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "character_program_builder")
+            state["agent_trace"].append("CharacterProgramBuilder created character program")
+            print("[ExecutionEngine] CharacterProgramBuilder created character program")
+        except Exception as error:
+            print(f"[ExecutionEngine] CharacterProgramBuilder failed: {error}")
+            state["character_program"] = self._fallback_character_program(state)
+            state["agent_trace"].append("CharacterProgramBuilder used fallback program")
 
     def _run_memory_retrieval(self, registry, state):
         query = f"{state.get('caption', '')} {state.get('user_prompt', '')}".strip()
@@ -307,6 +347,8 @@ class DynamicExecutionEngine:
     def _run_context_program_builder(self, registry, state):
         try:
             self._run_state_step(registry, state, "context_program_builder")
+            self._apply_goal_tree_context(state)
+            self._apply_character_program_context(state)
             state["agent_trace"].append("ContextProgramBuilder created context program")
             print("[ExecutionEngine] ContextProgramBuilder created context program")
         except Exception as error:
@@ -373,6 +415,8 @@ class DynamicExecutionEngine:
 
     def _run_prompt_compiler(self, registry, state):
         try:
+            self._apply_goal_tree_context(state)
+            self._apply_character_program_context(state)
             self._run_state_step(registry, state, "prompt_compiler")
             state["agent_trace"].append("PromptCompiler compiled prompt package")
             print("[ExecutionEngine] PromptCompiler compiled prompt package")
@@ -627,6 +671,135 @@ class DynamicExecutionEngine:
         )
         context_program["adaptive_plan"] = adaptive_plan
         state["context_program"] = context_program
+
+    def _apply_character_program_context(self, state):
+        character_program = state.get("character_program") or {}
+        context_program = state.get("context_program")
+        if not character_program or not isinstance(context_program, dict):
+            return
+
+        characters = context_program.setdefault("characters", {})
+        character_items = characters.setdefault("characters", [])
+        character_hint = self._character_program_hint(character_program)
+        if character_hint and not any(
+            isinstance(item, dict) and item.get("caption_hint") == character_hint
+            for item in character_items
+        ):
+            character_items.append(
+                {
+                    "caption_hint": character_hint,
+                    "character_program": character_program,
+                }
+            )
+
+        identity_rules = character_program.get("identity_rules") or []
+        self._extend_unique(
+            characters.setdefault("preservation_rules", []),
+            identity_rules,
+        )
+        if character_items:
+            characters["character_count"] = max(
+                characters.get("character_count") or 0,
+                len(character_items),
+            )
+        context_program["character_program"] = character_program
+        state["context_program"] = context_program
+
+    def _apply_goal_tree_context(self, state):
+        goal_tree = state.get("goal_tree") or {}
+        context_program = state.get("context_program")
+        if not goal_tree or not isinstance(context_program, dict):
+            return
+
+        context_program["goal_tree"] = goal_tree
+        priorities = goal_tree.get("priorities") or {}
+        success_criteria = goal_tree.get("success_criteria") or []
+
+        quality = context_program.setdefault("quality", {})
+        priority_hints = [
+            f"{name} priority {score}"
+            for name, score in priorities.items()
+            if isinstance(score, (int, float)) and score >= 0.8
+        ]
+        self._extend_unique(
+            quality.setdefault("quality_keywords", []),
+            priority_hints,
+        )
+        self._extend_unique(
+            quality.setdefault("success_criteria", []),
+            success_criteria,
+        )
+
+        characters = context_program.setdefault("characters", {})
+        if priorities.get("identity", 0) >= 0.9:
+            self._extend_unique(
+                characters.setdefault("preservation_rules", []),
+                ["identity is the highest priority"],
+            )
+
+        style = context_program.setdefault("style", {})
+        if priorities.get("style", 0) >= 0.9:
+            self._extend_unique(
+                style.setdefault("rendering_rules", []),
+                ["preserve requested style without reducing identity clarity"],
+            )
+
+        layout = context_program.setdefault("layout", {})
+        if priorities.get("composition", 0) >= 0.8:
+            self._extend_unique(
+                layout.setdefault("composition_rules", []),
+                ["composition priority should remain high"],
+            )
+
+        lighting = context_program.setdefault("lighting", {})
+        if priorities.get("lighting", 0) >= 0.8:
+            self._extend_unique(
+                lighting.setdefault("lighting_keywords", []),
+                ["priority lighting mood"],
+            )
+        state["context_program"] = context_program
+
+    def _character_program_hint(self, character_program):
+        identity = character_program.get("identity") or {}
+        appearance = character_program.get("appearance") or {}
+        parts = [
+            identity.get("gender"),
+            identity.get("role"),
+            appearance.get("outfit"),
+            ", ".join(appearance.get("accessories") or []),
+        ]
+        return ", ".join(str(part) for part in parts if part)
+
+    def _fallback_character_program(self, state):
+        caption = str(state.get("caption") or "")
+        return {
+            "identity": {
+                "gender": "",
+                "estimated_age": "",
+                "species": "",
+                "role": "",
+            },
+            "appearance": {
+                "hair": "",
+                "hair_color": "",
+                "eye_color": "",
+                "skin": "",
+                "outfit": "",
+                "accessories": [],
+            },
+            "style": {
+                "anime": "",
+                "realism": "",
+                "rendering": "",
+            },
+            "pose": "",
+            "expression": "",
+            "dominant_colors": [],
+            "identity_rules": [
+                "preserve recognizable character identity",
+                f"stay faithful to caption: {caption}",
+            ],
+        }
 
     def _extend_unique(self, target, items):
         seen = {str(item).lower() for item in target}

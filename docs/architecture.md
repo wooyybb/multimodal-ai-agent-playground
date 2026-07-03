@@ -19,6 +19,7 @@ Semantic Planning Layer
 -> LLMClient
 -> AIModelService
 -> MockLLM
+-> GoalPlanner
 -> LLMContextReasoner
 
 Execution Layer
@@ -31,6 +32,8 @@ Agent Layer
 -> VisionAgent
 -> VLMRouter
 -> BLIPVLM / FlorenceVLM Skeleton / QwenVLM Skeleton
+-> CharacterProgramBuilder
+-> GoalPlanner
 -> RetrievalAgent
 -> ScenePlanningAgent
 -> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
@@ -86,6 +89,8 @@ flowchart TD
     VR --> BLIP[BLIPVLM]
     VR --> FLO[FlorenceVLM Skeleton]
     VR --> QW[QwenVLM Skeleton]
+    V --> CPB[CharacterProgramBuilder]
+    CPB --> CP[ContextProgramBuilder]
     R --> M1[Memory Retrieval]
     R --> K[Knowledge Retrieval]
     R --> S[Scene and Prompt Specialist Agents]
@@ -116,24 +121,26 @@ flowchart TD
 3. Planner creates an execution plan.
 4. ExecutionEngine dispatches steps through ToolRegistry.
 5. VisionAgent routes image understanding through VLMRouter and stores caption-compatible vision output.
-6. Memory and retrieval add context.
-7. Specialist agents build visual sections.
-8. ContextProgramBuilder creates a provider-independent context program.
-9. ContextProgramValidator checks schema, section types, and provider compatibility.
-10. PromptAssembler creates a canonical prompt.
-11. PromptCritic performs rule-based prompt review.
-12. LLMPromptCriticAgent performs optional semantic prompt critique.
-13. PromptOptimizer reviews and improves prompt quality.
-14. ProviderRouter selects provider from config.
-15. PromptCompiler converts Context Program into a provider-specific prompt package.
-16. ProviderPromptAdapter turns the compiled package into final provider input.
-17. GenerationAgent creates image output.
-18. EvaluationAgent scores generated output.
-19. ReflectionAgent analyzes failure signals.
-20. AdaptivePlanner creates a re-planning strategy and updates context before retry.
-21. RetryAgent decides whether to run the second attempt.
-22. MemoryManager saves history.
-23. DebugReport and Benchmark tools record observability artifacts.
+6. CharacterProgramBuilder converts vision output into structured identity and appearance data.
+7. GoalPlanner creates a Goal Tree with priorities and success criteria.
+8. Memory and retrieval add context.
+9. Specialist agents build visual sections.
+10. ContextProgramBuilder creates a provider-independent context program with Character Program and Goal Tree data.
+11. ContextProgramValidator checks schema, section types, and provider compatibility.
+12. PromptAssembler creates a canonical prompt.
+13. PromptCritic performs rule-based prompt review.
+14. LLMPromptCriticAgent performs optional semantic prompt critique.
+15. PromptOptimizer reviews and improves prompt quality.
+16. ProviderRouter selects provider from config.
+17. PromptCompiler converts Context Program into a provider-specific prompt package.
+18. ProviderPromptAdapter turns the compiled package into final provider input.
+19. GenerationAgent creates image output.
+20. EvaluationAgent scores generated output.
+21. ReflectionAgent analyzes failure signals.
+22. AdaptivePlanner creates a re-planning strategy and updates context before retry.
+23. RetryAgent decides whether to run the second attempt.
+24. MemoryManager saves history.
+25. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
@@ -143,6 +150,8 @@ flowchart TD
 - OpenAIProvider owns optional real OpenAI calls and falls back to MockProvider when unavailable.
 - LLMContextReasoner owns semantic intent interpretation before prompt construction.
 - VLMRouter owns vision provider selection and keeps VisionAgent independent from a specific VLM.
+- CharacterProgramBuilder owns structured character identity representation from vision output.
+- GoalPlanner owns priority planning and success criteria before execution planning.
 - ExecutionEngine owns workflow order.
 - ToolRegistry owns agent lookup and invocation.
 - ContextProgramBuilder owns structured context.

@@ -45,6 +45,8 @@ This project treats image generation as an agentic workflow:
 ```text
 Image / Text
 -> Vision Understanding
+-> Character Program
+-> Goal Tree
 -> LLM Context Reasoning
 -> Context Program
 -> Prompt Compiler
@@ -65,6 +67,12 @@ User
   |
   v
 Vision Layer
+  |
+  v
+Character Program
+  |
+  v
+Goal Planning
   |
   v
 Reasoning Layer
@@ -103,9 +111,11 @@ The framework is intentionally layered. UI, API, planning, execution, tools, pro
 
 ```text
 PlannerAgent
+-> GoalPlanner
 -> DynamicExecutionEngine
 -> ToolRegistry
 -> VisionAgent
+-> CharacterProgramBuilder
 -> LLMContextReasoner
 -> ScenePlanningAgent
 -> Character / Style / Layout / Pose / Expression / Lighting Agents
@@ -131,6 +141,8 @@ PlannerAgent
 | Area | Description |
 | --- | --- |
 | Vision Layer | Uses BLIP by default through a VLM adapter layer; prepared for Florence-2 and Qwen-VL style expansion. |
+| Character Program | Parses caption and vision result into structured identity, appearance, style, pose, expression, colors, and identity rules. |
+| Goal-oriented Planning | Builds a Goal Tree with main goal, sub-goals, priorities, and success criteria before execution planning. |
 | Context Engineering | Converts user intent, caption, memory, retrieval, scene, layout, and provider constraints into a structured Context Program. |
 | Execution Engine | Runs a planner-produced workflow through a registry-based dynamic execution engine. |
 | Memory | Stores previous prompts, scores, reflections, retries, and output paths for future context retrieval. |
@@ -171,6 +183,7 @@ outputs/      Runtime outputs only; do not use as a curated demo archive
 - [x] AI Agent
 - [x] Execution Engine
 - [x] Planner
+- [x] Goal-oriented Planning
 - [x] Reflection
 - [x] Adaptive Planning
 - [x] Tool Calling
@@ -268,6 +281,7 @@ Example run trace:
 
 ```text
 [PlannerAgent] Running...
+[GoalPlanner] Running...
 [ExecutionEngine] Starting dynamic execution...
 [VisionAgent] Running...
 [LLMContextReasoner] Running...

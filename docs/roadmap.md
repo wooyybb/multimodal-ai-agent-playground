@@ -51,10 +51,12 @@
 - Sprint 47: Real OpenAI Provider Integration
 - Sprint 48: Multi-VLM Adapter
 - Sprint 49: Adaptive Planning Loop
+- Sprint 50: Character Program Builder
+- Sprint 51: Goal-oriented Planning
 
 ## Planned Sprints
 
-- Sprint 50: Production hardening
+- Sprint 52: Production hardening
 
 ## Future Work
 
