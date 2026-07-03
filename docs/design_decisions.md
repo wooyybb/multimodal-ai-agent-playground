@@ -96,6 +96,14 @@ Reason: VisionAgent should not be permanently coupled to BLIP. A VLM adapter kee
 
 Future: Replace skeleton providers with real Florence/Qwen integrations and add richer object, style, and character parsing.
 
+## Adaptive Planning Loop
+
+Decision: Add `AdaptivePlanner` between reflection and retry.
+
+Reason: A score-based retry repeats generation without explaining what should change. Adaptive planning turns reflection into a re-planning step by producing failure analysis, hypothesis, strategy, context updates, and priority changes.
+
+Future: Replace rule-based planning with LLM-assisted planning and compare adaptive retries in benchmark reports.
+
 ## Provider Adapter
 
 Decision: Separate `ProviderRouter` and `ProviderPromptAdapter`.

@@ -100,6 +100,7 @@ class DebugReportManager:
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "initial_output_image_path": self._safe(state.get("output_image_path")),
             "initial_score": self._safe(state.get("score")),
+            "adaptive_plan": self._safe(state.get("adaptive_plan")),
             "retry_needed": self._safe(state.get("retry_needed")),
             "raw_suggested_prompt": self._safe(state.get("raw_suggested_prompt")),
             "retry_prompt": self._safe(state.get("retry_prompt")),
@@ -154,6 +155,11 @@ class DebugReportManager:
         self._append_block(lines, "OPTIMIZED PROMPT", state.get("optimized_prompt"))
         self._append_block(
             lines,
+            "ADAPTIVE PLAN",
+            self._adaptive_plan_preview(state.get("adaptive_plan")),
+        )
+        self._append_block(
+            lines,
             "COMPILED PROMPT PACKAGE",
             self._compiled_prompt_package_preview(state.get("compiled_prompt_package")),
         )
@@ -205,6 +211,17 @@ class DebugReportManager:
             "negative_prompt": package.get("negative_prompt"),
             "prompt_blocks": package.get("prompt_blocks", {}),
             "compiler_notes": package.get("compiler_notes", []),
+        }
+
+    def _adaptive_plan_preview(self, plan):
+        plan = plan or {}
+        return {
+            "Failure Analysis": plan.get("failure_analysis"),
+            "Hypothesis": plan.get("hypothesis"),
+            "Strategy": plan.get("strategy"),
+            "Context Updates": plan.get("context_updates", []),
+            "Priority Change": plan.get("priority_change", []),
+            "Confidence": plan.get("confidence"),
         }
 
     def _vision_result(self, state):

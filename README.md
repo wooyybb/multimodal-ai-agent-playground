@@ -53,6 +53,7 @@ User
 -> ProviderPromptAdapter
 -> GenerationAgent
 -> EvaluationAgent
+-> AdaptivePlanner
 -> ReflectionAgent / RetryAgent
 -> MemoryManager
 -> DebugReport / BenchmarkReport
@@ -79,9 +80,11 @@ User
 15. `ProviderPromptAdapter` converts the compiled package into final provider input.
 16. `GenerationAgent` generates the image.
 17. `EvaluationAgent` scores the result with CLIP when available.
-18. `ReflectionAgent` and `RetryAgent` decide whether a retry is needed.
-19. `MemoryManager` saves run history.
-20. Debug reports and benchmark reports make the run inspectable.
+18. `ReflectionAgent` analyzes the result.
+19. `AdaptivePlanner` creates a rule-based re-planning strategy before retry.
+20. `RetryAgent` decides whether the adaptive retry should run.
+21. `MemoryManager` saves run history.
+22. Debug reports and benchmark reports make the run inspectable.
 
 ## Core Features
 
@@ -141,6 +144,12 @@ Never commit real API keys, `.env` files, or token values.
 ### Execution Engine
 
 `DynamicExecutionEngine` dispatches each step and supports state-based agents through `run(state) -> dict`.
+
+### Adaptive Planning Loop
+
+`AdaptivePlanner` runs after reflection and before retry. It analyzes failure signals such as low CLIP score, weak subject identity, layout mismatch, or style conflict, then writes an `adaptive_plan` with failure analysis, hypothesis, strategy, context updates, priority changes, and confidence.
+
+When retry is needed, the execution engine applies these context updates to the current context program and re-runs the prompt compiler/provider adapter before the second generation attempt.
 
 ### Memory
 

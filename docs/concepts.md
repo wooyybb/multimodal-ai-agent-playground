@@ -96,6 +96,14 @@ Multimodal Understanding은 이미지와 텍스트 intent를 함께 해석하는
 
 Reference Image Understanding은 업로드된 이미지를 단순 caption이 아니라 character, style, layout reference로 사용하는 방향입니다. Sprint 48은 이 확장을 위한 provider boundary를 먼저 만들었습니다.
 
+## Adaptive Planning
+
+Adaptive Planning은 evaluation과 reflection 이후 다음 generation 전략을 다시 세우는 loop입니다. 단순 Retry는 score만 보고 한 번 더 생성하지만, Adaptive Planner는 failure analysis, hypothesis, strategy, context updates, priority change를 만들어 prompt compiler 이전 context를 보강합니다.
+
+## Re-Planning
+
+Re-Planning은 기존 prompt를 그대로 재사용하지 않고 실패 원인에 맞춰 character priority, layout simplicity, style weight, camera framing 같은 planning 요소를 수정하는 과정입니다.
+
 ## Future Work
 
 - Context Program schema validation

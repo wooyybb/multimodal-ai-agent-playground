@@ -37,6 +37,7 @@ class PlannerAgent:
             "generation",
             "evaluation",
             "reflection",
+            "adaptive_planner",
             "retry",
             "memory_save",
         ]

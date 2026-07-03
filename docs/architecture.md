@@ -50,6 +50,7 @@ Provider Layer
 
 Evaluation Layer
 -> EvaluationAgent
+-> AdaptivePlanner
 -> ReflectionAgent
 -> RetryAgent
 
@@ -100,7 +101,9 @@ flowchart TD
     PPA --> G[GenerationAgent]
     G --> EV[EvaluationAgent]
     EV --> RF[ReflectionAgent]
-    RF --> RT[RetryAgent]
+    RF --> AP[AdaptivePlanner]
+    AP --> PCMP
+    AP --> RT[RetryAgent]
     RT --> MM[MemoryManager]
     MM --> DR[Debug Report]
     DR --> B[Benchmark Report]
@@ -126,9 +129,11 @@ flowchart TD
 16. ProviderPromptAdapter turns the compiled package into final provider input.
 17. GenerationAgent creates image output.
 18. EvaluationAgent scores generated output.
-19. ReflectionAgent and RetryAgent decide retry.
-20. MemoryManager saves history.
-21. DebugReport and Benchmark tools record observability artifacts.
+19. ReflectionAgent analyzes failure signals.
+20. AdaptivePlanner creates a re-planning strategy and updates context before retry.
+21. RetryAgent decides whether to run the second attempt.
+22. MemoryManager saves history.
+23. DebugReport and Benchmark tools record observability artifacts.
 
 ## Key Boundaries
 
@@ -146,6 +151,7 @@ flowchart TD
 - PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
 - PromptCompiler owns context-program-to-provider-package compilation.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
+- AdaptivePlanner owns rule-based failure analysis and re-planning between reflection and retry.
 - Generation, evaluation, memory, benchmark, and debug report stay separated.
 
 ## Future Work

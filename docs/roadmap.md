@@ -50,11 +50,11 @@
 - Sprint 46: AI Model Service Layer
 - Sprint 47: Real OpenAI Provider Integration
 - Sprint 48: Multi-VLM Adapter
+- Sprint 49: Adaptive Planning Loop
 
 ## Planned Sprints
 
-- Sprint 49: Detailed Vision Parsing or Multi-Metric Evaluation
-- Sprint 50: Production
+- Sprint 50: Production hardening
 
 ## Future Work
 

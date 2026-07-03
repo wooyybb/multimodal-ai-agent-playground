@@ -27,9 +27,10 @@ class DynamicExecutionEngine:
             "provider_router",
             "prompt_compiler",
             "provider_prompt_adapter",
-            "generation",
+        "generation",
         "evaluation",
         "reflection",
+        "adaptive_planner",
         "retry",
         "memory_save",
     ]
@@ -432,6 +433,25 @@ class DynamicExecutionEngine:
         )
         state["retry_needed"] = state["reflection_needs_retry"]
 
+    def _run_adaptive_planner(self, registry, state):
+        state.setdefault("agent_trace", [])
+        try:
+            self._run_state_step(registry, state, "adaptive_planner")
+            self._apply_adaptive_context_updates(state)
+            state["agent_trace"].append("AdaptivePlanner created re-planning strategy")
+            print("[ExecutionEngine] AdaptivePlanner created re-planning strategy.")
+        except Exception as error:
+            print(f"[ExecutionEngine] AdaptivePlanner failed: {error}")
+            state["adaptive_plan"] = {
+                "failure_analysis": "adaptive planning unavailable",
+                "hypothesis": str(error),
+                "strategy": "fallback to existing retry prompt",
+                "context_updates": [],
+                "priority_change": [],
+                "confidence": 0.0,
+            }
+            state["agent_trace"].append("AdaptivePlanner skipped after error")
+
     def _run_retry(self, registry, state):
         retry_needed = registry.call("retry", state.get("score", 0.0))
         state["retry_needed"] = retry_needed
@@ -440,6 +460,7 @@ class DynamicExecutionEngine:
 
         if retry_needed:
             print("[ExecutionEngine] Retry needed. Starting second attempt.")
+            self._prepare_adaptive_retry_prompt(registry, state)
             raw_suggested_prompt = state.get("raw_suggested_prompt") or state.get(
                 "final_prompt",
                 "",
@@ -497,6 +518,7 @@ class DynamicExecutionEngine:
                     "provider_negative_prompt": state.get("provider_negative_prompt"),
                     "adapter_notes": state.get("adapter_notes"),
                     "reflection": state.get("reflection"),
+                    "adaptive_plan": state.get("adaptive_plan"),
                     "retry_needed": state.get("retry_needed"),
                     "retry_prompt": (
                         state.get("retry_prompt")
@@ -536,6 +558,83 @@ class DynamicExecutionEngine:
             state["best_score"] = score
 
         print(f"[ExecutionEngine] Best score selected: {state.get('best_score')}")
+
+    def _prepare_adaptive_retry_prompt(self, registry, state):
+        state.setdefault("agent_trace", [])
+        adaptive_plan = state.get("adaptive_plan") or {}
+        if not adaptive_plan:
+            return
+
+        print("[ExecutionEngine] Applying adaptive re-planning before retry.")
+        self._apply_adaptive_context_updates(state)
+        try:
+            self._run_prompt_compiler(registry, state)
+            self._run_provider_prompt_adapter(registry, state)
+            compiled_prompt = (
+                state.get("provider_prompt")
+                or state.get("final_prompt")
+                or state.get("raw_suggested_prompt")
+            )
+            strategy = adaptive_plan.get("strategy")
+            if strategy:
+                compiled_prompt = f"{compiled_prompt}, adaptive strategy: {strategy}"
+            state["raw_suggested_prompt"] = compiled_prompt
+            state["agent_trace"].append("AdaptivePlanner updated retry prompt package")
+            print("[ExecutionEngine] Adaptive prompt package prepared.")
+        except Exception as error:
+            print(f"[ExecutionEngine] Adaptive prompt package failed: {error}")
+            state["agent_trace"].append(f"adaptive prompt package failed: {error}")
+
+    def _apply_adaptive_context_updates(self, state):
+        adaptive_plan = state.get("adaptive_plan") or {}
+        context_program = state.get("context_program")
+        if not adaptive_plan or not isinstance(context_program, dict):
+            return
+
+        updates = adaptive_plan.get("context_updates") or []
+        priorities = adaptive_plan.get("priority_change") or []
+        if not updates and not priorities:
+            return
+
+        characters = context_program.setdefault("characters", {})
+        layout = context_program.setdefault("layout", {})
+        style = context_program.setdefault("style", {})
+        quality = context_program.setdefault("quality", {})
+
+        self._extend_unique(
+            characters.setdefault("preservation_rules", []),
+            [
+                item
+                for item in updates
+                if "subject" in item or "identity" in item or "caption" in item
+            ],
+        )
+        self._extend_unique(
+            layout.setdefault("composition_rules", []),
+            [
+                item
+                for item in updates
+                if "layout" in item or "camera" in item or "framing" in item
+            ],
+        )
+        self._extend_unique(
+            style.setdefault("rendering_rules", []),
+            [item for item in updates if "style" in item],
+        )
+        self._extend_unique(
+            quality.setdefault("quality_keywords", []),
+            ["adaptive re-planning", *priorities],
+        )
+        context_program["adaptive_plan"] = adaptive_plan
+        state["context_program"] = context_program
+
+    def _extend_unique(self, target, items):
+        seen = {str(item).lower() for item in target}
+        for item in items:
+            key = str(item).lower()
+            if item and key not in seen:
+                target.append(item)
+                seen.add(key)
 
     def _compress_prompt(self, registry, prompt, max_words, label):
         compressor = getattr(registry, "_tools", {}).get("prompt_compressor")

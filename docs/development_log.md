@@ -120,6 +120,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added BLIPVLM as the default provider plus Florence-2 and Qwen-VL skeleton providers.
 - Debug reports now include structured `vision_result` metadata when available.
 
+## Sprint 49
+
+- Added `AdaptivePlanner` after `ReflectionAgent` and before `RetryAgent`.
+- Added rule-based failure analysis, hypothesis generation, strategy, context updates, priority changes, and confidence.
+- Retry now applies adaptive context updates and re-runs prompt compiler/provider adapter before the second generation attempt.
+- Debug reports now include `adaptive_plan`.
+
 ## Future Work
 
 - Keep this file short.

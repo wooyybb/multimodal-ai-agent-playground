@@ -11,6 +11,9 @@ class ToolRegistry:
             from agents.llm_context_reasoner import LLMContextReasoner
 
             self.register("llm_context_reasoner", LLMContextReasoner())
+            from agents.adaptive_planner import AdaptivePlanner
+
+            self.register("adaptive_planner", AdaptivePlanner())
         except Exception as error:
             print(f"[ToolRegistry] Default tool registration skipped: {error}")
 
