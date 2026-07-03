@@ -404,3 +404,16 @@
 - Benchmark dashboard
 - Prompt A/B testing
 - Docker packaging
+
+## Sprint38: Run Comparison Report - Done
+
+- Markdown comparison report generator added
+- Static HTML comparison report generator added
+- Latest benchmark result is loaded automatically
+- CLIP score interpretation note added
+
+## Next Sprint Proposal
+
+- API Schema expansion
+- Docker packaging
+- Benchmark dashboard

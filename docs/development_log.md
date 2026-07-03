@@ -324,3 +324,10 @@
 - Added `benchmark/benchmark_runner.py`.
 - Added benchmark result output under `benchmark/results/`.
 - Benchmark records score, best score, retry status, provider, prompt length, image path, and debug report paths.
+
+## Sprint38: Run Comparison Report
+
+- Added `benchmark/report_generator.py`.
+- Added Markdown report generation under `benchmark/reports/`.
+- Added static HTML report generation under `benchmark/reports/`.
+- Report summarizes total runs, success/failure count, average best score, retry rate, best run, failed runs, and result table.

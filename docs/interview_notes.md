@@ -534,3 +534,17 @@ A. 한 prompt가 실패해도 전체 benchmark는 계속 진행합니다. 실패
 
 Q. Debug Report와 Benchmark는 어떻게 연결되나요?
 A. Benchmark 결과에는 각 run의 `debug_report_path`와 `prompt_preview_path`가 포함됩니다. 점수가 낮은 항목은 해당 report를 열어 prompt lifecycle을 추적할 수 있습니다.
+
+## Sprint38 Interview Notes
+
+Q. Benchmark Report는 왜 만들었나요?
+A. benchmark 결과 JSON은 기계가 읽기 좋지만 사람이 비교하기 어렵습니다. Markdown/HTML report는 score, retry, provider, debug path를 한눈에 비교할 수 있게 합니다.
+
+Q. CLIP score만으로 품질을 판단할 수 있나요?
+A. 어렵습니다. CLIP score는 prompt-image semantic similarity에 가깝고, 구도나 미감 같은 absolute image quality와는 다릅니다.
+
+Q. Debug Report와 Benchmark Report의 차이는 무엇인가요?
+A. Debug Report는 한 run의 세부 lifecycle을 보여주고, Benchmark Report는 여러 run을 비교합니다.
+
+Q. 실험 결과를 어떻게 비교했나요?
+A. benchmark result JSON을 읽어 total, average best_score, retry rate, best/worst run, failed runs, result table로 정리했습니다.

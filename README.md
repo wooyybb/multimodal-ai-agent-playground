@@ -153,6 +153,21 @@ benchmark/results/benchmark_YYYYMMDD_HHMMSS.json
 
 Each result records prompt id, provider, score, best score, retry status, image path, debug report path, prompt preview path, and prompt length.
 
+Generate a comparison report from the latest benchmark result:
+
+```bash
+python -m benchmark.report_generator
+```
+
+Reports are saved under:
+
+```text
+benchmark/reports/report_YYYYMMDD_HHMMSS.md
+benchmark/reports/report_YYYYMMDD_HHMMSS.html
+```
+
+CLIP score is useful for prompt-image semantic similarity, but it should not be treated as absolute visual quality. Use benchmark reports together with debug reports and prompt previews.
+
 ## Project Structure
 
 ```text
@@ -229,6 +244,7 @@ Runtime images are copied only when the corresponding source files exist. Do not
 - Sprint 35: FastAPI Service Layer
 - Sprint 36: Prompt Debug Report and Trace Viewer
 - Sprint 37: Benchmark Runner
+- Sprint 38: Run Comparison Report
 
 ## Roadmap
 
