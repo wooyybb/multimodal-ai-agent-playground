@@ -365,3 +365,16 @@
 - AgentState adoption inside more agents
 - Graph State
 - Multi-session state management
+
+## Sprint35: FastAPI Service Layer - Done
+
+- FastAPI app added
+- REST routes added
+- Service layer added
+- Swagger/OpenAPI available through FastAPI
+
+## Next Sprint Proposal
+
+- API authentication
+- Async job queue
+- Docker/FastAPI deployment

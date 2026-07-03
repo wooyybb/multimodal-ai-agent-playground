@@ -113,6 +113,26 @@ python main.py
 
 This launches the Gradio UI. Upload an image, enter a prompt, and run the agent workflow.
 
+Run the FastAPI service layer:
+
+```bash
+uvicorn api.app:app --reload
+```
+
+Swagger UI:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+FastAPI endpoints:
+
+```text
+GET  /
+GET  /health
+POST /generate
+```
+
 ## Project Structure
 
 ```text
@@ -125,6 +145,7 @@ knowledge/   Knowledge and style retrieval resources
 config/      Provider capability configuration
 docs/        Architecture notes, sprint book, decisions, prompts, reviews
 ui/          Gradio application
+api/         FastAPI REST service layer
 outputs/     Runtime generated outputs
 ```
 
@@ -166,6 +187,7 @@ outputs/     Runtime generated outputs
 - Sprint 31: PromptOptimizerAgent
 - Sprint 32: Intelligent Prompt Optimizer
 - Sprint 33: LLM Prompt Optimizer Interface
+- Sprint 35: FastAPI Service Layer
 
 ## Roadmap
 
@@ -176,7 +198,7 @@ Planned future work:
 - Multi-provider generation
 - Reference image handling improvements
 - Image editing workflow
-- Docker / FastAPI deployment
+- Docker / FastAPI deployment hardening
 
 ## Notes
 

@@ -462,3 +462,22 @@ ExecutionEngine
 ```
 
 The existing Agent code still receives dict-style state in this Sprint. `AgentState` acts as a framework core boundary that centralizes common fields, supports validation warnings, preserves unknown keys in `extra`, and keeps the current workflow compatible.
+
+## Sprint35 FastAPI Service Layer
+
+Sprint35 adds a REST service layer without changing the AI Agent framework.
+
+```text
+Gradio UI
+-> ExecutionEngine
+-> Agents
+
+FastAPI
+-> REST API
+-> Service Layer
+-> OrchestratorAgent
+-> ExecutionEngine
+-> Agents
+```
+
+FastAPI exposes `GET /`, `GET /health`, and `POST /generate`. Swagger UI is available at `/docs` and ReDoc at `/redoc`.
