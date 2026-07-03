@@ -503,3 +503,25 @@ Interface-first Design defines inputs, outputs, and failure behavior before inte
 ### Optional AI Service Integration
 
 Optional integration means the system can run without the external service while still exposing a clear extension point.
+
+## Sprint36 Concepts
+
+### Observability
+
+Observability means making internal agent decisions and intermediate artifacts visible after a run.
+
+### Trace Logging
+
+Trace Logging records which agents ran and what major workflow steps completed.
+
+### Prompt Lifecycle
+
+Prompt Lifecycle tracks how user input becomes scene plan, canonical prompt, optimized prompt, provider prompt, evaluation prompt, and retry prompt.
+
+### Reproducibility
+
+Reproducibility improves when report files preserve prompts, scores, outputs, and agent trace for a run.
+
+### Debug Report
+
+Debug Report is a structured record of one generation run, stored separately from memory history.

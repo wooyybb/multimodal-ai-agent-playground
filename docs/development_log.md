@@ -309,3 +309,11 @@
 - Added `AgentState.from_dict()`, `to_dict()`, `update_from_dict()`, and `validate()`.
 - ExecutionEngine now builds and validates AgentState at workflow boundaries.
 - ToolRegistry state-based execution now accepts dict and AgentState inputs.
+
+## Sprint36: Prompt Debug Report and Trace Viewer
+
+- Added `DebugReportManager`.
+- Added `outputs/runs/run_*/report.json`.
+- Added `outputs/runs/run_*/prompt_preview.txt`.
+- Added best-effort copying for initial, retry, and best images.
+- Memory history now stores debug report paths when available.

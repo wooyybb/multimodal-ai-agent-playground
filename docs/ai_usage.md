@@ -158,4 +158,8 @@ Codex was used to implement the Critic-Optimizer pattern with explicit rule cons
 
 Codex was used to build an interface-first LLM optimizer structure without making external API calls. The prompt constrained the implementation to disabled/mock/fallback behavior so architecture could improve without introducing secret handling or network dependency.
 
+## Sprint36 AI Usage
+
+Codex was used to add an observability layer with constrained file scope. The implementation focused on debug report generation, safe serialization, and best-effort behavior without changing agents or tools.
+
 Codex was guided with explicit provider selection rules and fallback policy. This kept routing deterministic and testable.

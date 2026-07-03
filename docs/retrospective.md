@@ -395,6 +395,24 @@
 - Prompt benchmark
 - Real LLM provider integration
 
+## Sprint36 Retrospective
+
+### 잘된 점
+
+- Run-level artifacts are now easier to inspect.
+- Debug report failures do not break the main workflow.
+
+### 아쉬운 점
+
+- There is no UI trace viewer yet.
+- No retention policy exists for old run folders.
+
+### 다음 Sprint
+
+- Benchmark Runner
+- UI Trace Viewer
+- Docker packaging
+
 ### 잘된 점
 
 - Provider selection responsibility is now explicit.

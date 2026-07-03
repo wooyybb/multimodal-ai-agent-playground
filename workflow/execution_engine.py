@@ -1,4 +1,5 @@
 from workflow.agent_state import AgentState
+from workflow.debug_report import DebugReportManager
 
 
 class DynamicExecutionEngine:
@@ -385,6 +386,7 @@ class DynamicExecutionEngine:
     def _run_memory_save(self, registry, state):
         state["memory_saved"] = False
         state["history_path"] = None
+        self._save_debug_report(state)
 
         try:
             state["history_path"] = registry.call(
@@ -417,6 +419,9 @@ class DynamicExecutionEngine:
                     "best_prompt": state.get("best_prompt"),
                     "best_score": state.get("best_score"),
                     "best_output_image_path": state.get("best_output_image_path"),
+                    "debug_report_path": state.get("debug_report_path"),
+                    "prompt_preview_path": state.get("prompt_preview_path"),
+                    "run_dir": state.get("run_dir"),
                 },
             )
             state["memory_saved"] = True
@@ -520,3 +525,16 @@ class DynamicExecutionEngine:
         if isinstance(section, list):
             return ", ".join(str(item) for item in section[:5])
         return str(section)
+
+    def _save_debug_report(self, state):
+        try:
+            manager = DebugReportManager()
+            state["run_dir"] = manager.create_run_dir()
+            copied_paths = manager.copy_output_images(state)
+            state.update(copied_paths)
+            state["prompt_preview_path"] = manager.save_prompt_preview(state)
+            state["agent_trace"].append("Debug report saved")
+            state["debug_report_path"] = manager.save_report(state)
+        except Exception as error:
+            print(f"[DebugReport] Save failed: {error}")
+            state["agent_trace"].append(f"debug_report failed: {error}")

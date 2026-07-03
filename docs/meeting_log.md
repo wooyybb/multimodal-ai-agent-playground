@@ -121,3 +121,7 @@ The team decided to add PromptOptimizerAgent because PromptCriticAgent only diag
 ## Sprint33 Meeting Log
 
 The project decided to extend prompt optimization with an LLM-ready interface. The implementation starts with disabled and mock modes so the architecture can be validated without external API calls.
+
+## Sprint36 Meeting Log
+
+The project prioritized observability before deployment hardening. Debug reports make it easier to explain, compare, and improve generation runs before adding Docker or production infrastructure.

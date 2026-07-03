@@ -378,3 +378,16 @@
 - API authentication
 - Async job queue
 - Docker/FastAPI deployment
+
+## Sprint36: Prompt Debug Report and Trace Viewer - Done
+
+- DebugReportManager added
+- report.json and prompt_preview.txt saved per run
+- initial/retry/best images copied when available
+- memory history links to debug artifacts
+
+## Next Sprint Proposal
+
+- Benchmark Runner
+- UI Trace Viewer
+- Docker packaging

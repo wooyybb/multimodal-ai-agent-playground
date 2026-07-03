@@ -379,3 +379,17 @@ The rule-based optimizer remains deterministic and debuggable. The LLM optimizer
 ### Why avoid external API calls in this Sprint?
 
 This Sprint is about architecture, not vendor integration. Avoiding API calls keeps the project runnable without keys and prevents accidental credential handling.
+
+## Sprint36 Decisions
+
+### Why keep Debug Report separate from memory/history?
+
+Memory history is optimized for lightweight retrieval across runs. Debug reports are larger observability artifacts for one specific run. Keeping them separate prevents memory from becoming too heavy while still linking paths from history.
+
+### Why save both prompt_preview.txt and report.json?
+
+`report.json` is structured and machine-readable. `prompt_preview.txt` is readable during interviews, debugging, and manual prompt comparison.
+
+### Why save reports best-effort?
+
+Observability should not break generation. If report serialization or image copying fails, the workflow should continue and record a trace warning.

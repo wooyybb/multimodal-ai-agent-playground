@@ -481,3 +481,18 @@ FastAPI
 ```
 
 FastAPI exposes `GET /`, `GET /health`, and `POST /generate`. Swagger UI is available at `/docs` and ReDoc at `/redoc`.
+
+## Sprint36 Observability / Debug Report Layer
+
+Sprint36 adds a best-effort debug report layer after generation, retry, and memory preparation.
+
+```text
+ExecutionEngine
+-> DebugReportManager
+-> outputs/runs/run_YYYYMMDD_HHMMSS/
+   -> report.json
+   -> prompt_preview.txt
+   -> initial.png / retry.png / best.png
+```
+
+The debug report captures prompt lifecycle artifacts: scene plan, prompt sections, critic report, optimizer report, provider prompt, evaluation prompt, scores, retry result, and agent trace. Report failures do not fail the workflow.

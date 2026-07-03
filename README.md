@@ -151,6 +151,24 @@ outputs/     Runtime generated outputs
 
 `outputs/` is runtime output storage. Do not treat the whole folder as curated demo assets for Git.
 
+## Debug Reports
+
+Each generation run can save a debug report under:
+
+```text
+outputs/runs/run_*/report.json
+outputs/runs/run_*/prompt_preview.txt
+outputs/runs/run_*/initial.png
+outputs/runs/run_*/retry.png
+outputs/runs/run_*/best.png
+```
+
+`report.json` stores structured intermediate state such as scene plan, prompt sections, prompt critic report, optimized prompt, provider prompt, evaluation prompt, score, retry result, and agent trace.
+
+`prompt_preview.txt` is a human-readable summary for interviews and debugging. It shows the prompt lifecycle from user request to provider prompt and evaluation result.
+
+Runtime images are copied only when the corresponding source files exist. Do not commit the whole `outputs/` directory.
+
 ## Sprint History
 
 - Sprint 00: Project skeleton
@@ -188,6 +206,7 @@ outputs/     Runtime generated outputs
 - Sprint 32: Intelligent Prompt Optimizer
 - Sprint 33: LLM Prompt Optimizer Interface
 - Sprint 35: FastAPI Service Layer
+- Sprint 36: Prompt Debug Report and Trace Viewer
 
 ## Roadmap
 

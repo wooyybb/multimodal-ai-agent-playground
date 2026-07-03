@@ -231,6 +231,13 @@ Memory가 단순 저장 파일에서 명시적 interface로 바뀌었습니다. 
 - Disabled mode keeps the existing optimized prompt.
 - Mock mode performs deterministic local cleanup for testability.
 - Future risk: real API integration will need timeout, cost, and credential handling.
+
+## Sprint36 Code Review
+
+- DebugReportManager sanitizes values before JSON serialization.
+- Image copying is best-effort and skips missing files.
+- ExecutionEngine stores debug paths before memory save so memory can link to reports.
+- Risk: outputs/runs can grow quickly and may need retention policy later.
 - ProviderPromptAdapter no longer receives a hardcoded provider in ExecutionEngine.
 - Unsupported providers fall back to FLUX.
 - Remaining risk: available providers are currently hardcoded as `["flux"]`.

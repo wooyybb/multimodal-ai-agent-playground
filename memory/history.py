@@ -159,6 +159,9 @@ class MemoryManager:
                 "best_output_image_path": record.get(
                     "best_output_image_path"
                 ),
+                "debug_report_path": record.get("debug_report_path"),
+                "prompt_preview_path": record.get("prompt_preview_path"),
+                "run_dir": record.get("run_dir"),
             }
 
         return {
