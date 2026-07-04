@@ -54,10 +54,11 @@
 - Sprint 50: Character Program Builder
 - Sprint 51: Goal-oriented Planning
 - Sprint 53: Strategy Selector
+- Sprint 54: Self Verification
 
 ## Planned Sprints
 
-- Sprint 54: Production hardening
+- Sprint 55: Real LLM Reasoning or Multi-Metric Evaluation
 
 ## Future Work
 

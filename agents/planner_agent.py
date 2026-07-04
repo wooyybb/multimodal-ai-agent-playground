@@ -47,6 +47,7 @@ class PlannerAgent:
             "generation",
             "evaluation",
             "reflection",
+            "self_verification",
             "adaptive_planner",
             "retry",
             "memory_save",

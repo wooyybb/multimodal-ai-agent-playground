@@ -7,16 +7,17 @@ class StrategySelector:
         prompt = str(state.get("final_prompt") or "")
         caption = str(state.get("caption") or "")
         text = f"{reflection} {prompt} {caption}".lower()
+        verification = state.get("self_verification") or {}
 
-        candidates = self._candidate_strategies(score, text)
-        selected = max(candidates, key=lambda item: item.get("score", 0.0))
+        candidates = self._candidate_strategies(score, text, verification)
+        selected = self._select_strategy(candidates, verification)
         print(f"[StrategySelector] Selected: {selected.get('id')} - {selected.get('title')}")
         return {
             "candidate_strategies": candidates,
             "selected_strategy": selected,
         }
 
-    def _candidate_strategies(self, score, text):
+    def _candidate_strategies(self, score, text, verification):
         candidates = [
             self._identity_strategy(score, text),
             self._layout_strategy(score, text),
@@ -24,7 +25,17 @@ class StrategySelector:
         ]
         if "style" in text or "anime" in text or "webtoon" in text:
             candidates.append(self._style_balance_strategy(score, text))
+        if verification and not verification.get("needs_replanning", True):
+            candidates.append(self._low_risk_strategy())
+        self._apply_verification_bias(candidates, verification)
         return candidates
+
+    def _select_strategy(self, candidates, verification):
+        if verification and not verification.get("needs_replanning", True):
+            low_risk = [item for item in candidates if item.get("id") == "S5"]
+            if low_risk:
+                return low_risk[0]
+        return max(candidates, key=lambda item: item.get("score", 0.0))
 
     def _identity_strategy(self, score, text):
         bonus = 0.12 if self._has_identity_signal(text) else 0.0
@@ -69,6 +80,38 @@ class StrategySelector:
             "risk": "May produce a less stylized image.",
             "score": self._clamp(0.64 + bonus + self._low_score_bonus(score)),
         }
+
+    def _low_risk_strategy(self):
+        return {
+            "id": "S5",
+            "title": "Keep current plan with minimal adjustments",
+            "reason": "Self verification passed or does not require replanning.",
+            "expected_effect": "Avoids unnecessary prompt drift while preserving current strengths.",
+            "risk": "May not fix subtle issues.",
+            "score": 0.88,
+        }
+
+    def _apply_verification_bias(self, candidates, verification):
+        if not verification:
+            return
+        issues = " ".join(verification.get("blocking_issues") or []).lower()
+        findings = " ".join(verification.get("verification_findings") or []).lower()
+        text = f"{issues} {findings}"
+        for candidate in candidates:
+            strategy_id = candidate.get("id")
+            if strategy_id == "S1" and any(
+                term in text for term in ("identity", "character", "outfit", "accessories")
+            ):
+                candidate["score"] = self._clamp(candidate.get("score", 0) + 0.12)
+                candidate["reason"] += " Self verification flagged identity preservation."
+            elif strategy_id == "S2" and any(
+                term in text for term in ("context", "composition", "layout")
+            ):
+                candidate["score"] = self._clamp(candidate.get("score", 0) + 0.08)
+                candidate["reason"] += " Self verification flagged context or layout consistency."
+            elif strategy_id == "S4" and "conflict" in text:
+                candidate["score"] = self._clamp(candidate.get("score", 0) + 0.1)
+                candidate["reason"] += " Self verification found semantic conflict."
 
     def _has_identity_signal(self, text):
         return any(

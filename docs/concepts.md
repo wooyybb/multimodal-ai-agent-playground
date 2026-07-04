@@ -124,6 +124,14 @@ Adaptive Planning은 evaluation과 reflection 이후 다음 generation 전략을
 
 Strategy Selection은 reflection과 hypothesis를 바탕으로 여러 candidate strategy를 만들고, rule 기반 score가 가장 높은 전략을 선택하는 단계입니다. 선택된 전략은 Adaptive Planning과 Context Program에 반영됩니다.
 
+## Self Verification
+
+Self Verification은 evaluation 이후 현재 state가 Goal Tree와 Context Program의 목표를 얼마나 만족하는지 점검하는 품질 관리 단계입니다. Evaluation은 image-text score를 계산하고, Self Verification은 goal satisfaction, prompt consistency, context consistency, strategy necessity를 rule 기반으로 확인합니다.
+
+## Goal Satisfaction Check
+
+Goal Satisfaction Check는 best score, goal priority, provider prompt, context validation, prompt report를 함께 보고 재계획이 필요한지 판단합니다.
+
 ## Candidate Strategy
 
 Candidate Strategy는 가능한 해결 방향입니다. 예를 들어 identity 보존 강화, camera/composition 단순화, lighting coherence 강화, style과 identity 균형 조정 같은 후보가 될 수 있습니다.

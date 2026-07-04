@@ -32,6 +32,7 @@ class DynamicExecutionEngine:
         "generation",
         "evaluation",
         "reflection",
+        "self_verification",
         "strategy_selector",
         "adaptive_planner",
         "retry",
@@ -518,6 +519,27 @@ class DynamicExecutionEngine:
             state["selected_strategy"] = fallback
             state["agent_trace"].append("StrategySelector used fallback strategy")
 
+    def _run_self_verification(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "self_verification")
+            state["agent_trace"].append(
+                "SelfVerificationAgent checked goal satisfaction"
+            )
+            print("[ExecutionEngine] SelfVerificationAgent checked goal satisfaction")
+        except Exception as error:
+            print(f"[ExecutionEngine] SelfVerificationAgent failed: {error}")
+            state["self_verification"] = {
+                "overall_pass": False,
+                "goal_satisfaction_score": 0,
+                "prompt_consistency_score": 0,
+                "context_consistency_score": 0,
+                "needs_replanning": True,
+                "verification_findings": [],
+                "blocking_issues": [str(error)],
+                "recommendations": ["fallback to strategy selection"],
+            }
+            state["agent_trace"].append("SelfVerificationAgent used fallback result")
+
     def _run_retry(self, registry, state):
         retry_needed = registry.call("retry", state.get("score", 0.0))
         state["retry_needed"] = retry_needed
@@ -916,6 +938,14 @@ class DynamicExecutionEngine:
         if "memory_retrieval" not in normalized and "vision" in normalized:
             insert_at = normalized.index("vision") + 1
             normalized.insert(insert_at, "memory_retrieval")
+
+        if "self_verification" not in normalized:
+            if "strategy_selector" in normalized:
+                insert_at = normalized.index("strategy_selector")
+                normalized.insert(insert_at, "self_verification")
+            elif "adaptive_planner" in normalized:
+                insert_at = normalized.index("adaptive_planner")
+                normalized.insert(insert_at, "self_verification")
 
         if "strategy_selector" not in normalized and "adaptive_planner" in normalized:
             insert_at = normalized.index("adaptive_planner")

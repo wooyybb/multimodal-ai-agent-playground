@@ -23,6 +23,9 @@ class ToolRegistry:
             from agents.strategy_selector import StrategySelector
 
             self.register("strategy_selector", StrategySelector())
+            from agents.self_verification_agent import SelfVerificationAgent
+
+            self.register("self_verification", SelfVerificationAgent())
         except Exception as error:
             print(f"[ToolRegistry] Default tool registration skipped: {error}")
 

@@ -266,6 +266,18 @@ A. 현재는 rule 기반으로 context_program의 character preservation rules, 
 
 ## Strategy Selection
 
+Q. Evaluation과 Self Verification의 차이는 무엇인가요?
+A. Evaluation은 생성 이미지와 텍스트의 유사도 같은 점수를 계산합니다. Self Verification은 그 점수와 Goal Tree, Context Program, Prompt Report를 함께 보고 목표 충족 여부와 재계획 필요성을 판단합니다.
+
+Q. 왜 Adaptive Planning 전에 Self Verification을 수행하나요?
+A. Adaptive Planning은 전략을 바꾸는 단계이므로, 그 전에 현재 결과가 실제로 목표를 만족하지 못했는지 확인해야 합니다. 이렇게 하면 불필요한 retry와 prompt drift를 줄일 수 있습니다.
+
+Q. needs_replanning은 어떻게 판단하나요?
+A. best_score가 낮거나, context validation score가 낮거나, prompt missing section 또는 semantic conflict가 있거나, identity priority가 높은데 provider prompt에 preservation language가 부족하면 true가 됩니다.
+
+Q. Self Verification은 Strategy Selector에 어떤 영향을 주나요?
+A. needs_replanning이 false이면 StrategySelector가 low-risk strategy를 선택하고, blocking issue가 있으면 해당 issue를 해결하는 전략의 score를 올립니다.
+
 Q. Strategy Selector를 만든 이유는?
 A. AdaptivePlanner가 하나의 전략만 만들면 대안 비교가 어렵습니다. StrategySelector는 여러 candidate strategy를 만들고 score로 선택해 의사결정 과정을 설명 가능하게 만듭니다.
 

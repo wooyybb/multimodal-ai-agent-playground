@@ -102,6 +102,7 @@ class DebugReportManager:
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "initial_output_image_path": self._safe(state.get("output_image_path")),
             "initial_score": self._safe(state.get("score")),
+            "self_verification": self._safe(state.get("self_verification")),
             "candidate_strategies": self._safe(state.get("candidate_strategies")),
             "selected_strategy": self._safe(state.get("selected_strategy")),
             "adaptive_plan": self._safe(state.get("adaptive_plan")),
@@ -163,6 +164,11 @@ class DebugReportManager:
             self._llm_prompt_critic_preview(state.get("llm_prompt_critic_report")),
         )
         self._append_block(lines, "OPTIMIZED PROMPT", state.get("optimized_prompt"))
+        self._append_block(
+            lines,
+            "SELF VERIFICATION",
+            self._self_verification_preview(state.get("self_verification")),
+        )
         self._append_block(
             lines,
             "STRATEGY",
@@ -249,6 +255,19 @@ class DebugReportManager:
             "Selected": selected,
             "Reason": selected.get("reason"),
             "Expected Effect": selected.get("expected_effect"),
+        }
+
+    def _self_verification_preview(self, verification):
+        verification = verification or {}
+        return {
+            "overall_pass": verification.get("overall_pass"),
+            "goal_satisfaction_score": verification.get("goal_satisfaction_score"),
+            "prompt_consistency_score": verification.get("prompt_consistency_score"),
+            "context_consistency_score": verification.get("context_consistency_score"),
+            "needs_replanning": verification.get("needs_replanning"),
+            "findings": verification.get("verification_findings", []),
+            "blocking issues": verification.get("blocking_issues", []),
+            "recommendations": verification.get("recommendations", []),
         }
 
     def _character_program_preview(self, program):
