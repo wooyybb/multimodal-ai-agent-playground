@@ -158,6 +158,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - StrategySelector references self verification to select low-risk or issue-focused strategies.
 - Debug reports now include `self_verification`.
 
+## Sprint 55
+
+- Added `evaluation/` metric layer.
+- Added CLIP, Identity, Prompt, and Aesthetic metric classes.
+- Added `EvaluationAggregator` with weighted scoring.
+- Refactored `EvaluationAgent` to use the aggregator while preserving float score compatibility.
+- Debug reports now include metrics, weighted score, and metric summary.
+
 ## Future Work
 
 - Keep this file short.

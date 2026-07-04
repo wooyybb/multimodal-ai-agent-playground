@@ -53,6 +53,8 @@ Provider Layer
 
 Evaluation Layer
 -> EvaluationAgent
+-> EvaluationAggregator
+-> CLIP / Identity / Prompt / Aesthetic Metrics
 -> AdaptivePlanner
 -> ReflectionAgent
 -> RetryAgent
@@ -137,7 +139,7 @@ flowchart TD
 17. PromptCompiler converts Context Program into a provider-specific prompt package.
 18. ProviderPromptAdapter turns the compiled package into final provider input.
 19. GenerationAgent creates image output.
-20. EvaluationAgent scores generated output.
+20. EvaluationAgent runs EvaluationAggregator and creates a weighted score.
 21. ReflectionAgent analyzes failure signals.
 22. SelfVerificationAgent checks goal satisfaction, prompt consistency, and context consistency.
 23. StrategySelector generates candidate strategies and selects the highest-scoring option.
@@ -164,6 +166,7 @@ flowchart TD
 - PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
 - PromptCompiler owns context-program-to-provider-package compilation.
 - ProviderPromptAdapter owns provider-specific prompt compilation.
+- EvaluationAggregator owns weighted metric scoring across CLIP and rule-based metrics.
 - SelfVerificationAgent owns rule-based goal satisfaction and consistency checks before strategy selection.
 - StrategySelector owns candidate strategy generation and explainable selection before adaptive planning.
 - AdaptivePlanner owns rule-based failure analysis and re-planning between reflection and retry.

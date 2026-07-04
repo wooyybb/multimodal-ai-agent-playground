@@ -266,6 +266,15 @@ A. 현재는 rule 기반으로 context_program의 character preservation rules, 
 
 ## Strategy Selection
 
+Q. 왜 CLIP 하나만 쓰지 않았나요?
+A. CLIP은 image-text alignment에는 유용하지만 identity preservation, prompt completeness, aesthetic prompt quality를 모두 설명하지는 못합니다. Multi-Metric Evaluation은 여러 관점을 분리해 더 설명 가능한 평가를 만듭니다.
+
+Q. Metric Aggregator를 만든 이유는?
+A. 평가 기준을 metric 단위로 분리하면 PickScore, DINO, Aesthetic Score, VLM Judge 같은 새 metric을 쉽게 추가할 수 있습니다. Aggregator는 각 metric을 실행하고 weight 기반 score를 계산합니다.
+
+Q. Metric을 추가하려면 어떻게 하나요?
+A. `BaseMetric` 인터페이스를 구현하고 `evaluate(state)`가 `{name, score, reason}`을 반환하게 만든 뒤 `EvaluationAggregator`의 metric list와 weight에 추가하면 됩니다.
+
 Q. Evaluation과 Self Verification의 차이는 무엇인가요?
 A. Evaluation은 생성 이미지와 텍스트의 유사도 같은 점수를 계산합니다. Self Verification은 그 점수와 Goal Tree, Context Program, Prompt Report를 함께 보고 목표 충족 여부와 재계획 필요성을 판단합니다.
 

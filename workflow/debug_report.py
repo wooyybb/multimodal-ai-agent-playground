@@ -100,6 +100,14 @@ class DebugReportManager:
             "compiled_prompt_package": self._safe(state.get("compiled_prompt_package")),
             "provider_negative_prompt": self._safe(state.get("provider_negative_prompt")),
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
+            "evaluation_result": self._safe(self._evaluation_result(state)),
+            "metrics": self._safe((self._evaluation_result(state) or {}).get("metrics")),
+            "weighted_score": self._safe(
+                (self._evaluation_result(state) or {}).get("weighted_score")
+            ),
+            "metric_summary": self._safe(
+                (self._evaluation_result(state) or {}).get("metric_summary")
+            ),
             "initial_output_image_path": self._safe(state.get("output_image_path")),
             "initial_score": self._safe(state.get("score")),
             "self_verification": self._safe(state.get("self_verification")),
@@ -192,11 +200,7 @@ class DebugReportManager:
         self._append_block(
             lines,
             "EVALUATION",
-            {
-                "score": state.get("score"),
-                "retry": state.get("retry_needed"),
-                "best_score": state.get("best_score"),
-            },
+            self._evaluation_preview(state),
         )
         self._append_block(lines, "AGENT TRACE", "\n".join(state.get("agent_trace", [])))
         return "\n".join(lines).strip() + "\n"
@@ -288,6 +292,28 @@ class DebugReportManager:
             return vision_result
         caption = state.get("caption")
         return getattr(caption, "vision_result", None)
+
+    def _evaluation_result(self, state):
+        evaluation_result = state.get("evaluation_result")
+        if evaluation_result:
+            return evaluation_result
+        score = state.get("score")
+        return getattr(score, "evaluation_result", None)
+
+    def _evaluation_preview(self, state):
+        result = self._evaluation_result(state) or {}
+        metrics = result.get("metrics") or []
+        metric_map = {item.get("name"): item for item in metrics if isinstance(item, dict)}
+        return {
+            "CLIP": metric_map.get("clip", {}),
+            "Identity": metric_map.get("identity", {}),
+            "Prompt": metric_map.get("prompt", {}),
+            "Aesthetic": metric_map.get("aesthetic", {}),
+            "Weighted": result.get("weighted_score", state.get("score")),
+            "Summary": result.get("metric_summary"),
+            "retry": state.get("retry_needed"),
+            "best_score": state.get("best_score"),
+        }
 
     def _vision_result_preview(self, vision_result):
         vision_result = vision_result or {}

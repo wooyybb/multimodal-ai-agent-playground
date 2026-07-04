@@ -92,7 +92,7 @@ Provider Layer
 Generation
   |
   v
-Evaluation
+Multi-Metric Evaluation
   |
   v
 Reflection
@@ -132,6 +132,7 @@ PlannerAgent
 -> AIModelService
 -> GenerationAgent
 -> EvaluationAgent
+-> EvaluationAggregator
 -> ReflectionAgent
 -> SelfVerificationAgent
 -> StrategySelector
@@ -157,6 +158,7 @@ PlannerAgent
 | Prompt Compiler | Converts provider-independent Context Program into provider-specific prompt packages. |
 | Prompt Critic | Reviews prompt quality, missing sections, conflicts, and provider suitability. |
 | Prompt Optimizer | Improves prompt structure based on critic feedback. |
+| Multi-Metric Evaluation | Aggregates CLIP, identity, prompt, and aesthetic metrics into a weighted score. |
 | Provider Routing | Selects generation provider using provider capability config. |
 | AI Model Service | Provides a provider abstraction layer for mock/OpenAI/Gemini/Claude/Ollama-style LLM calls. |
 | FastAPI | Exposes the framework through REST endpoints and Swagger docs. |

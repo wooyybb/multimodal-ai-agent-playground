@@ -55,10 +55,11 @@
 - Sprint 51: Goal-oriented Planning
 - Sprint 53: Strategy Selector
 - Sprint 54: Self Verification
+- Sprint 55: Multi-Metric Evaluation Layer
 
 ## Planned Sprints
 
-- Sprint 55: Real LLM Reasoning or Multi-Metric Evaluation
+- Sprint 56: Real LLM Reasoning or VLM Judge
 
 ## Future Work
 

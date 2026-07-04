@@ -128,6 +128,18 @@ Strategy Selection은 reflection과 hypothesis를 바탕으로 여러 candidate 
 
 Self Verification은 evaluation 이후 현재 state가 Goal Tree와 Context Program의 목표를 얼마나 만족하는지 점검하는 품질 관리 단계입니다. Evaluation은 image-text score를 계산하고, Self Verification은 goal satisfaction, prompt consistency, context consistency, strategy necessity를 rule 기반으로 확인합니다.
 
+## Metric Abstraction
+
+Metric Abstraction은 CLIP, Identity, Prompt, Aesthetic 같은 평가 기준을 동일한 `evaluate(state) -> {name, score, reason}` 인터페이스로 분리하는 구조입니다.
+
+## Evaluation Aggregation
+
+Evaluation Aggregation은 여러 metric score를 weight로 합산해 weighted score를 만드는 과정입니다. 현재 weight는 CLIP 0.55, Identity 0.20, Prompt 0.15, Aesthetic 0.10입니다.
+
+## Explainable Evaluation
+
+Explainable Evaluation은 단일 점수만 반환하지 않고 metric별 reason과 summary를 함께 남겨 Reflection과 Debug Report가 왜 그런 점수가 나왔는지 확인할 수 있게 합니다.
+
 ## Goal Satisfaction Check
 
 Goal Satisfaction Check는 best score, goal priority, provider prompt, context validation, prompt report를 함께 보고 재계획이 필요한지 판단합니다.
