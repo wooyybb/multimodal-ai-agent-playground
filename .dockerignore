@@ -1,0 +1,11 @@
+.git
+__pycache__/
+*.pyc
+.env
+outputs/
+benchmark/results/
+benchmark/reports/
+memory/history.json
+.venv/
+venv/
+.cache/

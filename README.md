@@ -183,6 +183,36 @@ Run report generator:
 python -m benchmark.report_generator
 ```
 
+## Run with Docker
+
+Docker and Docker Compose can run the FastAPI service and Gradio UI in the same reproducible environment.
+
+Build and start both services:
+
+```bash
+docker compose up --build
+```
+
+FastAPI Swagger:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Gradio UI:
+
+```text
+http://127.0.0.1:7860
+```
+
+Stop services:
+
+```bash
+docker compose down
+```
+
+The Docker setup uses `.env` through `docker-compose.yml`, but real API keys must never be written into `Dockerfile` or committed to Git. Runtime artifacts are mounted from `outputs/`, `memory/`, and `benchmark/` so generated files stay outside the container image.
+
 ## Environment Variables
 
 Do not commit real keys or `.env` files.

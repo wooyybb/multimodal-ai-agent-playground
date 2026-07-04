@@ -9,7 +9,7 @@
 | v0.3 | Context Engineering: Context Program, Validator, Prompt Compiler | Complete |
 | v0.4 | Intelligence Layer: Goal Planning, LLM Layer, Strategy Selection, Self Verification | Complete |
 | v0.5 | Evaluation & Observability: Multi-Metric Evaluation, Debug Report, Benchmark | Complete |
-| v1.0 | Docker, CI, deployment guide, curated demo release | Planned |
+| v1.0 | Docker, CI, deployment guide, curated demo release | In Progress |
 
 ## Completed Sprints
 
@@ -67,15 +67,19 @@
 - Sprint 53: Strategy Selector
 - Sprint 54: Self Verification
 - Sprint 55: Multi-Metric Evaluation Layer
+- Sprint 56: v1.0 README and GitHub polish
+- Sprint 57: Docker and Docker Compose
 
 ## Planned Sprints
 
-- Sprint 56: Real LLM Reasoning or VLM Judge
+- Sprint 58: CI validation and Docker smoke tests
+- Sprint 59: Queue-based generation jobs
+- Sprint 60: Deployment dashboard
 
 ## Future Work
 
 - Add Context Program v2 schema enforcement.
 - Add provider compiler regression tests.
-- Add Docker/FastAPI deployment guide.
+- Add CI checks for Docker build and FastAPI health.
 - Add persistent multi-session memory.
 - Add benchmark dashboard for visual comparison.

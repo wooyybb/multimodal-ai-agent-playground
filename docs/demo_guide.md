@@ -48,7 +48,35 @@ python -m benchmark.report_generator
 
 Use this path to show benchmark result summarization for review.
 
-## 5. Check Debug Report
+## 5. Run with Docker
+
+Docker Compose starts both the FastAPI service and Gradio UI with the same project image.
+
+```bash
+docker compose up --build
+```
+
+FastAPI Swagger:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Gradio:
+
+```text
+http://127.0.0.1:7860
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+Keep real keys in a local `.env` file only. Do not add `.env` or generated `outputs/` files to Git.
+
+## 6. Check Debug Report
 
 Runtime debug artifacts are saved under `outputs/runs/`.
 
