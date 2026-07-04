@@ -23,7 +23,7 @@ Planner / Execution Layer
 Vision and Context Layer
   |
   +--> VisionAgent
-  +--> VLMRouter
+  +--> VLMRouter: BLIP default, Florence/Qwen skeletons
   +--> ReferenceImageParser
   +--> CharacterProgramBuilder
   +--> GoalPlanner
@@ -119,7 +119,7 @@ flowchart TD
 
 1. User provides an image and/or prompt through Gradio or FastAPI.
 2. Planner and execution engine initialize state and execution order.
-3. Vision layer extracts caption/vision result, parses Reference Image structure, and builds Character Program.
+3. Vision layer extracts standard `vision_result`, parses Reference Image structure, and builds Character Program.
 4. GoalPlanner creates Goal Tree and priority hierarchy.
 5. ContextProgramBuilder creates structured provider-independent context.
 6. ContextProgramValidator checks schema and provider compatibility.
@@ -138,6 +138,7 @@ flowchart TD
 - ToolRegistry isolates execution engine from concrete agent classes.
 - Context Program separates semantic context from provider prompt text.
 - Reference Image Parser separates structured visual identity/context from plain captions.
+- Standard VLM schema keeps BLIP, Florence-2, and Qwen-VL adapters interchangeable.
 - PromptCompiler separates provider-independent context from provider-specific prompt packages.
 - EvaluationAggregator separates metric computation from reflection/retry policy.
 - SelfVerificationAgent checks whether replanning is necessary before strategy selection.

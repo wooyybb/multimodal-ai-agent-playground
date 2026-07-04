@@ -227,11 +227,13 @@ Do not commit real keys or `.env` files.
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `OPENAI_API_KEY` | Optional key for OpenAI provider experiments. |
 | `LLM_PROVIDER` | Selects LLM provider mode, such as `mock` or `openai`. |
-| `VLM_PROVIDER` | Selects VLM provider mode, such as `blip`. |
+| `VLM_PROVIDER` | Selects VLM provider mode: `blip`, `florence`, or `qwen`. BLIP is the default. |
 
 ## Current Limitations
 
 - BLIP is used as the default VLM.
+- Florence-2 and Qwen-VL are prepared as adapter skeletons and currently fall back to BLIP.
+- Reference Image Parser uses the detailed VLM schema, including character, style, composition, and color hints.
 - FLUX is the current generation provider path.
 - OpenAI, Gemini, Claude, and Ollama providers are designed as extensible service boundaries.
 - CLIP-based evaluation is supplemented with rule-based identity, prompt, and aesthetic metrics.

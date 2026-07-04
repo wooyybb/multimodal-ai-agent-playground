@@ -187,6 +187,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - ExecutionEngine merges reference image structure into Character Program without changing generation/evaluation code.
 - Debug reports now include `reference_image`.
 
+## Sprint 59
+
+- Strengthened the standard VLM output schema.
+- BLIPVLM now fills character_hints, style_hints, composition_hints, and color_hints using rule-based parsing.
+- FlorenceVLM and QwenVLM remain skeleton adapters but return the same schema through BLIP fallback.
+- ReferenceImageParser now prioritizes VLM hints before falling back to caption parsing.
+- Debug reports show detailed VLM fields including provider, fallback status, composition hints, and color hints.
+
 ## Future Work
 
 - Keep this file short.

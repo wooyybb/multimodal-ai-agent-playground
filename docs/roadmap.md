@@ -70,12 +70,13 @@
 - Sprint 56: v1.0 README and GitHub polish
 - Sprint 57: Docker and Docker Compose
 - Sprint 58: Reference Image Parser
+- Sprint 59: Real VLM Upgrade Preparation
 
 ## Planned Sprints
 
-- Sprint 59: CI validation and Docker smoke tests
-- Sprint 60: Queue-based generation jobs
-- Sprint 61: Deployment dashboard
+- Sprint 60: CI validation and Docker smoke tests
+- Sprint 61: Queue-based generation jobs
+- Sprint 62: Deployment dashboard
 
 ## Future Work
 

@@ -336,11 +336,15 @@ class DebugReportManager:
         vision_result = vision_result or {}
         return {
             "model": vision_result.get("model"),
+            "provider": vision_result.get("provider"),
+            "used_fallback": vision_result.get("used_fallback"),
             "caption": vision_result.get("caption"),
             "detailed_description": vision_result.get("detailed_description"),
             "objects": vision_result.get("objects", []),
-            "style_hints": vision_result.get("style_hints", []),
             "character_hints": vision_result.get("character_hints", {}),
+            "style_hints": vision_result.get("style_hints", []),
+            "composition_hints": vision_result.get("composition_hints", {}),
+            "color_hints": vision_result.get("color_hints", {}),
         }
 
     def _safe(self, value):

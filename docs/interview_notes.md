@@ -248,8 +248,17 @@ A. 짧은 caption 생성에는 강하지만 자세한 scene graph, character att
 Q. Florence/Qwen 같은 VLM으로 어떻게 확장할 수 있나요?
 A. `BaseVLM.analyze()` 인터페이스만 구현하면 됩니다. provider가 달라져도 VisionAgent는 `caption`과 `vision_result`를 같은 구조로 받습니다.
 
+Q. 왜 Standard Vision Result Schema가 필요한가요?
+A. BLIP, Florence-2, Qwen-VL이 서로 다른 출력을 내면 Reference Image Parser와 Character Program이 provider마다 다른 코드를 가져야 합니다. 표준 schema를 두면 caption, character_hints, composition_hints, color_hints를 같은 방식으로 읽을 수 있습니다.
+
+Q. Florence/Qwen은 현재 실제로 연결되어 있나요?
+A. 현재는 skeleton adapter입니다. `VLM_PROVIDER=florence` 또는 `VLM_PROVIDER=qwen`을 선택해도 기본 실행 안정성을 위해 BLIP fallback을 사용하고, `used_fallback=true`와 fallback model 이름을 vision_result에 기록합니다.
+
+Q. BLIP fallback을 유지한 이유는 무엇인가요?
+A. 무거운 VLM을 필수로 로드하면 로컬 실행성과 데모 안정성이 떨어집니다. 먼저 adapter contract와 schema를 고정하고, 실제 Florence/Qwen 연결은 같은 interface 뒤에 붙일 수 있게 준비했습니다.
+
 Q. vision_result와 caption의 차이는 무엇인가요?
-A. caption은 downstream 호환을 위한 짧은 문자열이고, vision_result는 detailed_description, objects, style_hints, character_hints, model, fallback 여부를 담는 구조화된 vision context입니다.
+A. caption은 downstream 호환을 위한 짧은 문자열이고, vision_result는 detailed_description, objects, character_hints, style_hints, composition_hints, color_hints, model, provider, fallback 여부를 담는 구조화된 vision context입니다.
 
 ## Character Program
 
