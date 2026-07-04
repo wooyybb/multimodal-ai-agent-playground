@@ -1,5 +1,25 @@
 # Interview Notes
 
+## Key Portfolio Questions
+
+Q. 이 프로젝트는 단순 이미지 생성 데모와 무엇이 다른가요?
+A. 단순 prompt-to-image가 아니라 Vision Understanding, Context Engineering, Prompt Compiler, Provider Routing, Multi-Metric Evaluation, Reflection, Self Verification, Strategy Selection, Adaptive Planning, Memory까지 포함한 전체 AI Agent workflow입니다.
+
+Q. Context Program은 무엇인가요?
+A. Context Program은 user intent, caption, character program, goal tree, memory, retrieval, layout, style, provider constraint를 provider-independent structured object로 정리한 중간 표현입니다. Prompt 이전 단계의 의미 구조입니다.
+
+Q. Prompt Compiler는 왜 필요한가요?
+A. Context Program은 provider-independent 구조이고, FLUX/SDXL/GPT Image 같은 provider는 서로 다른 prompt 형식이 필요합니다. Prompt Compiler는 structured context를 provider-specific prompt package로 변환합니다.
+
+Q. Adaptive Planning은 Retry와 무엇이 다른가요?
+A. Retry는 다시 생성할지 결정하는 정책이고, Adaptive Planning은 왜 실패했는지 분석한 뒤 context update와 priority change를 만들어 다음 generation 전략을 바꾸는 re-planning 단계입니다.
+
+Q. Multi-Metric Evaluation을 도입한 이유는 무엇인가요?
+A. CLIP만으로는 identity preservation, prompt completeness, aesthetic quality를 설명하기 어렵습니다. Multi-Metric Evaluation은 CLIP, Identity, Prompt, Aesthetic metric을 분리하고 weighted score와 reason을 남깁니다.
+
+Q. 실제 서비스로 확장하려면 무엇을 추가해야 하나요?
+A. Docker/CI, queue-based async execution, auth, persistent database, object storage, monitoring, benchmark dashboard, multi-session memory, stronger provider error handling이 필요합니다.
+
 ## Table of Contents
 
 - [Architecture](#architecture)

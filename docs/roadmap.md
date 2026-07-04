@@ -1,5 +1,16 @@
 # Roadmap
 
+## Release Roadmap
+
+| Release | Goal | Status |
+| --- | --- | --- |
+| v0.1 | Core Pipeline: Vision, Prompt, Generation, Evaluation, Retry | Complete |
+| v0.2 | Multi-Agent Framework: Orchestrator, Tool Registry, Execution Engine | Complete |
+| v0.3 | Context Engineering: Context Program, Validator, Prompt Compiler | Complete |
+| v0.4 | Intelligence Layer: Goal Planning, LLM Layer, Strategy Selection, Self Verification | Complete |
+| v0.5 | Evaluation & Observability: Multi-Metric Evaluation, Debug Report, Benchmark | Complete |
+| v1.0 | Docker, CI, deployment guide, curated demo release | Planned |
+
 ## Completed Sprints
 
 - Sprint 01: VisionAgent and BLIP captioning interface

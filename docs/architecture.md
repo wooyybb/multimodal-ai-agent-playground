@@ -1,181 +1,149 @@
 # Architecture
 
-## Table of Contents
+This document summarizes the current v1.0-oriented architecture of Multimodal AI Agent Playground.
 
-- [Architecture Layers](#architecture-layers)
-- [Mermaid Diagram](#mermaid-diagram)
-- [Runtime Flow](#runtime-flow)
-- [Key Boundaries](#key-boundaries)
-- [Future Work](#future-work)
-
-## Architecture Layers
+## Layered View
 
 ```text
-UI Layer
--> Gradio
--> FastAPI
-
-Semantic Planning Layer
--> LLMClient
--> AIModelService
--> MockLLM
--> GoalPlanner
--> LLMContextReasoner
-
-Execution Layer
--> PlannerAgent
--> DynamicExecutionEngine
--> AgentState
--> ToolRegistry
-
-Agent Layer
--> VisionAgent
--> VLMRouter
--> BLIPVLM / FlorenceVLM Skeleton / QwenVLM Skeleton
--> CharacterProgramBuilder
--> GoalPlanner
--> RetrievalAgent
--> ScenePlanningAgent
--> Character / Style / Layout / Pose / Expression / Lighting / Negative Agents
--> ContextProgramBuilder
--> ContextProgramValidator
--> PromptAssembler
--> PromptCritic
--> LLMPromptCriticAgent
--> PromptOptimizer
--> LLMPromptOptimizerAgent
-
+User
+  |
+  +--> Gradio UI
+  |
+  +--> FastAPI Service Layer
+          |
+          v
+Planner / Execution Layer
+  |
+  +--> PlannerAgent
+  +--> DynamicExecutionEngine
+  +--> ToolRegistry
+  +--> AgentState
+          |
+          v
+Vision and Context Layer
+  |
+  +--> VisionAgent
+  +--> VLMRouter
+  +--> CharacterProgramBuilder
+  +--> GoalPlanner
+  +--> LLMContextReasoner
+  +--> RetrievalAgent
+  +--> ContextProgramBuilder
+  +--> ContextProgramValidator
+          |
+          v
+Prompt Layer
+  |
+  +--> PromptAssembler
+  +--> PromptCritic / LLMPromptCriticAgent
+  +--> PromptOptimizer / LLMPromptOptimizerAgent
+  +--> PromptCompiler
+          |
+          v
 Provider Layer
--> ProviderRouter
--> PromptCompiler
--> ProviderPromptAdapter
--> GenerationAgent
-
-Evaluation Layer
--> EvaluationAgent
--> EvaluationAggregator
--> CLIP / Identity / Prompt / Aesthetic Metrics
--> AdaptivePlanner
--> ReflectionAgent
--> RetryAgent
-
-Persistence and Observability
--> MemoryManager
--> DebugReportManager
--> BenchmarkRunner
--> ReportGenerator
+  |
+  +--> ProviderRouter
+  +--> ProviderPromptAdapter
+  +--> AIModelService
+          |
+          v
+Generation and Evaluation Layer
+  |
+  +--> GenerationAgent
+  +--> EvaluationAgent
+  +--> EvaluationAggregator
+  +--> CLIP / Identity / Prompt / Aesthetic Metrics
+          |
+          v
+Reasoning Loop
+  |
+  +--> ReflectionAgent
+  +--> SelfVerificationAgent
+  +--> StrategySelector
+  +--> AdaptivePlanner
+  +--> RetryAgent
+          |
+          v
+Observability and Memory
+  |
+  +--> MemoryManager
+  +--> DebugReportManager
+  +--> BenchmarkRunner
+  +--> ReportGenerator
 ```
 
 ## Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    U[User] --> UI[Gradio UI]
+    U[User] --> UI[Gradio]
     U --> API[FastAPI]
-    UI --> LC[LLMClient]
-    API --> LC
-    LC --> AMS[AIModelService]
-    AMS --> REG[Provider Registry]
-    REG --> ML[Mock Provider]
-    REG --> OAI[OpenAI Provider]
-    REG --> GEM[Gemini Provider Skeleton]
-    REG --> CLA[Claude Provider Skeleton]
-    REG --> OLL[Ollama Provider Skeleton]
-    ML --> LR[LLMContextReasoner]
-    OAI --> LR
-    LR --> E[DynamicExecutionEngine]
-    E --> P[PlannerAgent]
-    E --> R[ToolRegistry]
-    R --> V[VisionAgent]
-    V --> VR[VLMRouter]
-    VR --> BLIP[BLIPVLM]
-    VR --> FLO[FlorenceVLM Skeleton]
-    VR --> QW[QwenVLM Skeleton]
-    V --> CPB[CharacterProgramBuilder]
+    UI --> ENG[DynamicExecutionEngine]
+    API --> ENG
+    ENG --> REG[ToolRegistry]
+    REG --> V[VisionAgent]
+    V --> VLM[VLMRouter: BLIP default]
+    VLM --> CPB[CharacterProgramBuilder]
+    REG --> GP[GoalPlanner]
+    REG --> LCR[LLMContextReasoner]
+    REG --> RET[Retrieval / Memory Retrieval]
     CPB --> CP[ContextProgramBuilder]
-    R --> M1[Memory Retrieval]
-    R --> K[Knowledge Retrieval]
-    R --> S[Scene and Prompt Specialist Agents]
-    S --> CP[ContextProgramBuilder]
+    GP --> CP
+    LCR --> CP
+    RET --> CP
     CP --> CV[ContextProgramValidator]
     CV --> PA[PromptAssembler]
     PA --> PC[PromptCritic]
-    PC --> LPC[LLMPromptCriticAgent]
-    LPC --> PO[PromptOptimizer]
-    PO --> PR[ProviderRouter]
-    PR --> PCMP[PromptCompiler]
-    PCMP --> PPA[ProviderPromptAdapter]
-    PPA --> G[GenerationAgent]
-    G --> EV[EvaluationAgent]
-    EV --> RF[ReflectionAgent]
-    RF --> SV[SelfVerificationAgent]
-    SV --> SS[StrategySelector]
-    SS --> AP[AdaptivePlanner]
-    AP --> PCMP
-    AP --> RT[RetryAgent]
-    RT --> MM[MemoryManager]
-    MM --> DR[Debug Report]
-    DR --> B[Benchmark Report]
+    PC --> PO[PromptOptimizer]
+    PO --> COMP[PromptCompiler]
+    COMP --> ROUTER[ProviderRouter]
+    ROUTER --> ADAPT[ProviderPromptAdapter]
+    ADAPT --> GEN[GenerationAgent]
+    GEN --> EVAL[EvaluationAgent]
+    EVAL --> AGG[EvaluationAggregator]
+    AGG --> METRICS[CLIP / Identity / Prompt / Aesthetic]
+    METRICS --> REF[ReflectionAgent]
+    REF --> VER[SelfVerificationAgent]
+    VER --> STR[StrategySelector]
+    STR --> AP[AdaptivePlanner]
+    AP --> COMP
+    AP --> RETRY[RetryAgent]
+    RETRY --> MEM[MemoryManager]
+    MEM --> DBG[Debug Report]
+    DBG --> BENCH[Benchmark / Report]
 ```
 
 ## Runtime Flow
 
-1. UI or API receives image and user prompt.
-2. LLMContextReasoner creates semantic planning fields without generating a prompt.
-3. Planner creates an execution plan.
-4. ExecutionEngine dispatches steps through ToolRegistry.
-5. VisionAgent routes image understanding through VLMRouter and stores caption-compatible vision output.
-6. CharacterProgramBuilder converts vision output into structured identity and appearance data.
-7. GoalPlanner creates a Goal Tree with priorities and success criteria.
-8. Memory and retrieval add context.
-9. Specialist agents build visual sections.
-10. ContextProgramBuilder creates a provider-independent context program with Character Program and Goal Tree data.
-11. ContextProgramValidator checks schema, section types, and provider compatibility.
-12. PromptAssembler creates a canonical prompt.
-13. PromptCritic performs rule-based prompt review.
-14. LLMPromptCriticAgent performs optional semantic prompt critique.
-15. PromptOptimizer reviews and improves prompt quality.
-16. ProviderRouter selects provider from config.
-17. PromptCompiler converts Context Program into a provider-specific prompt package.
-18. ProviderPromptAdapter turns the compiled package into final provider input.
-19. GenerationAgent creates image output.
-20. EvaluationAgent runs EvaluationAggregator and creates a weighted score.
-21. ReflectionAgent analyzes failure signals.
-22. SelfVerificationAgent checks goal satisfaction, prompt consistency, and context consistency.
-23. StrategySelector generates candidate strategies and selects the highest-scoring option.
-24. AdaptivePlanner creates a re-planning strategy and updates context before retry.
-25. RetryAgent decides whether to run the second attempt.
-26. MemoryManager saves history.
-27. DebugReport and Benchmark tools record observability artifacts.
+1. User provides an image and/or prompt through Gradio or FastAPI.
+2. Planner and execution engine initialize state and execution order.
+3. Vision layer extracts caption/vision result and builds Character Program.
+4. GoalPlanner creates Goal Tree and priority hierarchy.
+5. ContextProgramBuilder creates structured provider-independent context.
+6. ContextProgramValidator checks schema and provider compatibility.
+7. Prompt layer assembles, critiques, optimizes, and compiles provider prompt package.
+8. Provider layer selects and adapts generation provider input.
+9. GenerationAgent creates an output image.
+10. EvaluationAggregator computes weighted score across CLIP and rule metrics.
+11. Reflection and Self Verification analyze the result.
+12. StrategySelector chooses a candidate strategy.
+13. AdaptivePlanner updates context and retry prompt if needed.
+14. Memory, debug report, and benchmark artifacts preserve observability.
 
 ## Key Boundaries
 
-- UI/API should not know individual agent internals.
-- LLMClient owns provider abstraction for reason, critic, and optimize calls.
-- AIModelService owns provider dispatch below LLMClient.
-- OpenAIProvider owns optional real OpenAI calls and falls back to MockProvider when unavailable.
-- LLMContextReasoner owns semantic intent interpretation before prompt construction.
-- VLMRouter owns vision provider selection and keeps VisionAgent independent from a specific VLM.
-- CharacterProgramBuilder owns structured character identity representation from vision output.
-- GoalPlanner owns priority planning and success criteria before execution planning.
-- ExecutionEngine owns workflow order.
-- ToolRegistry owns agent lookup and invocation.
-- ContextProgramBuilder owns structured context.
-- ContextProgramValidator owns context schema and provider compatibility checks.
-- PromptAssembler owns canonical prompt construction.
-- PromptCriticAgent owns deterministic checks; LLMPromptCriticAgent owns semantic mock/fallback critique.
-- PromptCompiler owns context-program-to-provider-package compilation.
-- ProviderPromptAdapter owns provider-specific prompt compilation.
-- EvaluationAggregator owns weighted metric scoring across CLIP and rule-based metrics.
-- SelfVerificationAgent owns rule-based goal satisfaction and consistency checks before strategy selection.
-- StrategySelector owns candidate strategy generation and explainable selection before adaptive planning.
-- AdaptivePlanner owns rule-based failure analysis and re-planning between reflection and retry.
-- Generation, evaluation, memory, benchmark, and debug report stay separated.
+- UI/API do not know internal agent details.
+- ToolRegistry isolates execution engine from concrete agent classes.
+- Context Program separates semantic context from provider prompt text.
+- PromptCompiler separates provider-independent context from provider-specific prompt packages.
+- EvaluationAggregator separates metric computation from reflection/retry policy.
+- SelfVerificationAgent checks whether replanning is necessary before strategy selection.
+- DebugReportManager keeps AI workflow observability separate from generation logic.
 
 ## Future Work
 
-- Context Program v2 schema validation
-- Queue-based execution
-- Multi-session state
-- Dashboard and benchmark dashboard
-- Deployment architecture with Docker and Docker Compose
+- Docker and CI for v1.0 release
+- Queue-based generation
+- Multi-session memory
+- Benchmark dashboard
+- VLM Judge and real multi-metric expansion

@@ -166,6 +166,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Refactored `EvaluationAgent` to use the aggregator while preserving float score compatibility.
 - Debug reports now include metrics, weighted score, and metric summary.
 
+## Sprint 56
+
+- Refactored README into a GitHub landing page for portfolio review.
+- Added release-oriented project summary and demo guide.
+- Updated architecture, roadmap, and interview notes to match the v1.0 framework direction.
+- No code functionality was changed in this sprint.
+
 ## Future Work
 
 - Keep this file short.
