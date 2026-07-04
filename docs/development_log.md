@@ -173,6 +173,20 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Updated architecture, roadmap, and interview notes to match the v1.0 framework direction.
 - No code functionality was changed in this sprint.
 
+## Sprint 57
+
+- Added Dockerfile, docker-compose.yml, and .dockerignore.
+- Documented Docker Compose execution for FastAPI and Gradio.
+- Kept core AI Agent code unchanged.
+
+## Sprint 58
+
+- Added `ReferenceImageParser`.
+- Inserted reference image parsing after VisionAgent and before CharacterProgramBuilder.
+- Reference Image Parser extracts identity, appearance, style, composition, colors, and identity rules from caption and vision result.
+- ExecutionEngine merges reference image structure into Character Program without changing generation/evaluation code.
+- Debug reports now include `reference_image`.
+
 ## Future Work
 
 - Keep this file short.

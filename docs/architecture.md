@@ -24,6 +24,7 @@ Vision and Context Layer
   |
   +--> VisionAgent
   +--> VLMRouter
+  +--> ReferenceImageParser
   +--> CharacterProgramBuilder
   +--> GoalPlanner
   +--> LLMContextReasoner
@@ -83,7 +84,8 @@ flowchart TD
     ENG --> REG[ToolRegistry]
     REG --> V[VisionAgent]
     V --> VLM[VLMRouter: BLIP default]
-    VLM --> CPB[CharacterProgramBuilder]
+    VLM --> RIP[ReferenceImageParser]
+    RIP --> CPB[CharacterProgramBuilder]
     REG --> GP[GoalPlanner]
     REG --> LCR[LLMContextReasoner]
     REG --> RET[Retrieval / Memory Retrieval]
@@ -117,7 +119,7 @@ flowchart TD
 
 1. User provides an image and/or prompt through Gradio or FastAPI.
 2. Planner and execution engine initialize state and execution order.
-3. Vision layer extracts caption/vision result and builds Character Program.
+3. Vision layer extracts caption/vision result, parses Reference Image structure, and builds Character Program.
 4. GoalPlanner creates Goal Tree and priority hierarchy.
 5. ContextProgramBuilder creates structured provider-independent context.
 6. ContextProgramValidator checks schema and provider compatibility.
@@ -135,6 +137,7 @@ flowchart TD
 - UI/API do not know internal agent details.
 - ToolRegistry isolates execution engine from concrete agent classes.
 - Context Program separates semantic context from provider prompt text.
+- Reference Image Parser separates structured visual identity/context from plain captions.
 - PromptCompiler separates provider-independent context from provider-specific prompt packages.
 - EvaluationAggregator separates metric computation from reflection/retry policy.
 - SelfVerificationAgent checks whether replanning is necessary before strategy selection.

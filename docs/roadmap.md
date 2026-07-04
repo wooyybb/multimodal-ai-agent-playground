@@ -69,12 +69,13 @@
 - Sprint 55: Multi-Metric Evaluation Layer
 - Sprint 56: v1.0 README and GitHub polish
 - Sprint 57: Docker and Docker Compose
+- Sprint 58: Reference Image Parser
 
 ## Planned Sprints
 
-- Sprint 58: CI validation and Docker smoke tests
-- Sprint 59: Queue-based generation jobs
-- Sprint 60: Deployment dashboard
+- Sprint 59: CI validation and Docker smoke tests
+- Sprint 60: Queue-based generation jobs
+- Sprint 61: Deployment dashboard
 
 ## Future Work
 

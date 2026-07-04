@@ -22,6 +22,7 @@ class PlannerAgent:
             "goal_planner",
             "memory_load",
             "vision",
+            "reference_image_parser",
             "character_program_builder",
             "memory_retrieval",
             "retrieval",

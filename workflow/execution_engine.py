@@ -7,6 +7,7 @@ class DynamicExecutionEngine:
         "goal_planner",
         "memory_load",
         "vision",
+        "reference_image_parser",
         "character_program_builder",
         "memory_retrieval",
             "retrieval",
@@ -134,14 +135,26 @@ class DynamicExecutionEngine:
     def _run_vision(self, registry, state):
         state["caption"] = registry.call("vision", state.get("image"))
 
+    def _run_reference_image_parser(self, registry, state):
+        try:
+            self._run_state_step(registry, state, "reference_image_parser")
+            state["agent_trace"].append("ReferenceImageParser parsed reference image")
+            print("[ExecutionEngine] ReferenceImageParser parsed reference image")
+        except Exception as error:
+            print(f"[ExecutionEngine] ReferenceImageParser failed: {error}")
+            state["reference_image"] = self._fallback_reference_image(state)
+            state["agent_trace"].append("ReferenceImageParser used fallback result")
+
     def _run_character_program_builder(self, registry, state):
         try:
             self._run_state_step(registry, state, "character_program_builder")
+            self._merge_reference_image_into_character_program(state)
             state["agent_trace"].append("CharacterProgramBuilder created character program")
             print("[ExecutionEngine] CharacterProgramBuilder created character program")
         except Exception as error:
             print(f"[ExecutionEngine] CharacterProgramBuilder failed: {error}")
             state["character_program"] = self._fallback_character_program(state)
+            self._merge_reference_image_into_character_program(state)
             state["agent_trace"].append("CharacterProgramBuilder used fallback program")
 
     def _run_memory_retrieval(self, registry, state):
@@ -789,7 +802,38 @@ class DynamicExecutionEngine:
                 len(character_items),
             )
         context_program["character_program"] = character_program
+        if state.get("reference_image"):
+            context_program["reference_image"] = state.get("reference_image")
         state["context_program"] = context_program
+
+    def _merge_reference_image_into_character_program(self, state):
+        reference_image = state.get("reference_image") or {}
+        character_program = state.get("character_program") or {}
+        if not reference_image or not isinstance(character_program, dict):
+            return
+
+        for section_name in ("identity", "appearance", "style"):
+            reference_section = reference_image.get(section_name) or {}
+            target_section = character_program.setdefault(section_name, {})
+            if isinstance(reference_section, dict) and isinstance(target_section, dict):
+                for key, value in reference_section.items():
+                    if value not in (None, "", [], {}) and not target_section.get(key):
+                        target_section[key] = value
+
+        composition = reference_image.get("composition") or {}
+        if composition:
+            character_program["reference_composition"] = composition
+
+        colors = reference_image.get("colors") or {}
+        dominant_colors = character_program.setdefault("dominant_colors", [])
+        for color in colors.get("dominant", []):
+            if color and color not in dominant_colors:
+                dominant_colors.append(color)
+
+        identity_rules = character_program.setdefault("identity_rules", [])
+        self._extend_unique(identity_rules, reference_image.get("identity_rules") or [])
+        character_program["reference_image"] = reference_image
+        state["character_program"] = character_program
 
     def _apply_goal_tree_context(self, state):
         goal_tree = state.get("goal_tree") or {}
@@ -887,6 +931,44 @@ class DynamicExecutionEngine:
             ],
         }
 
+    def _fallback_reference_image(self, state):
+        caption = str(state.get("caption") or "")
+        return {
+            "identity": {
+                "gender": "",
+                "estimated_age": "",
+                "species": "",
+                "role": "",
+            },
+            "appearance": {
+                "hair": "",
+                "hair_color": "",
+                "eye_color": "",
+                "skin": "",
+                "outfit": "",
+                "accessories": [],
+            },
+            "style": {
+                "anime": 0.0,
+                "realism": 0.0,
+                "lineart": 0.0,
+                "rendering": "",
+            },
+            "composition": {
+                "camera": "",
+                "framing": "",
+                "viewpoint": "",
+            },
+            "colors": {
+                "dominant": [],
+                "accent": [],
+            },
+            "identity_rules": [
+                "preserve reference image identity",
+                f"stay faithful to caption: {caption}",
+            ],
+        }
+
     def _extend_unique(self, target, items):
         seen = {str(item).lower() for item in target}
         for item in items:
@@ -939,6 +1021,10 @@ class DynamicExecutionEngine:
             insert_at = normalized.index("vision") + 1
             normalized.insert(insert_at, "memory_retrieval")
 
+        if "reference_image_parser" not in normalized and "vision" in normalized:
+            insert_at = normalized.index("vision") + 1
+            normalized.insert(insert_at, "reference_image_parser")
+
         if "self_verification" not in normalized:
             if "strategy_selector" in normalized:
                 insert_at = normalized.index("strategy_selector")
@@ -962,6 +1048,10 @@ class DynamicExecutionEngine:
     def _print_prompt_preview(self, state):
         sections = state.get("prompt_sections") or {}
         print("========== Prompt Preview ==========")
+        reference_image = state.get("reference_image") or {}
+        if reference_image:
+            print("Reference Image")
+            print(self._preview_section(reference_image))
         print(f"Character\n{self._preview_section(sections.get('character'))}")
         print(f"Layout\n{self._preview_section(sections.get('layout'))}")
         print(f"Style\n{self._preview_section(sections.get('style'))}")

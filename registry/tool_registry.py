@@ -17,6 +17,9 @@ class ToolRegistry:
             from agents.character_program_builder import CharacterProgramBuilder
 
             self.register("character_program_builder", CharacterProgramBuilder())
+            from agents.reference_image_parser import ReferenceImageParser
+
+            self.register("reference_image_parser", ReferenceImageParser())
             from agents.goal_planner import GoalPlanner
 
             self.register("goal_planner", GoalPlanner())

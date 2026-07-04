@@ -28,6 +28,7 @@ This project builds the full agent loop around image generation:
 ```text
 Before Generation
 -> Vision Understanding
+-> Reference Image Parsing
 -> Character Program
 -> Goal Planning
 -> LLM Context Reasoning
@@ -59,6 +60,9 @@ User
           |
           v
 Vision Layer
+  |
+  v
+Reference Image Parser
   |
   v
 LLM Reasoning Layer
@@ -109,6 +113,7 @@ Memory
 | State-based Execution Engine | Runs workflow steps through shared state and dynamic execution. | Implemented |
 | Tool Registry | Registers and invokes agents/tools by name. | Implemented |
 | Multi-VLM Adapter | Keeps BLIP as default while preparing Florence/Qwen-style VLM extension. | Implemented |
+| Reference Image Parser | Extracts structured identity, appearance, style, composition, color, and identity rules from vision output. | Implemented |
 | Character Program | Converts caption/vision result into structured character identity data. | Implemented |
 | Context Program | Builds provider-independent structured context before prompt compilation. | Implemented |
 | Context Validator | Checks context schema and provider compatibility. | Implemented |

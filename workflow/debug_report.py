@@ -81,6 +81,7 @@ class DebugReportManager:
             "context_program_summary": self._safe(state.get("context_program_summary")),
             "context_program_version": self._safe(state.get("context_program_version")),
             "context_validation": self._safe(state.get("context_validation")),
+            "reference_image": self._safe(state.get("reference_image")),
             "character_program": self._safe(state.get("character_program")),
             "character_section": self._safe(state.get("character_section")),
             "style_section": self._safe(state.get("style_section")),
@@ -138,6 +139,11 @@ class DebugReportManager:
         )
         self._append_block(lines, "CONTEXT REASONING", state.get("context_reasoning"))
         self._append_block(lines, "SCENE PLAN", state.get("scene_plan"))
+        self._append_block(
+            lines,
+            "REFERENCE IMAGE",
+            self._reference_image_preview(state.get("reference_image")),
+        )
         self._append_block(
             lines,
             "CONTEXT PROGRAM",
@@ -284,6 +290,17 @@ class DebugReportManager:
             "Expression": program.get("expression"),
             "Dominant Colors": program.get("dominant_colors", []),
             "Identity Rules": program.get("identity_rules", []),
+        }
+
+    def _reference_image_preview(self, reference_image):
+        reference_image = reference_image or {}
+        return {
+            "Identity": reference_image.get("identity", {}),
+            "Appearance": reference_image.get("appearance", {}),
+            "Style": reference_image.get("style", {}),
+            "Composition": reference_image.get("composition", {}),
+            "Colors": reference_image.get("colors", {}),
+            "Identity Rules": reference_image.get("identity_rules", []),
         }
 
     def _vision_result(self, state):
