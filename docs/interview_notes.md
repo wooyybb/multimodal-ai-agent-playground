@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v2.3 SDXL Style Prompt Renderer Questions
+
+Q. 왜 SDXL에서는 Prompt를 줄였나요?
+A. SDXL Img2Img는 reference image를 직접 입력으로 받기 때문에 identity를 긴 텍스트로 다시 설명할 필요가 없습니다. 긴 prompt는 reference image와 충돌하거나 CLIP/텍스트 인코더 budget 문제를 만들 수 있으므로, SDXL에는 style 중심의 짧은 prompt를 사용합니다.
+
+Q. 왜 Identity를 Prompt에서 제거했나요?
+A. Identity, gender, hair, outfit, eye color, accessories는 reference image가 담당해야 하는 정보입니다. Prompt에 다시 넣으면 이미지가 가진 실제 시각 단서와 텍스트 설명이 충돌할 수 있습니다. 그래서 SDXL Style Prompt는 style, lighting, quality, mood, camera, rendering만 포함합니다.
+
+Q. Img2Img의 장점은 무엇인가요?
+A. Img2Img는 reference image를 latent 변환의 출발점으로 사용합니다. 따라서 prompt-only generation보다 silhouette, pose, composition, outfit 같은 reference 구조를 더 자연스럽게 유지할 수 있습니다.
+
+Q. FLUX와 SDXL Prompt Rendering 차이는 무엇인가요?
+A. FLUX는 reference image가 provider 입력으로 직접 들어가지 않으므로 dense prompt가 필요합니다. SDXL Img2Img는 reference image가 identity를 제공하므로 StyleProgram 기반 style prompt만 사용합니다.
+
+Q. 77 token 문제는 어떻게 해결했나요?
+A. SDXLPromptRenderer가 style prompt를 60 token 이하로 제한하고, 목표는 40 token 이하로 유지합니다. Debug Report에는 style prompt, word count, token count가 저장됩니다.
+
 ## v2.4 Reference-aware Style Transfer Questions
 
 Q. 왜 Prompt만으로 Style Transfer하지 않았나요?

@@ -2,6 +2,7 @@ from time import perf_counter
 
 from generation.generation_config import GenerationConfig
 from generation.generation_planner import GenerationPlanner
+from generation.prompt_renderer import ProviderPromptRenderer
 from generation.generation_result import GenerationResult
 from provider.flux_fast_provider import FluxFastProvider
 from provider.sdxl_quality_provider import SDXLQualityProvider
@@ -10,6 +11,7 @@ from provider.sdxl_quality_provider import SDXLQualityProvider
 class GenerationRouter:
     def __init__(self, planner=None, providers=None):
         self.planner = planner or GenerationPlanner()
+        self.prompt_renderer = ProviderPromptRenderer()
         self.providers = providers or {
             "flux_fast": FluxFastProvider(),
             "sdxl_quality": SDXLQualityProvider(),
@@ -28,10 +30,21 @@ class GenerationRouter:
             plan["generation_mode"] = "fast"
             plan["reason"] = "unknown provider fallback to flux_fast"
 
-        prompt = state.get("generation_prompt") or state.get("final_prompt") or ""
+        dense_prompt = state.get("generation_prompt") or state.get("final_prompt") or ""
         state["generation_plan"] = plan
         state["generation_mode"] = plan.get("generation_mode")
         state["generation_provider"] = provider_name
+        rendered_prompt = self.prompt_renderer.render(provider_name, dense_prompt, state, plan)
+        prompt = rendered_prompt.get("provider_prompt", dense_prompt)
+        state["dense_generation_prompt"] = dense_prompt
+        state["generation_prompt"] = prompt
+        state["provider_prompt_type"] = rendered_prompt.get("prompt_type")
+        state["style_prompt"] = rendered_prompt.get("style_prompt", "")
+        state["style_prompt_word_count"] = rendered_prompt.get("word_count")
+        state["style_prompt_token_count"] = rendered_prompt.get("token_count")
+        state["provider_prompt_rendering"] = rendered_prompt
+        print(f"[GenerationRouter] Prompt Type: {rendered_prompt.get('prompt_type')}")
+        print(f"[GenerationRouter] Prompt Length: {rendered_prompt.get('token_count')} tokens")
 
         config = GenerationConfig.from_plan(plan)
         negative_prompt = state.get("provider_negative_prompt") or state.get("negative_prompt") or ""
@@ -55,6 +68,13 @@ class GenerationRouter:
         }
         result["generation_mode"] = plan.get("generation_mode")
         result["generation_provider"] = provider_name
+        result["dense_generation_prompt"] = dense_prompt
+        result["generation_prompt"] = prompt
+        result["provider_prompt_type"] = rendered_prompt.get("prompt_type")
+        result["style_prompt"] = rendered_prompt.get("style_prompt", "")
+        result["style_prompt_word_count"] = rendered_prompt.get("word_count")
+        result["style_prompt_token_count"] = rendered_prompt.get("token_count")
+        result["provider_prompt_rendering"] = rendered_prompt
         result["cfg"] = plan.get("cfg")
         result["strength"] = plan.get("strength") if plan.get("strength") is not None else config.strength
         result["steps"] = plan.get("steps")

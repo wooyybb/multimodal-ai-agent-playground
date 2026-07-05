@@ -22,7 +22,7 @@
 | v2.0 | Generation Quality Upgrade | Complete |
 | v2.1 | Reference Conditioning Interface | Complete |
 | v2.2 | Real SDXL Img2Img Integration | Complete |
-| v2.3 | IP-Adapter Hook Integration | Complete |
+| v2.3 | SDXL Style Prompt Renderer | Complete |
 | v2.4 | Reference-aware Style Transfer Pipeline | Complete |
 
 ## Completed Sprints
@@ -98,7 +98,7 @@
 - Version 2.0: Provider-independent Generation Router with FLUX Fast Mode and SDXL Quality Mode skeleton
 - Version 2.1: Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
 - Version 2.2: Real SDXL Img2Img integration with Diffusers `StableDiffusionXLImg2ImgPipeline`, `SDXL_MODEL_ID`, reference image input, strength, and no mock fallback
-- Version 2.3: Optional IP-Adapter hook in SDXL provider with prompt-only fallback
+- Version 2.3: Provider-specific prompt rendering with dense FLUX prompts and short SDXL style prompts under the 77-token budget
 - Version 2.4: Style Program, inference-only LoRA hook, ControlNet placeholder, and reference-aware style transfer debug trace
 
 ## Planned Sprints

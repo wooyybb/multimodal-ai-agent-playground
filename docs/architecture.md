@@ -361,32 +361,34 @@ Quality Mode uses a `GenerationConfig` object:
 
 Providers return a `GenerationResult` with output path, backend, mode, config, latency, prompt length, notes, and fallback status. The SDXL provider uses `diffusers.StableDiffusionXLImg2ImgPipeline` with `SDXL_MODEL_ID`, reference image, `strength`, steps, CFG, and resolution. Reference Conditioning now has a real Img2Img path, while IP-Adapter and ControlNet remain future provider-layer hooks.
 
-## IP-Adapter Hook v2.3
+## SDXL Style Prompt Renderer v2.3
 
-SDXL Quality Provider keeps the IP-Adapter integration point documented, but the current Img2Img sprint does not activate IP-Adapter.
+Generation Router now applies provider-specific prompt rendering:
 
 ```text
-Reference Conditioning Package
+Context / Prompt Compiler
   |
   v
-SDXL Quality Provider
+Generation Router
   |
-  +-- current -> Img2Img reference image
+  +-- flux_fast    -> Dense Prompt
   |
-  +-- future  -> load_ip_adapter(...)
-        +-- fallback to prompt-only if unavailable
+  +-- sdxl_quality -> Style Prompt
 ```
 
-The hook records:
+FLUX keeps the dense visual prompt because it depends on prompt text for subject, identity, composition, style, and quality. SDXL Img2Img receives a short style-only prompt because the reference image already provides identity.
 
-- `reference_conditioning_enabled`
-- `conditioning_type`
-- `ip_adapter_enabled`
-- `used_conditioning_fallback`
-- `conditioning_reason`
-- `ip_adapter_status`
+The SDXL style prompt is built only from `style_program`:
 
-This makes the future reference-aware conditioning point explicit while keeping the current real backend focused on Img2Img.
+- style
+- lighting
+- quality
+- mood
+- camera
+- rendering
+- color palette
+
+Identity terms such as gender, hair, outfit, eye color, weapon, and accessories are removed before generation. The renderer records `provider_prompt_type`, `style_prompt`, `style_prompt_word_count`, and `style_prompt_token_count`. The target is 40 tokens or fewer, and the hard limit is 60 tokens so the prompt stays below 77 tokens.
 
 ## Reference-aware Style Transfer v2.4
 

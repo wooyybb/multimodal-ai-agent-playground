@@ -147,7 +147,7 @@ v2.1 adds a Reference Conditioning Interface. Current generation is still prompt
 
 Prompt-only generation has limits for reference preservation: text can describe hair color, eye color, outfit, identity, and accessories, but it cannot directly bind visual features from the reference image. The conditioning package keeps those preservation requirements explicit until real reference-conditioned providers are attached.
 
-v2.3 documents the IP-Adapter hook position for future reference-aware conditioning. The current v2.2 Img2Img backend does not activate IP-Adapter yet; reference awareness comes from the Img2Img reference image.
+v2.3 adds provider-specific prompt rendering. FLUX keeps the dense generation prompt. SDXL Img2Img receives a short Style Prompt generated only from `style_program`: style, lighting, quality, mood, camera, rendering, and color palette. Identity terms such as gender, hair, outfit, eye color, and accessories are removed because the reference image supplies identity through Img2Img.
 
 v2.4 completes the Reference-aware Style Transfer pipeline boundary at the architecture level. Generation Planner can still create a `style_program`, but this Img2Img sprint does not activate LoRA, ControlNet, or IP-Adapter. Those remain future provider-layer extension points.
 
@@ -252,6 +252,7 @@ Debug reports make the framework inspectable.
 - `report.json`: machine-readable state snapshot
 - `prompt_preview.txt`: readable prompt lifecycle and trace
 - prompt rendering outputs: generation prompt, CLIP prompt, PickScore prompt, VLM Judge prompt
+- provider-specific rendering outputs: prompt type, dense prompt, SDXL style prompt, word count, token count
 - evaluation metrics and retry information
 - incremental execution fields: executed layers, skipped layers, dirty reasons, and context cache path
 - output image references
@@ -333,6 +334,13 @@ The framework does not use one prompt for every model-facing task. The Prompt Re
 | `pickscore_prompt` | Human preference-oriented prompt preserving style, quality, and composition. |
 | `vlm_judge_prompt` | Longer judging instruction for future reference/generated image comparison. |
 
+Provider-specific prompt rendering is applied at Generation Router time:
+
+| Provider | Prompt Type | Behavior |
+| --- | --- | --- |
+| `flux_fast` | Dense | Uses the existing rich visual prompt. |
+| `sdxl_quality` | Style | Uses only `style_program` fields and keeps the prompt under 77 tokens. Identity stays in the reference image. |
+
 The CLIP prompt is intentionally short and removes quality-only terms such as `masterpiece`, `8k`, and `ultra detailed` so evaluation focuses on character, outfit, action, and background semantics.
 
 ## Evaluation Prompt Routing
@@ -371,7 +379,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v2.0 | Generation Quality Upgrade with provider-independent Generation Router |
 | v2.1 | Reference Conditioning Interface |
 | v2.2 | SDXL Quality Provider Integration |
-| v2.3 | Optional IP-Adapter hook for reference-aware SDXL generation |
+| v2.3 | SDXL Style Prompt Renderer |
 | v2.4 | Reference-aware Style Transfer with Style Program, LoRA hook, and ControlNet hook |
 
 ## Portfolio Highlights

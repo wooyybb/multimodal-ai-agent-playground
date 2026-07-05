@@ -162,7 +162,19 @@ class DebugReportManager:
                 )
             ),
             "prompt_rendering": self._safe(state.get("prompt_rendering")),
+            "provider_prompt_rendering": self._safe(
+                state.get("provider_prompt_rendering")
+            ),
+            "provider_prompt_type": self._safe(state.get("provider_prompt_type")),
+            "dense_generation_prompt": self._safe(state.get("dense_generation_prompt")),
             "generation_prompt": self._safe(state.get("generation_prompt")),
+            "style_prompt": self._safe(state.get("style_prompt")),
+            "style_prompt_word_count": self._safe(
+                state.get("style_prompt_word_count")
+            ),
+            "style_prompt_token_count": self._safe(
+                state.get("style_prompt_token_count")
+            ),
             "clip_prompt": self._safe(state.get("clip_prompt")),
             "pickscore_prompt": self._safe(state.get("pickscore_prompt")),
             "vlm_judge_prompt": self._safe(state.get("vlm_judge_prompt")),
@@ -376,6 +388,12 @@ class DebugReportManager:
         return {
             "generation_prompt": state.get("generation_prompt")
             or rendering.get("generation_prompt"),
+            "provider_prompt_type": state.get("provider_prompt_type"),
+            "provider_prompt_rendering": state.get("provider_prompt_rendering"),
+            "dense_generation_prompt": state.get("dense_generation_prompt"),
+            "style_prompt": state.get("style_prompt"),
+            "style_prompt_word_count": state.get("style_prompt_word_count"),
+            "style_prompt_token_count": state.get("style_prompt_token_count"),
             "clip_prompt": state.get("clip_prompt") or rendering.get("clip_prompt"),
             "pickscore_prompt": state.get("pickscore_prompt")
             or rendering.get("pickscore_prompt"),
