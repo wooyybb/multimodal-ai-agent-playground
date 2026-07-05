@@ -360,6 +360,36 @@ Quality Mode uses a `GenerationConfig` object:
 
 Providers return a `GenerationResult` with output path, backend, mode, config, latency, prompt length, notes, and fallback status. The SDXL provider can attempt `diffusers.StableDiffusionXLPipeline` only when explicitly enabled through `SDXL_ENABLE_DIFFUSERS=true`; otherwise it uses a safe mock fallback. Reference Conditioning remains prompt-only for now, with IP-Adapter and ControlNet kept as provider-layer hooks.
 
+## IP-Adapter Hook v2.3
+
+SDXL Quality Provider reads `reference_conditioning_package` and can optionally attempt IP-Adapter conditioning.
+
+```text
+Reference Conditioning Package
+  |
+  v
+SDXL Quality Provider
+  |
+  +-- USE_IP_ADAPTER=false -> prompt-only generation
+  |
+  +-- USE_IP_ADAPTER=true
+        |
+        +-- load_ip_adapter(IP_ADAPTER_MODEL_PATH, weight_name=...)
+        +-- set_ip_adapter_scale(identity_strength)
+        +-- fallback to prompt-only if unavailable
+```
+
+The hook records:
+
+- `reference_conditioning_enabled`
+- `conditioning_type`
+- `ip_adapter_enabled`
+- `used_conditioning_fallback`
+- `conditioning_reason`
+- `ip_adapter_status`
+
+This makes reference-aware generation explicit without requiring local IP-Adapter files in the default workflow.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

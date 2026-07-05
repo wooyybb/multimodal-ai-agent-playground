@@ -236,7 +236,12 @@ class ProviderPromptAdapter:
     def _supports_conditioning(self, provider, conditioning):
         provider = str(provider or "").lower()
         conditioning_type = str(conditioning.get("conditioning_type") or "").lower()
-        if provider == "sdxl" and conditioning_type in {"img2img", "ip_adapter", "controlnet"}:
+        if provider in {"sdxl", "sdxl_quality"} and conditioning_type in {
+            "img2img",
+            "ip_adapter",
+            "ip_adapter_planned",
+            "controlnet",
+        }:
             return True
         return False
 

@@ -22,6 +22,7 @@
 | v2.0 | Generation Quality Upgrade | Complete |
 | v2.1 | Reference Conditioning Interface | Complete |
 | v2.2 | SDXL Quality Provider Integration | Complete |
+| v2.3 | IP-Adapter Hook Integration | Complete |
 
 ## Completed Sprints
 
@@ -96,6 +97,7 @@
 - Version 2.0: Provider-independent Generation Router with FLUX Fast Mode and SDXL Quality Mode skeleton
 - Version 2.1: Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
 - Version 2.2: SDXL Quality Provider interface with GenerationConfig, GenerationResult, env-based routing, and safe fallback
+- Version 2.3: Optional IP-Adapter hook in SDXL provider with prompt-only fallback
 
 ## Planned Sprints
 

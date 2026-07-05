@@ -139,6 +139,8 @@ v2.1 adds a Reference Conditioning Interface. Current generation is still prompt
 
 Prompt-only generation has limits for reference preservation: text can describe hair color, eye color, outfit, identity, and accessories, but it cannot directly bind visual features from the reference image. The conditioning package keeps those preservation requirements explicit until real reference-conditioned providers are attached.
 
+v2.3 adds an optional IP-Adapter hook inside the SDXL Quality Provider. `USE_IP_ADAPTER=false` keeps prompt-only generation. When `USE_IP_ADAPTER=true`, the provider attempts `load_ip_adapter(...)` and `set_ip_adapter_scale(...)` if the configured adapter files exist. If loading fails, generation falls back to prompt-only behavior and records the reason in the debug report.
+
 ### Evaluation Layer
 
 Responsible for output evaluation and adaptive planning.
@@ -281,6 +283,9 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
 | `GENERATION_PROVIDER` | `flux_fast` or `sdxl_quality`; default is `flux_fast`. |
 | `SDXL_ENABLE_DIFFUSERS` | Optional `true` to attempt real `diffusers` SDXL execution when dependencies and model access are available. |
+| `USE_IP_ADAPTER` | Optional `true` to attempt SDXL IP-Adapter conditioning. Default is `false`. |
+| `IP_ADAPTER_MODEL_PATH` | Optional path for a local/public IP-Adapter model directory. |
+| `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename passed to `load_ip_adapter`. |
 
 VLM-only local run on PowerShell:
 
@@ -353,6 +358,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v2.0 | Generation Quality Upgrade with provider-independent Generation Router |
 | v2.1 | Reference Conditioning Interface |
 | v2.2 | SDXL Quality Provider Integration |
+| v2.3 | Optional IP-Adapter hook for reference-aware SDXL generation |
 
 ## Portfolio Highlights
 

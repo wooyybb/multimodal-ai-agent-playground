@@ -90,6 +90,15 @@ class DebugReportManager:
             "scheduler": self._safe(state.get("scheduler")),
             "resolution": self._safe(state.get("resolution")),
             "future_hooks": self._safe(state.get("future_hooks")),
+            "ip_adapter_status": self._safe(state.get("ip_adapter_status")),
+            "reference_conditioning_enabled": self._safe(
+                state.get("reference_conditioning_enabled")
+            ),
+            "conditioning_type": self._safe(state.get("conditioning_type")),
+            "used_conditioning_fallback": self._safe(
+                state.get("used_conditioning_fallback")
+            ),
+            "conditioning_reason": self._safe(state.get("conditioning_reason")),
             "context_cache": self._safe(state.get("context_cache")),
             "context_cache_path": self._safe(state.get("context_cache_path")),
             "executed_layers": self._safe(state.get("executed_layers", [])),
@@ -367,6 +376,12 @@ class DebugReportManager:
             "identity_strength": package.get("identity_strength"),
             "style_strength": package.get("style_strength"),
             "structure_strength": package.get("structure_strength"),
+            "ip_adapter_enabled": (
+                state.get("ip_adapter_status") or {}
+            ).get("enabled"),
+            "fallback": state.get("used_conditioning_fallback"),
+            "reason": state.get("conditioning_reason")
+            or (state.get("ip_adapter_status") or {}).get("reason"),
             "preserve": package.get("preserve", {}),
             "notes": package.get("notes", []),
         }
@@ -504,6 +519,7 @@ class DebugReportManager:
             "scheduler": state.get("scheduler") or plan.get("scheduler"),
             "resolution": state.get("resolution") or plan.get("resolution"),
             "future_hooks": state.get("future_hooks") or plan.get("future_hooks"),
+            "ip_adapter_status": state.get("ip_adapter_status"),
             "notes": state.get("generation_notes", []),
         }
 

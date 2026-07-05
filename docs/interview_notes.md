@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v2.3 IP-Adapter Hook Questions
+
+Q. 왜 prompt-only generation만으로 reference 보존이 어렵나요?
+A. Prompt는 reference image의 특징을 설명할 뿐, feature를 generation model에 직접 주입하지 않습니다. Hair, outfit, accessory, silhouette 같은 identity cue는 텍스트만으로 흔들릴 수 있어서 IP-Adapter 같은 image conditioning hook이 필요합니다.
+
+Q. IP-Adapter는 이 구조에서 어떤 역할을 하나요?
+A. IP-Adapter는 reference image feature를 SDXL generation provider에 전달해 identity/style preservation을 강화하는 역할입니다. 현재 구조에서는 `reference_conditioning_package`를 읽은 뒤 SDXL provider 내부에서 `load_ip_adapter`와 `set_ip_adapter_scale`을 호출하는 hook으로 배치했습니다.
+
+Q. 학습 없이 reference-aware generation을 어떻게 구성했나요?
+A. 별도 학습을 하지 않고 공개 IP-Adapter 또는 기존 adapter weight를 provider layer에서 선택적으로 로드하는 구조입니다. Framework는 adapter path, weight name, conditioning strength를 config와 debug report에 기록하고, 실제 adapter 파일이 있을 때만 사용합니다.
+
+Q. IP-Adapter가 실패하면 workflow는 어떻게 동작하나요?
+A. Crash하지 않고 prompt-only fallback으로 계속 진행합니다. `used_conditioning_fallback=true`, `conditioning_reason`, `ip_adapter_status`가 Debug Report에 저장되어 실패 원인을 추적할 수 있습니다.
+
 ## v2.2 SDXL Quality Provider Questions
 
 Q. 왜 FLUX와 SDXL을 함께 사용했나요?

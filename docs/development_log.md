@@ -120,6 +120,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - SDXL Quality Provider can optionally attempt `diffusers` execution, with mock fallback as the default safe path.
 - Debug reports now include generation config, prompt length, provider, mode, CFG, steps, scheduler, resolution, and latency.
 
+## Version 2.3
+
+- Added optional IP-Adapter hook inside SDXL Quality Provider.
+- SDXL provider now reads `reference_conditioning_package` and records conditioning status.
+- `USE_IP_ADAPTER=false` keeps prompt-only generation by default.
+- Missing adapter files or hook failures fall back gracefully and record the reason in debug reports.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.
