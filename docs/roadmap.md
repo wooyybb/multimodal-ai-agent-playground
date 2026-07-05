@@ -10,6 +10,7 @@
 | v0.4 | Intelligence Layer: Goal Planning, LLM Layer, Strategy Selection, Self Verification | Complete |
 | v0.5 | Evaluation & Observability: Multi-Metric Evaluation, Debug Report, Benchmark | Complete |
 | v1.0 RC1 | Layer-based architecture cleanup and portfolio documentation | Complete |
+| v1.0 RC2 | Responsibility refactoring and framework simplification | Complete |
 | v1.0 | CI, demo polish, deployment-ready release | Planned |
 
 ## Completed Sprints
@@ -74,6 +75,7 @@
 - Sprint 59: Real VLM Upgrade Preparation
 - Sprint 60: Real LLM Reasoning Layer
 - Release Candidate 1: Layer-based framework organization
+- Release Candidate 2: Framework simplification and responsibility refactoring
 
 ## Planned Sprints
 

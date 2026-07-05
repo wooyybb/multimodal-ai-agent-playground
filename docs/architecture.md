@@ -1,11 +1,11 @@
 # Architecture
 
-This document describes the v1.0 RC1 architecture of Multimodal AI Agent Playground using a layer-based view.
+This document describes the v1.0 RC2 responsibility-based architecture of Multimodal AI Agent Playground.
 
-## Layer Diagram
+## Target Architecture
 
 ```text
-User Input
+User
   |
   v
 Planning Layer
@@ -20,73 +20,71 @@ Generation Layer
 Evaluation Layer
   |
   v
-Reasoning Layer
-  |
-  v
-Memory / Observability Layer
+Infrastructure Layer
 ```
 
 ## Layer Responsibilities
 
-| Layer | Responsibility | Representative Components |
+| Layer | Responsibility | Internal Examples |
 | --- | --- | --- |
-| Planning Layer | Interpret request, reference image, goal, scene, and character identity. | PlannerAgent, GoalPlanner, ReferenceImageParser, CharacterProgramBuilder |
-| Context Layer | Convert planning outputs into structured Context Program and prompt program. | ContextProgramBuilder, ContextProgramValidator, PromptAssembler, PromptCompiler |
-| Generation Layer | Select provider, adapt prompt, and generate image. | ProviderRouter, ProviderPromptAdapter, GenerationAgent |
-| Evaluation Layer | Evaluate generated image through multiple metrics. | EvaluationAgent, EvaluationAggregator, CLIP/Identity/Prompt/Aesthetic metrics |
-| Reasoning Layer | Analyze failures, verify goals, select strategy, and adapt plan. | ReflectionAgent, SelfVerificationAgent, StrategySelector, AdaptivePlanner |
-| Memory / Observability Layer | Store run history, debug reports, benchmark outputs, and prompt previews. | MemoryManager, DebugReportManager, BenchmarkRunner, ReportGenerator |
+| Planning Layer | Understand user intent and reference image. | Vision, Goal Planning, Reference Parsing, Character Extraction, Scene Planning |
+| Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Compilation, Prompt Validation, Prompt Optimization |
+| Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX |
+| Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
+| Infrastructure Layer | Support runtime, observability, and access. | Memory, History, Debug Report, Benchmark, FastAPI, Gradio |
 
 ## Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    U[User Input] --> P[Planning Layer]
+    U[User] --> P[Planning Layer]
     P --> C[Context Layer]
     C --> G[Generation Layer]
     G --> E[Evaluation Layer]
-    E --> R[Reasoning Layer]
-    R --> C
-    R --> M[Memory / Observability Layer]
-    G --> M
-    E --> M
+    E --> C
+    E --> I[Infrastructure Layer]
+    P --> I
+    C --> I
+    G --> I
 
-    P -.examples.-> PEX[PlannerAgent / GoalPlanner / ReferenceImageParser]
-    C -.examples.-> CEX[ContextProgramBuilder / PromptCompiler]
-    G -.examples.-> GEX[ProviderRouter / GenerationAgent]
-    E -.examples.-> EEX[EvaluationAggregator / CLIP Metric]
-    R -.examples.-> REX[Reflection / StrategySelector / AdaptivePlanner]
-    M -.examples.-> MEX[MemoryManager / DebugReport / Benchmark]
+    P -.internal.-> P1[Vision / Goal / Reference / Scene]
+    C -.internal.-> C1[Context Program / Prompt Compiler]
+    G -.internal.-> G1[Provider Router / Generation]
+    E -.internal.-> E1[Evaluation / Adaptive Planning / Retry]
+    I -.internal.-> I1[Memory / Debug / Benchmark / API / UI]
 ```
 
 ## Runtime Flow
 
-1. User provides an image and/or text prompt through Gradio or FastAPI.
-2. Planning Layer builds goals, reference image structure, scene intent, and character program.
-3. Context Layer creates and validates Context Program, then compiles provider-specific prompt packages.
-4. Generation Layer selects a provider and generates an image.
-5. Evaluation Layer scores the output with CLIP and rule-based metrics.
-6. Reasoning Layer reflects, verifies, selects a strategy, and may adapt the next prompt.
-7. Memory / Observability Layer saves history, debug reports, and benchmark artifacts.
+1. Planning Layer reads user input and image reference.
+2. Context Layer turns planning output into provider-ready context and prompt package.
+3. Generation Layer chooses provider and generates the image.
+4. Evaluation Layer scores the result and decides whether adaptation or retry is needed.
+5. Infrastructure Layer records memory, debug reports, benchmark outputs, and exposes UI/API access.
 
-## Key Design Boundaries
+## Design Boundaries
 
-- UI/API should not know individual agent internals.
-- Planning produces structured intent and visual understanding, not final model prompts.
-- Context Program is provider-independent.
-- PromptCompiler converts Context Program into provider-specific prompt packages.
-- Generation provider details are isolated behind routing and adapter layers.
-- Evaluation is metric-based and explainable.
-- Reasoning is optional-LLM capable but rule fallback remains the default stability path.
-- Observability is treated as a first-class layer through debug reports and benchmark outputs.
+- Agents are internal implementation details.
+- Layers are the public explanation model.
+- Context Engineering owns the conversion from intent to generation-ready structured data.
+- Generation does not own evaluation or retry policy.
+- Evaluation owns adaptive planning and retry decision.
+- Infrastructure owns memory, debug report, benchmark, API, and UI support.
 
-## Why Layer-based Organization?
+## Why Responsibility Refactoring?
 
-The project contains many agents, but the important architecture is not the number of classes. The important idea is that each class belongs to a layer with a clear responsibility. This makes the framework easier to explain, maintain, test, and extend.
+The project contains many specialized components. Listing every agent makes the framework look more complex than it is. Responsibility-based layers make it easier to understand what the system does and where each capability belongs.
+
+## What Did Not Change
+
+- Core execution order is preserved.
+- Existing agents and tools are preserved.
+- No new AI model, VLM, LLM, tool, or metric was added.
+- The cleanup is architectural communication and light metadata/log organization.
 
 ## Future Work
 
-- ExecutionEngine cleanup using the same layer naming.
-- AgentState organization by layer-owned fields.
-- CI checks for compile, import, and Docker smoke tests.
-- Demo polish and curated release assets.
+- Continue simplifying ExecutionEngine comments and trace output.
+- Organize AgentState fields by layer ownership.
+- Add CI smoke tests for compile, import, FastAPI, and Docker.
+- Polish demo assets for v1.0 release.

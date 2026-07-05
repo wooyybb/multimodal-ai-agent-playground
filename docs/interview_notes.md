@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v1.0 RC2 Responsibility Questions
+
+Q. 왜 Agent를 많이 만들지 않고 Layer로 설명했나요?
+A. Agent는 내부 구현 단위이고, 면접이나 문서에서 중요한 것은 책임 구조입니다. Agent 이름을 모두 나열하면 프로젝트가 복잡해 보이지만, Planning, Context, Generation, Evaluation, Infrastructure로 설명하면 전체 흐름이 빠르게 이해됩니다. 그래서 RC2에서는 Agent 중심 설명을 줄이고 Responsibility 중심으로 재정리했습니다.
+
+Q. Layer 구조의 장점은 무엇인가요?
+A. Layer 구조는 각 기능이 어디에 속하는지 명확하게 보여줍니다. 새로운 기능을 추가할 때도 먼저 어떤 책임 Layer에 속하는지 결정할 수 있어 설계가 흔들리지 않습니다. 또한 README만 읽어도 5분 안에 전체 Framework를 파악할 수 있습니다.
+
+Q. ExecutionEngine은 Layer를 어떻게 실행하나요?
+A. ExecutionEngine은 기존처럼 step 단위로 Agent를 실행합니다. 다만 RC2에서는 step을 Planning, Context, Generation, Evaluation, Infrastructure Layer로 읽을 수 있도록 주석과 로그를 정리했습니다. 실행 방식은 유지하되 이해 방식을 Layer 중심으로 바꾼 것입니다.
+
+Q. Context Engineering은 어떤 역할을 하나요?
+A. Context Engineering은 사용자 의도, reference image, memory, retrieval, provider constraint를 생성 가능한 구조로 바꾸는 역할입니다. 이 프로젝트에서는 Context Program과 Prompt Compiler가 그 중심입니다. 즉 prompt 문자열을 바로 만드는 것이 아니라, 먼저 provider-independent context를 만들고 이후 provider별 prompt package로 변환합니다.
+
+Q. Adaptive Planning은 어디에 포함됩니까?
+A. RC2 구조에서는 Adaptive Planning을 Evaluation Layer 내부의 feedback process로 봅니다. Evaluation 결과를 보고 reflection, hypothesis, strategy, retry decision을 수행하기 때문입니다. 따라서 Adaptive Planning은 별도 외부 Layer가 아니라 Evaluation & Adaptive Planning 책임 안에 포함됩니다.
+
 ## v1.0 RC1 Layer-based Questions
 
 Q. 이 프로젝트는 단순 이미지 생성 데모와 무엇이 다른가요?

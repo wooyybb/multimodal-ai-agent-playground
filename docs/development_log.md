@@ -210,6 +210,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added Layer Map and v1.0 RC1 release notes.
 - Preserved core workflow and avoided new model, agent, tool, API, or metric functionality.
 
+## Release Candidate 2
+
+- Simplified public architecture into five responsibility layers: Planning, Context, Generation, Evaluation, and Infrastructure.
+- Treated hypothesis, strategy, retry, reflection, and adaptive planning as internal Evaluation Layer processes.
+- Updated README, architecture, project summary, demo guide, roadmap, and interview notes.
+- Added v1.0 RC2 release notes.
+- Added layer-readable ExecutionEngine logs and ToolRegistry metadata without changing core behavior.
+
 ## Future Work
 
 - Keep this file short.

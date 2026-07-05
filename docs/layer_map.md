@@ -4,42 +4,39 @@ Layer-based view is used for documentation and portfolio communication. Internal
 
 ## Planning Layer
 
-- Role: Interpret user intent, reference image, goal, scene, and character identity.
-- Included agents: PlannerAgent, GoalPlanner, ScenePlanningAgent, ReferenceImageParser, CharacterProgramBuilder.
-- Input: user prompt, image, caption, vision result, previous planning state.
-- Output: execution plan, goal tree, reference image structure, scene plan, character program.
+- Role: Understand user intent and reference image.
+- Includes: Vision, Goal Planning, Reference Parsing, Character Extraction, Scene Planning.
+- Input: user prompt, input image, caption, vision result, previous planning state.
+- Output: goal tree, reference image structure, character program, scene plan.
 
 ## Context Layer
 
-- Role: Convert planning results into provider-independent Context Program and prompt program.
-- Included agents: ContextProgramBuilder, ContextProgramValidator, PromptAssembler, PromptCompiler, PromptCompressor, NegativePromptAgent.
-- Input: planning outputs, retrieval context, memory context, provider constraints.
-- Output: context program, context validation, canonical prompt, compiled prompt package.
+- Role: Build generation-ready context.
+- Includes: Character Program, Context Program, Prompt Compilation, Prompt Validation, Negative Prompt, Prompt Optimization, Prompt Compression.
+- Input: planning output, retrieval context, memory context, provider constraints.
+- Output: context program, context validation, optimized prompt, compiled prompt package.
 
 ## Generation Layer
 
-- Role: Select provider, adapt prompt, and run image generation.
-- Included agents/tools: ProviderRouter, ProviderPromptAdapter, GenerationAgent, FLUX Tool.
+- Role: Generate according to provider requirements.
+- Includes: Provider Router, Provider Adapter, Generation Agent, FLUX.
 - Input: compiled prompt package, provider config, provider prompt.
-- Output: generated image path and provider-specific generation metadata.
+- Output: generated image path and provider generation metadata.
 
 ## Evaluation Layer
 
-- Role: Evaluate generated output with multiple metrics.
-- Included agents/metrics: EvaluationAgent, EvaluationAggregator, CLIP Metric, Identity Metric, Prompt Metric, Aesthetic Metric.
-- Input: reference image, generated image path, prompt, character program, compiled prompt package.
-- Output: metrics, weighted score, metric summary.
+- Role: Evaluate result and adapt the next plan.
+- Includes: Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry.
+- Input: generated image, reference image, prompt package, score, context program.
+- Output: metrics, weighted score, reflection, adaptive plan, retry decision, best result.
 
-## Reasoning Layer
+## Infrastructure Layer
 
-- Role: Analyze evaluation results, generate hypotheses, select strategy, verify goals, and adapt plan.
-- Included agents: ReflectionAgent, LLMContextReasoner, LLMPromptCriticAgent, LLMPromptOptimizerAgent, HypothesisGenerator, StrategySelector, SelfVerificationAgent, AdaptivePlanner, RetryAgent.
-- Input: evaluation result, score, reflection, goal tree, prompt report, context program.
-- Output: reflection, hypothesis, selected strategy, self verification, adaptive plan, retry decision.
+- Role: Support persistence, debugging, comparison, and access.
+- Includes: Memory, History, Debug Report, Benchmark, Report Generator, FastAPI, Gradio.
+- Input: full execution state, output paths, metrics, prompts, trace.
+- Output: history record, debug report, benchmark result, API/UI access.
 
-## Memory / Observability Layer
+## Note
 
-- Role: Store previous runs, debug traces, benchmark results, and prompt lifecycle artifacts.
-- Included components: MemoryManager, MemoryRetrieval, DebugReportManager, BenchmarkRunner, ReportGenerator.
-- Input: full execution state, prompt previews, output paths, metrics, retry results.
-- Output: history records, debug report, prompt preview, benchmark JSON, comparison reports.
+Layer-based view is used for documentation and portfolio communication. Internal implementation may still use individual agent classes.

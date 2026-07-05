@@ -1,151 +1,130 @@
 # Multimodal AI Agent Playground
 
-**Layer-based AI Agent Framework for Multimodal Image Generation**
+**Responsibility-based AI Agent Framework for Multimodal Image Generation**
 
-![Status](https://img.shields.io/badge/status-v1.0_RC1-blue)
+![Status](https://img.shields.io/badge/status-v1.0_RC2-blue)
 ![Python](https://img.shields.io/badge/Python-3.x-green)
-![Architecture](https://img.shields.io/badge/Architecture-Layer--based-purple)
+![Architecture](https://img.shields.io/badge/Architecture-Responsibility--Layered-purple)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-teal)
 ![Gradio](https://img.shields.io/badge/UI-Gradio-orange)
 
 ## Project Overview
 
-This project is not a collection of many agents for its own sake. It is a multimodal image generation framework organized into six layers:
+This project is not about having many agents. It is a multimodal image generation framework organized by responsibility.
+
+The framework is explained through five layers:
 
 1. Planning Layer
 2. Context Layer
 3. Generation Layer
 4. Evaluation Layer
-5. Reasoning Layer
-6. Memory / Observability Layer
+5. Infrastructure Layer
 
-The framework turns user input and reference images into structured planning data, builds a provider-independent Context Program, compiles provider-specific prompts, generates images, evaluates outputs, reasons about failures, and records each run for debugging and comparison.
+Each internal agent is treated as an implementation detail inside one of these layers.
 
 ## Why This Project?
 
-Most image generation demos stop at:
+Most image generation demos are direct prompt-to-image scripts. They are hard to inspect when the result is poor.
+
+This project separates the workflow into responsibilities:
 
 ```text
-User Prompt -> Image Generation -> Result
+Understand intent and reference image
+-> Build generation-ready context
+-> Generate with provider-specific adaptation
+-> Evaluate and adapt the plan
+-> Save memory, debug reports, and benchmark results
 ```
 
-This project treats image generation as an inspectable AI Agent workflow:
-
-```text
-Understand input
--> Plan goals and visual context
--> Build Context Program
--> Compile provider prompt
--> Generate image
--> Evaluate with multiple metrics
--> Reflect and re-plan
--> Save memory and debug report
-```
-
-The purpose is to show framework-level engineering: separation of responsibility, provider abstraction, context engineering, evaluation, fallback design, and observability.
+The goal is to make the system understandable in five minutes: what each layer owns, how data moves, and where future improvements belong.
 
 ## Layer-based Architecture
 
 ```text
-User Input
+User
   |
   v
 Planning Layer
-  - PlannerAgent
-  - GoalPlanner
-  - ReferenceImageParser
-  - CharacterProgramBuilder
   |
   v
 Context Layer
-  - ContextProgramBuilder
-  - ContextProgramValidator
-  - PromptAssembler
-  - PromptCompiler
   |
   v
 Generation Layer
-  - ProviderRouter
-  - ProviderPromptAdapter
-  - GenerationAgent
   |
   v
 Evaluation Layer
-  - EvaluationAgent
-  - EvaluationAggregator
-  - CLIP / Identity / Prompt / Aesthetic Metrics
   |
   v
-Reasoning Layer
-  - ReflectionAgent
-  - SelfVerificationAgent
-  - StrategySelector
-  - AdaptivePlanner
-  |
-  v
-Memory / Observability Layer
-  - MemoryManager
-  - DebugReportManager
-  - BenchmarkRunner
-  - ReportGenerator
+Infrastructure Layer
 ```
 
 ## End-to-End Workflow
 
-```text
-Image / User Prompt
--> Planning Layer
--> Context Layer
--> Generation Layer
--> Evaluation Layer
--> Reasoning Layer
--> Memory / Observability Layer
-```
-
-The internal implementation still uses individual Python classes, but the project is explained and maintained through layer ownership.
+| Step | Layer | Responsibility |
+| --- | --- | --- |
+| 1 | Planning | Understand user intent, reference image, goal, character, and scene. |
+| 2 | Context | Build Context Program, validate it, optimize prompt, and compile provider prompt package. |
+| 3 | Generation | Route provider, adapt prompt, and generate image. |
+| 4 | Evaluation | Evaluate output, reflect, select strategy, adapt plan, and decide retry. |
+| 5 | Infrastructure | Save memory, debug report, benchmark output, API/UI access, and run history. |
 
 ## Core Layers
 
-| Layer | Role | Representative Components |
-| --- | --- | --- |
-| Planning | Interpret user intent, image references, goals, scene, and character identity. | PlannerAgent, GoalPlanner, ReferenceImageParser |
-| Context | Convert planning output into Context Program and provider-independent prompt structures. | ContextProgramBuilder, PromptCompiler |
-| Generation | Select provider, adapt prompt, and generate image. | ProviderRouter, ProviderPromptAdapter, GenerationAgent |
-| Evaluation | Score generated output with multiple metrics. | EvaluationAgent, EvaluationAggregator |
-| Reasoning | Reflect, verify, select strategy, and adapt plan. | ReflectionAgent, StrategySelector, AdaptivePlanner |
-| Memory / Observability | Save history, debug reports, benchmark outputs, and prompt previews. | MemoryManager, DebugReportManager, BenchmarkRunner |
+### Planning Layer
+
+Responsible for understanding user intent and reference image.
+
+Includes vision, goal planning, reference parsing, character extraction, and scene planning.
+
+### Context Layer
+
+Responsible for making generation-ready context.
+
+Externally, this layer can be understood as the Prompt Compiler layer. Internally, it includes Context Program, prompt validation, negative prompt, prompt optimization, and prompt compression.
+
+### Generation Layer
+
+Responsible for provider-specific generation.
+
+It includes provider routing, provider prompt adaptation, generation agent, and FLUX integration.
+
+### Evaluation Layer
+
+Responsible for output evaluation and adaptive planning.
+
+It includes evaluation aggregation, reflection, hypothesis/strategy logic, adaptive planning, and retry decision. Hypothesis, Strategy, and Retry are treated as internal steps of adaptive evaluation.
+
+### Infrastructure Layer
+
+Responsible for system support.
+
+It includes memory, history, debug report, benchmark, report generator, FastAPI, and Gradio.
 
 ## Key Features
 
-- Layer-based AI Agent architecture
-- DynamicExecutionEngine and ToolRegistry
-- BLIP default VLM with Florence/Qwen adapter skeletons
-- Reference Image Parser and Character Program
-- Context Program and Context Validator
-- Prompt Compiler and Provider Prompt Adapter
+- Responsibility-based framework architecture
+- DynamicExecutionEngine with layer-readable execution flow
+- ToolRegistry with layer metadata
+- Context Program and Prompt Compiler
+- Provider routing and provider prompt adaptation
 - FLUX-oriented generation path
-- Multi-Metric Evaluation with CLIP and rule-based metrics
-- Reflection, Self Verification, Strategy Selection, Adaptive Planning
-- Optional LLM reasoning with rule fallback
-- Memory, Debug Report, Benchmark Runner, Report Generator
+- Multi-metric evaluation
+- Adaptive planning and retry loop
+- Memory, debug report, benchmark, and report generator
 - Gradio UI and FastAPI service layer
 
 ## Repository Structure
 
-```text
-agents/       Agent classes grouped conceptually by planning, context, reasoning, and generation roles
-workflow/     DynamicExecutionEngine, AgentState, debug reports, pipeline facade
-tools/        BLIP, FLUX, CLIP, and VLM adapter tools
-llm/          LLM client, reasoner router, AIModelService, provider skeletons
-evaluation/   Metric abstraction and EvaluationAggregator
-memory/       MemoryManager and run history
-knowledge/    Retrieval knowledge and style library resources
-api/          FastAPI service layer
-ui/           Gradio interface
-benchmark/    Benchmark runner and report generator
-docs/         Architecture, layer map, roadmap, sprint book, prompts, interview notes
-outputs/      Runtime output directory; do not commit generated outputs
-```
+The folders remain implementation-oriented, but README explains them by responsibility:
+
+| Responsibility | Main Folders |
+| --- | --- |
+| Planning | `agents/`, `tools/vlm/` |
+| Context | `agents/`, `knowledge/`, `llm/` |
+| Generation | `agents/`, `tools/`, `config/` |
+| Evaluation | `agents/`, `evaluation/`, `tools/` |
+| Infrastructure | `workflow/`, `memory/`, `api/`, `ui/`, `benchmark/`, `docs/` |
 
 ## Quick Start
 
@@ -167,7 +146,7 @@ Run FastAPI:
 uvicorn api.app:app --reload
 ```
 
-Open Swagger:
+Swagger:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -195,22 +174,16 @@ FastAPI: `http://127.0.0.1:8000/docs`
 
 Gradio: `http://127.0.0.1:7860`
 
-Stop Docker services:
-
-```bash
-docker compose down
-```
-
 ## Debug Report / Benchmark
 
-Each run can save:
+Debug reports make the framework inspectable.
 
 - `report.json`: machine-readable state snapshot
-- `prompt_preview.txt`: human-readable prompt lifecycle and agent trace
+- `prompt_preview.txt`: readable prompt lifecycle and trace
+- evaluation metrics and retry information
 - output image references
-- evaluation scores and retry information
 
-Benchmark results are saved under `benchmark/results/`. Do not commit runtime outputs or API keys.
+Benchmark results are saved under `benchmark/results/`. Runtime outputs and API keys should not be committed.
 
 ## Environment Variables
 
@@ -218,7 +191,7 @@ Benchmark results are saved under `benchmark/results/`. Do not commit runtime ou
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `OPENAI_API_KEY` | Optional OpenAI key for LLM reasoning experiments. |
-| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; default behavior remains rule/fallback oriented. |
+| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; rule/fallback remains the default behavior. |
 | `VLM_PROVIDER` | `blip`, `florence`, or `qwen`; BLIP is the default. |
 
 ## Current Limitations
@@ -226,34 +199,28 @@ Benchmark results are saved under `benchmark/results/`. Do not commit runtime ou
 - BLIP is the default VLM; Florence/Qwen adapters currently use BLIP fallback.
 - FLUX is the current generation provider path.
 - OpenAI reasoning is optional and falls back to rule-based behavior.
-- Some reasoning and evaluation steps are intentionally rule-based for stability.
-- Image quality depends on external model/provider behavior.
+- Some adaptive planning and evaluation logic is intentionally rule-based for stability.
+- Image quality depends on external provider behavior.
 
 ## Roadmap
 
 | Release | Focus |
 | --- | --- |
-| v0.1 | Core multimodal pipeline |
-| v0.2 | Multi-agent orchestration and registry |
-| v0.3 | Context Engineering and Prompt Compiler |
-| v0.4 | Reasoning loop and provider abstraction |
-| v0.5 | Evaluation, debug reports, benchmark |
-| v1.0 RC1 | Layer-based architecture cleanup |
-| v1.0 | Demo polish, CI, deployment-ready documentation |
+| v1.0 RC1 | Layer-based documentation cleanup |
+| v1.0 RC2 | Responsibility refactoring and framework simplification |
+| v1.0 | Demo polish, CI, and deployment-ready release |
 
 ## Portfolio Highlights
 
-This project demonstrates:
-
 - AI Agent Architecture
+- Responsibility-driven framework design
 - Context Engineering
-- Prompt Engineering
-- Multimodal AI workflow design
-- Provider abstraction and fallback design
+- Prompt Compiler design
+- Provider abstraction
 - Multi-metric evaluation
-- Backend API and UI integration
-- Debuggable AI system design
-- Framework refactoring from feature-based agents into layer-based architecture
+- Adaptive planning
+- Debuggable AI workflow
+- FastAPI and Gradio integration
 
 ## Documentation
 
@@ -263,7 +230,7 @@ This project demonstrates:
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)
 - [Roadmap](docs/roadmap.md)
-- [v1.0 RC1 Release Notes](docs/release_notes_v1_rc1.md)
+- [v1.0 RC2 Release Notes](docs/release_notes_v1_rc2.md)
 
 ## License
 

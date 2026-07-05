@@ -9,16 +9,27 @@ class ToolRegistry:
             "reference_image_parser",
             "character_program_builder",
             "scene_planning",
+            "llm_context_reasoner",
         ],
         "context": [
             "retrieval",
             "memory_retrieval",
             "prompt_compressor",
+            "character",
+            "style",
+            "layout",
+            "pose",
+            "expression",
+            "lighting",
             "context_program_builder",
             "context_program_validator",
             "prompt_assembler",
-            "prompt_compiler",
             "negative_prompt",
+            "prompt_critic",
+            "llm_prompt_critic",
+            "prompt_optimizer",
+            "llm_prompt_optimizer",
+            "prompt_compiler",
         ],
         "generation": [
             "provider_router",
@@ -27,23 +38,24 @@ class ToolRegistry:
         ],
         "evaluation": [
             "evaluation",
-        ],
-        "reasoning": [
-            "llm_context_reasoner",
-            "prompt_critic",
-            "llm_prompt_critic",
-            "prompt_optimizer",
-            "llm_prompt_optimizer",
             "reflection",
             "self_verification",
             "strategy_selector",
             "adaptive_planner",
             "retry",
         ],
-        "memory_observability": [
+        "infrastructure": [
             "memory_load",
             "memory_save",
         ],
+    }
+    LAYER_LABELS = {
+        "planning": "Planning Layer",
+        "context": "Context Layer",
+        "generation": "Generation Layer",
+        "evaluation": "Evaluation Layer",
+        "infrastructure": "Infrastructure Layer",
+        "unmapped": "Unmapped Layer",
     }
 
     def __init__(self):
@@ -134,3 +146,6 @@ class ToolRegistry:
             if tool_name in tools:
                 return layer
         return "unmapped"
+
+    def layer_label_for(self, tool_name: str) -> str:
+        return self.LAYER_LABELS.get(self.layer_for(tool_name), "Unmapped Layer")

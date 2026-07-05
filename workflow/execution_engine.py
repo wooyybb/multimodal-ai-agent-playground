@@ -4,39 +4,46 @@ from workflow.debug_report import DebugReportManager
 
 class DynamicExecutionEngine:
     DEFAULT_PLAN = [
+        # ===== Planning Layer =====
         "goal_planner",
+        # ===== Infrastructure Layer =====
         "memory_load",
+        # ===== Planning Layer =====
         "vision",
         "reference_image_parser",
         "character_program_builder",
+        # ===== Context Layer =====
         "memory_retrieval",
-            "retrieval",
-            "prompt_compressor",
-            "scene_planning",
-            "character",
-            "style",
-            "layout",
-            "pose",
-            "expression",
-            "lighting",
-            "negative_prompt",
-            "context_program_builder",
-            "context_program_validator",
-            "prompt_assembler",
-            "prompt_critic",
-            "llm_prompt_critic",
-            "prompt_optimizer",
-            "llm_prompt_optimizer",
-            "provider_router",
-            "prompt_compiler",
-            "provider_prompt_adapter",
+        "retrieval",
+        "prompt_compressor",
+        "scene_planning",
+        "character",
+        "style",
+        "layout",
+        "pose",
+        "expression",
+        "lighting",
+        "negative_prompt",
+        "context_program_builder",
+        "context_program_validator",
+        "prompt_assembler",
+        "prompt_critic",
+        "llm_prompt_critic",
+        "prompt_optimizer",
+        "llm_prompt_optimizer",
+        "prompt_compiler",
+        # ===== Generation Layer =====
+        "provider_router",
+        "provider_prompt_adapter",
         "generation",
+        # ===== Evaluation Layer =====
         "evaluation",
         "reflection",
         "self_verification",
         "strategy_selector",
         "adaptive_planner",
         "retry",
+        # ===== Infrastructure Layer =====
         "memory_save",
     ]
 
@@ -60,7 +67,8 @@ class DynamicExecutionEngine:
         plan = self._normalize_plan(execution_plan or self.DEFAULT_PLAN)
 
         for step in plan:
-            print(f"[ExecutionEngine] Running step: {step}")
+            layer_label = self._layer_label(registry, step)
+            print(f"[{layer_label}] Running step: {step}")
             try:
                 handler = getattr(self, f"_run_{step}", None)
                 if handler is None:
@@ -1039,11 +1047,16 @@ class DynamicExecutionEngine:
         return normalized
 
     def _run_state_step(self, registry, state, step):
-        print(f"[ExecutionEngine] Running state-based step: {step}")
+        print(f"[{self._layer_label(registry, step)}] Running state-based step: {step}")
         result = registry.run_with_state(step, state)
         state.update(result)
-        print(f"[ExecutionEngine] State updated by: {step}")
+        print(f"[{self._layer_label(registry, step)}] State updated by: {step}")
         return result
+
+    def _layer_label(self, registry, step):
+        if hasattr(registry, "layer_label_for"):
+            return registry.layer_label_for(step)
+        return "ExecutionEngine"
 
     def _print_prompt_preview(self, state):
         sections = state.get("prompt_sections") or {}

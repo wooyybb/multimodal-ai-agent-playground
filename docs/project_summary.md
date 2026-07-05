@@ -16,16 +16,15 @@ Many image generation demos are difficult to inspect because prompt creation, mo
 
 ## Design Goal
 
-The design goal is to separate the workflow into clear layers:
+The design goal is to keep the framework understandable through five responsibilities:
 
 1. Planning Layer
 2. Context Layer
 3. Generation Layer
 4. Evaluation Layer
-5. Reasoning Layer
-6. Memory / Observability Layer
+5. Infrastructure Layer
 
-This lets the project stay understandable even as the number of agents grows.
+This keeps the project understandable even as the number of internal agents grows.
 
 ## Layer-based Structure
 
@@ -35,11 +34,9 @@ The Context Layer converts planning output into Context Program and provider-ind
 
 The Generation Layer selects the provider, adapts the prompt, and runs image generation.
 
-The Evaluation Layer scores output with CLIP and additional rule-based metrics.
+The Evaluation Layer scores output with CLIP and additional rule-based metrics, then performs reflection, strategy selection, adaptive planning, and retry decisions.
 
-The Reasoning Layer performs reflection, self verification, strategy selection, adaptive planning, and retry decisions.
-
-The Memory / Observability Layer saves run history, debug reports, benchmark results, and prompt previews.
+The Infrastructure Layer saves run history, debug reports, benchmark results, prompt previews, and exposes FastAPI/Gradio access.
 
 ## Core Implementation
 
@@ -48,6 +45,7 @@ The Memory / Observability Layer saves run history, debug reports, benchmark res
 - `ContextProgramBuilder` and `PromptCompiler` separate semantic context from provider prompts.
 - `ProviderRouter` and `ProviderPromptAdapter` isolate generation provider details.
 - `EvaluationAggregator` combines multiple metrics into an explainable score.
+- Adaptive planning and retry are treated as part of the Evaluation Layer's feedback loop.
 - `DebugReportManager` captures state, prompts, traces, metrics, and output paths.
 - `BenchmarkRunner` and `ReportGenerator` support repeatable comparison.
 
