@@ -1,18 +1,18 @@
 # Interview Notes
 
-## v1.2 Real LLM Reasoning Questions
+## v1.1 VLM-only Stabilization Questions
 
-Q. 실제 LLM을 어디에 사용했나요?
-A. Prompt를 바로 생성하는 데 쓰기보다 Context Reasoning, LLM Prompt Critique, Prompt Optimization, Hypothesis/Strategy reasoning처럼 판단과 구조화가 필요한 Reasoning Layer에 사용했습니다. `LLM_PROVIDER=openai`일 때만 OpenAI provider를 시도하고, 기본값은 rule/mock fallback입니다.
+Q. 이번 v1.1에서 집중한 것은 무엇인가요?
+A. 유료 LLM API 연동은 보류하고 Vision Layer 안정화에 집중했습니다. `VLM_PROVIDER=blip` 또는 `VLM_PROVIDER=florence`만 바꿔도 `vision_result`, `reference_image`, `character_program`이 같은 schema로 downstream에 전달되도록 정리했습니다.
 
-Q. 왜 Agent가 OpenAI를 직접 호출하지 않게 했나요?
-A. Agent가 provider API를 직접 호출하면 provider 교체, 테스트, fallback 처리가 어려워집니다. 그래서 Agent는 `LLMClient` 또는 `ReasonerRouter`만 호출하고, 실제 OpenAI 호출은 `llm/` layer의 `AIModelService`와 `OpenAIProvider`가 담당하게 했습니다.
+Q. OpenAI API 없이도 동작하나요?
+A. 네. 현재 기본 실행은 `LLM_PROVIDER=rule` 또는 mock fallback을 사용합니다. Vision 품질 개선은 VLM provider 교체와 structured vision schema 중심으로 진행했기 때문에 OpenAI API key가 없어도 Gradio/FastAPI workflow를 실행할 수 있습니다.
 
-Q. LLM 실패 시 fallback은 어떻게 동작하나요?
-A. `OPENAI_API_KEY`가 없거나 client 로딩 실패, request 실패, JSON parsing 실패가 발생하면 crash하지 않고 기존 rule/mock 결과를 반환합니다. 이때 `llm_provider`, `llm_used_fallback`, `llm_reasoning_raw_text`, parse success, latency가 debug report에 기록됩니다.
+Q. Florence-2가 실패하면 어떻게 되나요?
+A. `VLM_PROVIDER=florence`일 때 Florence-2 로딩을 시도합니다. 모델 로딩, 환경, 입력 이미지 문제로 실패하면 BLIP fallback을 사용하고 `provider=florence`, `model=blip_fallback_for_florence`, `used_fallback=true`, `latency`를 기록합니다.
 
-Q. 왜 Structured JSON Output이 중요한가요?
-A. Reasoning 결과가 agent state에 병합되려면 문자열 설명보다 dict 구조가 안전합니다. JSON schema를 강제하면 Context Reasoning, Critic Report, Optimizer Report를 Debug Report와 downstream agent가 일관되게 사용할 수 있습니다.
+Q. ReferenceImageParser와 CharacterProgramBuilder는 어떻게 안정화했나요?
+A. ReferenceImageParser는 caption을 무조건 파싱하지 않고 `characters`, `objects`, `colors`, `composition` 같은 structured fields를 먼저 사용합니다. CharacterProgramBuilder도 `reference_image`를 우선 반영하고 caption은 fallback으로만 사용합니다.
 
 ## v1.1 Vision Layer Questions
 

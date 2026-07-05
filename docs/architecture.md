@@ -27,7 +27,7 @@ Infrastructure Layer
 
 | Layer | Responsibility | Internal Examples |
 | --- | --- | --- |
-| Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
+| Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence-2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
 | Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Compilation, Prompt Validation, Prompt Optimization |
 | Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX |
 | Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
@@ -77,7 +77,6 @@ VLMRouter
   |
   +-- BLIPVLM (default)
   +-- FlorenceVLM (Florence-2 adapter, BLIP fallback)
-  +-- QwenVLM (Qwen2.5-VL planned, BLIP fallback)
   |
   v
 Standard Vision Result
@@ -101,6 +100,7 @@ Every provider returns these core fields:
   "colors": {},
   "composition": {},
   "provider": "",
+  "model": "",
   "used_fallback": false,
   "latency": 0.0
 }
@@ -115,38 +115,16 @@ Backward-compatible aliases such as `detailed_description`, `character_hints`, a
 ```text
 characters
 -> objects
--> style
+-> colors
+-> composition
 -> caption fallback
 ```
 
-This keeps caption parsing as a fallback while allowing Florence2 or future VLM providers to supply richer visual understanding.
+This keeps caption parsing as a fallback while allowing Florence-2 to supply richer visual understanding when available.
 
-## Reasoning Layer v1.2
+## Reasoning Boundary
 
-The framework keeps rule/mock reasoning as the default, but can optionally call OpenAI through the LLM Layer:
-
-```text
-Reasoning Agent
-  |
-  v
-LLMClient / ReasonerRouter
-  |
-  v
-AIModelService
-  |
-  v
-OpenAIProvider
-  |
-  v
-Structured JSON Result
-  |
-  v
-Rule or Mock Fallback if unavailable
-```
-
-Existing agents never call OpenAI directly. They call the shared `llm/` layer, which handles provider selection, JSON parsing, fallback metadata, and latency logging.
-
-OpenAI is used only when `LLM_PROVIDER=openai`. If `OPENAI_API_KEY` is missing, the client cannot load, the request fails, or the response is not valid JSON, the system records fallback metadata and returns the existing rule/mock result.
+For this v1.1 VLM-only stabilization, LLM reasoning remains on the existing rule/mock fallback path. OpenAI API calls are not required for the default workflow.
 
 ## Design Boundaries
 
@@ -165,9 +143,9 @@ The project contains many specialized components. Listing every agent makes the 
 
 - Core execution order is preserved.
 - Existing agents and tools are preserved.
-- Florence2 is introduced behind the existing VLM adapter boundary.
+- Florence-2 is introduced behind the existing VLM adapter boundary.
 - BLIP remains the default and fallback provider.
-- OpenAI reasoning is optional and isolated behind the LLM Layer.
+- LLM reasoning remains rule/mock fallback for this release focus.
 - Generation, Evaluation, Adaptive Planning, Memory, FastAPI, Docker, and Benchmark layers are unchanged.
 
 ## Future Work

@@ -210,14 +210,15 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Standardized `vision_result` around `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, and `latency`.
 - Updated ReferenceImageParser to prioritize structured fields before caption fallback.
 - Debug reports now preserve provider, latency, and detailed vision fields.
+- Stabilized the v1.1 scope as VLM-only: `VLM_PROVIDER=blip` or `VLM_PROVIDER=florence`, with LLM reasoning kept on rule/mock fallback.
+- CharacterProgramBuilder now prioritizes `reference_image` when building character identity, appearance, style, and dominant colors.
+- Debug reports expose VLM provider, fallback status, latency, `reference_image`, and `character_program`.
 
 ## Version 1.2
 
-- Connected optional OpenAI reasoning through the existing LLM Layer instead of direct agent calls.
-- Kept rule/mock fallback as the default and as the failure path for missing API keys, request errors, or invalid JSON.
-- Added LLM metadata for provider, fallback status, raw text on parse failure, parse success, and latency.
-- Updated LLM Prompt Critic and LLM Prompt Optimizer so `LLM_PROVIDER=openai` enables real provider attempts.
-- Debug reports now surface LLM provider, fallback, raw response text, context reasoning, critic report, and optimizer report.
+- Deferred paid LLM API focus.
+- Keep default reasoning on rule/mock fallback while stabilizing the Vision Layer first.
+- Future work can revisit real LLM reasoning after the VLM/reference image pipeline is stable.
 
 ## Release Candidate 1
 

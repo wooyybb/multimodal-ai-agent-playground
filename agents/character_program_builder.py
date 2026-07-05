@@ -34,23 +34,31 @@ class CharacterProgramBuilder:
         vision_result = state.get("vision_result") or self._vision_result_from_caption(
             state.get("caption")
         )
+        reference_image = state.get("reference_image") or {}
         user_prompt = str(state.get("user_prompt") or "")
         scene_plan = state.get("scene_plan") or {}
         text = " ".join(
             [
                 caption,
+                self._stringify(reference_image),
                 str(vision_result.get("detailed_description") or ""),
                 user_prompt,
             ]
         ).lower()
 
-        identity = self._identity(text, scene_plan)
-        appearance = self._appearance(text)
-        style = self._style(text)
-        pose = self._pose(text)
-        expression = self._expression(text)
-        dominant_colors = self._dominant_colors(text)
+        identity = self._identity(text, scene_plan, reference_image)
+        appearance = self._appearance(text, reference_image)
+        style = self._style(text, reference_image)
+        pose = self._pose(text, reference_image)
+        expression = self._expression(text, reference_image)
+        dominant_colors = self._dominant_colors(text, reference_image)
         identity_rules = self._identity_rules(identity, appearance, text)
+        identity_rules = self._unique(
+            [
+                *identity_rules,
+                *((reference_image.get("identity_rules") or []) if reference_image else []),
+            ]
+        )
 
         character_program = {
             "identity": identity,
@@ -70,30 +78,31 @@ class CharacterProgramBuilder:
     def _vision_result_from_caption(self, caption):
         return getattr(caption, "vision_result", {}) or {}
 
-    def _identity(self, text, scene_plan):
-        gender = ""
+    def _identity(self, text, scene_plan, reference_image=None):
+        reference_identity = (reference_image or {}).get("identity") or {}
+        gender = reference_identity.get("gender") or ""
         if any(word in text for word in ("woman", "girl", "female", "lady")):
-            gender = "female"
+            gender = gender or "female"
         elif any(word in text for word in ("man", "boy", "male", "gentleman")):
-            gender = "male"
+            gender = gender or "male"
 
-        estimated_age = "adult"
+        estimated_age = reference_identity.get("estimated_age") or "adult"
         if any(word in text for word in ("girl", "boy", "child", "kid")):
             estimated_age = "young"
         elif any(word in text for word in ("elderly", "old", "senior")):
             estimated_age = "senior"
 
-        species = "human"
+        species = reference_identity.get("species") or "human"
         if any(word in text for word in ("cat", "dog", "animal", "creature")):
             species = "non-human"
 
-        role = scene_plan.get("scene_type") or ""
+        role = reference_identity.get("role") or scene_plan.get("scene_type") or ""
         if "sword" in text or "armor" in text:
-            role = "warrior"
+            role = role or "warrior"
         elif "school" in text or "student" in text:
-            role = "student"
+            role = role or "student"
         elif "princess" in text:
-            role = "princess"
+            role = role or "princess"
 
         return {
             "gender": gender,
@@ -102,40 +111,50 @@ class CharacterProgramBuilder:
             "role": role,
         }
 
-    def _appearance(self, text):
+    def _appearance(self, text, reference_image=None):
+        reference_appearance = (reference_image or {}).get("appearance") or {}
         hair_color = self._first_color_before(text, "hair")
         hair = "long hair" if "long hair" in text else "short hair" if "short hair" in text else ""
         eye_color = self._first_color_before(text, "eyes")
         skin = "pale skin" if "pale skin" in text else "dark skin" if "dark skin" in text else ""
         outfit = self._outfit(text)
-        accessories = [word for word in self.ACCESSORY_WORDS if word in text]
+        accessories = self._unique(
+            [
+                *(reference_appearance.get("accessories") or []),
+                *[word for word in self.ACCESSORY_WORDS if word in text],
+            ]
+        )
 
         return {
-            "hair": hair,
-            "hair_color": hair_color,
-            "eye_color": eye_color,
-            "skin": skin,
-            "outfit": outfit,
+            "hair": reference_appearance.get("hair") or hair,
+            "hair_color": reference_appearance.get("hair_color") or hair_color,
+            "eye_color": reference_appearance.get("eye_color") or eye_color,
+            "skin": reference_appearance.get("skin") or skin,
+            "outfit": reference_appearance.get("outfit") or outfit,
             "accessories": accessories,
         }
 
-    def _style(self, text):
+    def _style(self, text, reference_image=None):
+        reference_style = (reference_image or {}).get("style") or {}
         anime = "high" if "anime" in text else "medium" if "webtoon" in text else ""
         realism = "high" if "realistic" in text or "photo" in text else "low" if anime else ""
-        rendering = ""
+        rendering = reference_style.get("rendering") or ""
         if "webtoon" in text:
-            rendering = "soft webtoon"
+            rendering = rendering or "soft webtoon"
         elif "line art" in text:
-            rendering = "clean line art"
+            rendering = rendering or "clean line art"
         elif anime:
-            rendering = "anime illustration"
+            rendering = rendering or "anime illustration"
         return {
-            "anime": anime,
-            "realism": realism,
+            "anime": reference_style.get("anime") or anime,
+            "realism": reference_style.get("realism") or realism,
             "rendering": rendering,
         }
 
-    def _pose(self, text):
+    def _pose(self, text, reference_image=None):
+        reference_pose = (reference_image or {}).get("pose")
+        if reference_pose:
+            return reference_pose
         if "holding" in text and "sword" in text:
             return "holding a sword"
         if "standing" in text:
@@ -146,7 +165,10 @@ class CharacterProgramBuilder:
             return "portrait pose"
         return "natural pose"
 
-    def _expression(self, text):
+    def _expression(self, text, reference_image=None):
+        reference_expression = (reference_image or {}).get("expression")
+        if reference_expression:
+            return reference_expression
         if "smile" in text or "smiling" in text:
             return "smiling"
         if "serious" in text:
@@ -155,8 +177,9 @@ class CharacterProgramBuilder:
             return "sad"
         return "natural readable expression"
 
-    def _dominant_colors(self, text):
-        return [color for color in self.COLOR_WORDS if color in text]
+    def _dominant_colors(self, text, reference_image=None):
+        reference_colors = ((reference_image or {}).get("colors") or {}).get("dominant") or []
+        return self._unique([*reference_colors, *[color for color in self.COLOR_WORDS if color in text]])
 
     def _identity_rules(self, identity, appearance, text):
         rules = ["preserve recognizable character identity"]
@@ -192,3 +215,20 @@ class CharacterProgramBuilder:
         if "armor" in text:
             return "armor"
         return ""
+
+    def _stringify(self, value):
+        if isinstance(value, dict):
+            return " ".join(self._stringify(item) for item in value.values())
+        if isinstance(value, list):
+            return " ".join(self._stringify(item) for item in value)
+        return str(value or "")
+
+    def _unique(self, values):
+        result = []
+        seen = set()
+        for value in values:
+            key = str(value).lower()
+            if value and key not in seen:
+                result.append(value)
+                seen.add(key)
+        return result

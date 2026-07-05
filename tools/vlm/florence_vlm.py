@@ -12,7 +12,7 @@ class FlorenceVLM(BaseVLM):
     def __init__(self, blip_tool=None, model_id: str | None = None):
         self.fallback = BLIPVLM(
             blip_tool=blip_tool,
-            provider="florence2",
+            provider="florence",
             model="blip_fallback_for_florence",
             used_fallback=True,
         )
@@ -48,14 +48,14 @@ class FlorenceVLM(BaseVLM):
                 colors=color_hints,
                 composition=composition_hints,
                 model=self.model_id,
-                provider="florence2",
+                provider="florence",
                 used_fallback=False,
                 latency=round(perf_counter() - started, 4),
             )
         except Exception as error:
             print(f"[FlorenceVLM] Fallback to BLIP: {error}")
             result = self.fallback.analyze(image, prompt=prompt)
-            result["provider"] = "florence2"
+            result["provider"] = "florence"
             result["model"] = "blip_fallback_for_florence"
             result["used_fallback"] = True
             result["latency"] = round(perf_counter() - started, 4)

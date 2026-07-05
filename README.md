@@ -86,8 +86,7 @@ Image
 Vision Router
   |
   +-- BLIP (default)
-  +-- Florence2 (optional, BLIP fallback if unavailable)
-  +-- Qwen2.5-VL (planned)
+  +-- Florence-2 (optional, BLIP fallback if unavailable)
   |
   v
 Standard Vision Result
@@ -96,7 +95,7 @@ Standard Vision Result
 Reference Image Parser
 ```
 
-All vision providers return the same `vision_result` contract: `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, and `latency`.
+All vision providers return the same `vision_result` contract: `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `model`, `used_fallback`, and `latency`.
 
 ### Context Layer
 
@@ -127,8 +126,8 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Responsibility-based framework architecture
 - DynamicExecutionEngine with layer-readable execution flow
 - ToolRegistry with layer metadata
-- Provider-independent Vision Layer with BLIP default and Florence2 fallback support
-- Optional OpenAI-backed LLM Reasoning Layer with rule/mock fallback
+- Provider-independent Vision Layer with BLIP default and Florence-2 fallback support
+- Rule/mock LLM reasoning fallback for local and free execution
 - Context Program and Prompt Compiler
 - Provider routing and provider prompt adaptation
 - FLUX-oriented generation path
@@ -216,28 +215,28 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 | Variable | Purpose |
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
-| `OPENAI_API_KEY` | Optional OpenAI key for LLM reasoning experiments. |
-| `OPENAI_MODEL` | Optional OpenAI model name for real LLM reasoning. |
-| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; rule/mock fallback remains the default behavior. |
-| `VLM_PROVIDER` | `blip`, `florence2`, `florence`, `qwen2.5-vl`, or `qwen`; BLIP is the default. |
+| `LLM_PROVIDER` | Use `rule` or `mock` for the current free/local setup. |
+| `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
 
-Optional OpenAI reasoning on PowerShell:
+VLM-only local run on PowerShell:
 
 ```powershell
-$env:LLM_PROVIDER="openai"
-$env:OPENAI_API_KEY="your_key_here"
-$env:OPENAI_MODEL="gpt-4.1-mini"
+$env:LLM_PROVIDER="rule"
+$env:VLM_PROVIDER="blip"
+python main.py
+
+$env:VLM_PROVIDER="florence"
+python main.py
 ```
 
-Never commit `.env` files or real API keys.
+OpenAI API keys are not required for this v1.1 VLM-only setup. Never commit `.env` files or real API keys.
 
 ## Current Limitations
 
 - BLIP is the default VLM.
-- Florence2 is available through the Vision Router and falls back to BLIP if the model cannot be loaded.
-- Qwen2.5-VL is planned and currently uses BLIP fallback.
+- Florence-2 is available through the Vision Router and falls back to BLIP if the model cannot be loaded.
 - FLUX is the current generation provider path.
-- OpenAI reasoning is optional. If `OPENAI_API_KEY` is missing, invalid, or returns non-JSON output, the system falls back to rule/mock reasoning.
+- LLM reasoning remains rule/mock fallback for this release focus.
 - Some adaptive planning and evaluation logic is intentionally rule-based for stability.
 - Image quality depends on external provider behavior.
 

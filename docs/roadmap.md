@@ -12,8 +12,8 @@
 | v1.0 RC1 | Layer-based architecture cleanup and portfolio documentation | Complete |
 | v1.0 RC2 | Responsibility refactoring and framework simplification | Complete |
 | v1.0 | CI, demo polish, deployment-ready release | Planned |
-| v1.1 | Vision Layer upgrade with Florence2 adapter and standard vision schema | Complete |
-| v1.2 | Real LLM Reasoning Layer with OpenAI provider and rule fallback | Complete |
+| v1.1 | VLM-only Vision Layer stabilization with BLIP and Florence-2 fallback | Complete |
+| v1.2 | Real LLM Reasoning Layer | Deferred |
 
 ## Completed Sprints
 
@@ -78,8 +78,7 @@
 - Sprint 60: Real LLM Reasoning Layer
 - Release Candidate 1: Layer-based framework organization
 - Release Candidate 2: Framework simplification and responsibility refactoring
-- Version 1.1: Vision Layer Upgrade with Florence2 adapter, BLIP fallback, and structured vision result schema
-- Version 1.2: Real LLM Reasoning Layer with OpenAI provider, structured JSON parsing, and rule/mock fallback
+- Version 1.1: VLM-only Vision Layer stabilization with BLIP, Florence-2 fallback, structured vision result schema, ReferenceImageParser, and CharacterProgramBuilder integration
 
 ## Planned Sprints
 

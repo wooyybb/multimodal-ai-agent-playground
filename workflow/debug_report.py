@@ -70,6 +70,15 @@ class DebugReportManager:
             "timestamp": self.timestamp,
             "user_prompt": self._safe(state.get("user_prompt")),
             "vision_result": self._safe(self._vision_result(state)),
+            "vlm_provider": self._safe(
+                (self._vision_result(state) or {}).get("provider")
+            ),
+            "vlm_used_fallback": self._safe(
+                (self._vision_result(state) or {}).get("used_fallback")
+            ),
+            "vlm_latency": self._safe(
+                (self._vision_result(state) or {}).get("latency")
+            ),
             "provider": self._safe(state.get("provider")),
             "llm_provider": self._safe(self._llm_summary(state).get("llm_provider")),
             "llm_used_fallback": self._safe(
@@ -147,6 +156,11 @@ class DebugReportManager:
             lines,
             "VISION RESULT",
             self._vision_result_preview(self._vision_result(state)),
+        )
+        self._append_block(
+            lines,
+            "VLM SUMMARY",
+            self._vlm_summary(self._vision_result(state)),
         )
         self._append_block(lines, "CONTEXT REASONING", state.get("context_reasoning"))
         self._append_block(lines, "SCENE PLAN", state.get("scene_plan"))
@@ -365,6 +379,21 @@ class DebugReportManager:
             "style_hints": vision_result.get("style_hints", []),
             "composition_hints": vision_result.get("composition_hints", {}),
             "color_hints": vision_result.get("color_hints", {}),
+        }
+
+    def _vlm_summary(self, vision_result):
+        vision_result = vision_result or {}
+        return {
+            "provider": vision_result.get("provider"),
+            "model": vision_result.get("model"),
+            "used_fallback": vision_result.get("used_fallback"),
+            "latency": vision_result.get("latency"),
+            "caption": vision_result.get("caption"),
+            "detailed_caption": vision_result.get("detailed_caption"),
+            "objects": vision_result.get("objects", []),
+            "characters": vision_result.get("characters", []),
+            "colors": vision_result.get("colors", {}),
+            "composition": vision_result.get("composition", {}),
         }
 
     def _llm_summary(self, state):

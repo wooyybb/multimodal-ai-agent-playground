@@ -30,7 +30,7 @@ This keeps the project understandable even as the number of internal agents grow
 
 The Planning Layer interprets the user request, image reference, goal tree, scene plan, and character identity.
 
-In v1.1, the Planning Layer includes a provider-independent Vision Layer. `VisionAgent` uses `VLMRouter` to select BLIP by default, Florence2 when requested, or planned Qwen2.5-VL support. All providers return the same structured `vision_result`, so the Reference Image Parser can read `characters`, `objects`, `style`, `colors`, and `composition` before falling back to caption parsing.
+In v1.1, the Planning Layer includes a provider-independent Vision Layer. `VisionAgent` uses `VLMRouter` to select BLIP by default or Florence-2 when requested. All providers return the same structured `vision_result`, so the Reference Image Parser can read `characters`, `objects`, `colors`, and `composition` before falling back to caption parsing.
 
 The Context Layer converts planning output into Context Program and provider-independent prompt structures.
 
@@ -50,7 +50,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Adaptive planning and retry are treated as part of the Evaluation Layer's feedback loop.
 - `DebugReportManager` captures state, prompts, traces, metrics, and output paths.
 - `BenchmarkRunner` and `ReportGenerator` support repeatable comparison.
-- The LLM Layer supports optional OpenAI structured JSON reasoning while preserving rule/mock fallback behavior.
+- The LLM reasoning path remains rule/mock fallback for local and free execution.
 
 ## Technology Stack
 
@@ -65,18 +65,17 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - FastAPI
 - Gradio
 - Docker
-- Optional OpenAI reasoning
+- Rule/mock LLM fallback
 - Git/GitHub
 - Codex-assisted development
 
 ## Current Limitations
 
 - BLIP remains the default VLM.
-- Florence2 can be selected through `VLM_PROVIDER=florence2`; if the model cannot load, the system falls back to BLIP and records `used_fallback=true`.
-- Qwen2.5-VL is planned and currently uses BLIP fallback.
+- Florence-2 can be selected through `VLM_PROVIDER=florence`; if the model cannot load, the system falls back to BLIP and records `used_fallback=true`.
 - FLUX is the current generation provider path.
 - Some reasoning remains rule-based by default.
-- OpenAI reasoning is optional and falls back automatically when no API key is available or JSON parsing fails.
+- OpenAI API is not required for the v1.1 VLM-only setup.
 - External provider quality and latency can affect final image quality.
 
 ## Future Improvements

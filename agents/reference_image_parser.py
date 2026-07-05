@@ -77,7 +77,7 @@ class ReferenceImageParser:
     def _has_structured_fields(self, vision_result):
         return any(
             bool(vision_result.get(key))
-            for key in ("characters", "objects", "style", "colors", "composition")
+            for key in ("characters", "objects", "colors", "composition")
         )
 
     def _vision_text(self, vision_result, caption, user_prompt, structured):
@@ -86,9 +86,9 @@ class ReferenceImageParser:
                 [
                     self._stringify(vision_result.get("characters") or []),
                     self._stringify(vision_result.get("objects") or []),
-                    self._stringify(vision_result.get("style") or {}),
                     self._stringify(vision_result.get("colors") or {}),
                     self._stringify(vision_result.get("composition") or {}),
+                    self._stringify(vision_result.get("style") or {}),
                     user_prompt,
                 ]
             ).lower()
