@@ -21,6 +21,7 @@
 | v1.7 | Context Cache and Incremental Execution | Complete |
 | v2.0 | Generation Quality Upgrade | Complete |
 | v2.1 | Reference Conditioning Interface | Complete |
+| v2.2 | SDXL Quality Provider Integration | Complete |
 
 ## Completed Sprints
 
@@ -94,6 +95,7 @@
 - Version 1.7: Context Cache, dirty checks, skipped layer reporting, and incremental execution
 - Version 2.0: Provider-independent Generation Router with FLUX Fast Mode and SDXL Quality Mode skeleton
 - Version 2.1: Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
+- Version 2.2: SDXL Quality Provider interface with GenerationConfig, GenerationResult, env-based routing, and safe fallback
 
 ## Planned Sprints
 

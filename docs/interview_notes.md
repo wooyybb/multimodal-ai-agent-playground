@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v2.2 SDXL Quality Provider Questions
+
+Q. 왜 FLUX와 SDXL을 함께 사용했나요?
+A. FLUX는 빠르고 현재 workflow에서 안정적인 기본 generation path입니다. SDXL은 negative prompt, img2img, ControlNet, IP-Adapter 같은 reference-aware 확장과 잘 맞는 품질 중심 provider로 설계하기 좋습니다. 그래서 FLUX는 Fast Mode로 유지하고 SDXL은 Quality Mode로 추가했습니다.
+
+Q. Fast Mode와 Quality Mode의 차이는 무엇인가요?
+A. Fast Mode는 `flux_fast`를 사용해 빠른 생성과 기존 호환성을 우선합니다. Quality Mode는 `sdxl_quality`를 사용하고 1024x1024, 30 steps, CFG 7.5, scheduler preset을 기록해 reference preservation과 style transfer 확장을 준비합니다.
+
+Q. 왜 Provider Router를 유지했나요?
+A. Provider 선택을 generation code 안에 하드코딩하면 FLUX, SDXL, future IP-Adapter/ControlNet 경로가 섞입니다. Router를 유지하면 환경변수나 planner 결정으로 provider를 바꾸면서도 Prompt Rendering, Evaluation, Debug Report는 같은 contract를 사용할 수 있습니다.
+
 ## v2.1 Reference Conditioning Interface Questions
 
 Q. 왜 prompt-only generation만으로 reference 보존이 어려운가요?

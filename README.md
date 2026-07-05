@@ -133,6 +133,8 @@ v2.0 adds two generation modes:
 
 Quality Mode currently uses an SDXL provider skeleton and stores quality preset metadata. It does not load a real SDXL model yet. Future hooks are reserved for IP Adapter and ControlNet.
 
+v2.2 keeps FLUX as the default provider and adds an SDXL Quality Provider interface. `GENERATION_PROVIDER=flux_fast` selects Fast Mode, while `GENERATION_PROVIDER=sdxl_quality` selects Quality Mode. SDXL uses the same generation interface and records `resolution`, `steps`, `cfg`, `scheduler`, `latency`, and prompt length in the debug report. Real `diffusers` execution is optional and disabled by default; otherwise the provider uses a safe mock fallback.
+
 v2.1 adds a Reference Conditioning Interface. Current generation is still prompt-only, but the Prompt Compiler now creates a `reference_conditioning_package` that future providers can use for img2img, IP-Adapter, or ControlNet.
 
 Prompt-only generation has limits for reference preservation: text can describe hair color, eye color, outfit, identity, and accessories, but it cannot directly bind visual features from the reference image. The conditioning package keeps those preservation requirements explicit until real reference-conditioned providers are attached.
@@ -277,6 +279,8 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `LLM_PROVIDER` | Use `rule` or `mock` for the current free/local setup. |
 | `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
+| `GENERATION_PROVIDER` | `flux_fast` or `sdxl_quality`; default is `flux_fast`. |
+| `SDXL_ENABLE_DIFFUSERS` | Optional `true` to attempt real `diffusers` SDXL execution when dependencies and model access are available. |
 
 VLM-only local run on PowerShell:
 
@@ -348,6 +352,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v1.7 | Context Cache and Incremental Execution |
 | v2.0 | Generation Quality Upgrade with provider-independent Generation Router |
 | v2.1 | Reference Conditioning Interface |
+| v2.2 | SDXL Quality Provider Integration |
 
 ## Portfolio Highlights
 

@@ -83,6 +83,8 @@ class DebugReportManager:
             "generation_provider": self._safe(state.get("generation_provider")),
             "generation_mode": self._safe(state.get("generation_mode")),
             "generation_plan": self._safe(state.get("generation_plan")),
+            "generation_config": self._safe(state.get("generation_config")),
+            "generation_prompt_length": self._safe(state.get("prompt_length")),
             "cfg": self._safe(state.get("cfg")),
             "steps": self._safe(state.get("steps")),
             "scheduler": self._safe(state.get("scheduler")),
@@ -495,6 +497,8 @@ class DebugReportManager:
         return {
             "provider": state.get("generation_provider") or plan.get("provider"),
             "generation_mode": state.get("generation_mode") or plan.get("generation_mode"),
+            "generation_config": state.get("generation_config"),
+            "prompt_length": state.get("prompt_length"),
             "cfg": state.get("cfg") if state.get("cfg") is not None else plan.get("cfg"),
             "steps": state.get("steps") or plan.get("steps"),
             "scheduler": state.get("scheduler") or plan.get("scheduler"),

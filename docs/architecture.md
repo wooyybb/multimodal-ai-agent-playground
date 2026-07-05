@@ -334,6 +334,32 @@ Generation Provider
   +-- img2img
 ```
 
+## SDXL Quality Provider v2.2
+
+Generation Router supports two provider IDs:
+
+```text
+GENERATION_PROVIDER=flux_fast    -> Fast Mode    -> FLUX
+GENERATION_PROVIDER=sdxl_quality -> Quality Mode -> SDXL Quality Provider
+```
+
+Quality Mode uses a `GenerationConfig` object:
+
+```json
+{
+  "provider": "sdxl_quality",
+  "mode": "quality",
+  "width": 1024,
+  "height": 1024,
+  "steps": 30,
+  "cfg": 7.5,
+  "scheduler": "DPM++ 2M Karras",
+  "resolution": "1024x1024"
+}
+```
+
+Providers return a `GenerationResult` with output path, backend, mode, config, latency, prompt length, notes, and fallback status. The SDXL provider can attempt `diffusers.StableDiffusionXLPipeline` only when explicitly enabled through `SDXL_ENABLE_DIFFUSERS=true`; otherwise it uses a safe mock fallback. Reference Conditioning remains prompt-only for now, with IP-Adapter and ControlNet kept as provider-layer hooks.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

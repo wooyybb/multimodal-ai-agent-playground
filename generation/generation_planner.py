@@ -1,3 +1,6 @@
+import os
+
+
 class GenerationPlanner:
     FAST_PRESET = {
         "generation_mode": "fast",
@@ -35,6 +38,12 @@ class GenerationPlanner:
         return preset
 
     def _mode(self, state):
+        provider_override = self._provider_override()
+        if provider_override == "sdxl_quality":
+            return "quality"
+        if provider_override == "flux_fast":
+            return "fast"
+
         explicit = str(state.get("generation_mode") or "").lower()
         requested = str(state.get("requested_provider") or state.get("provider") or "").lower()
         user_prompt = str(state.get("user_prompt") or "").lower()
@@ -42,6 +51,12 @@ class GenerationPlanner:
         if any(keyword in text for keyword in ("quality", "sdxl", "identity", "preserve", "high fidelity")):
             return "quality"
         return "fast"
+
+    def _provider_override(self):
+        provider = str(os.getenv("GENERATION_PROVIDER") or "").strip().lower()
+        if provider in {"flux_fast", "sdxl_quality"}:
+            return provider
+        return ""
 
     def _reason(self, state, mode):
         if mode == "quality":

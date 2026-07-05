@@ -113,6 +113,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - ProviderPromptAdapter preserves the package and records prompt-only fallback notes when conditioning is unsupported.
 - Debug reports now show reference conditioning status, strengths, preserve flags, and notes.
 
+## Version 2.2
+
+- Added `GenerationConfig` and `GenerationResult` for provider-independent generation output.
+- GenerationRouter now supports `GENERATION_PROVIDER=flux_fast` and `GENERATION_PROVIDER=sdxl_quality`.
+- SDXL Quality Provider can optionally attempt `diffusers` execution, with mock fallback as the default safe path.
+- Debug reports now include generation config, prompt length, provider, mode, CFG, steps, scheduler, resolution, and latency.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.
