@@ -99,6 +99,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Unchanged artifacts can be restored from cache and marked as skipped.
 - Debug reports now include executed layers, skipped layers, dirty reasons, and context cache path.
 
+## Version 2.0
+
+- Added provider-independent Generation Planner and Generation Router.
+- Preserved the existing FLUX path as `flux_fast` Fast Mode.
+- Added `sdxl_quality` as a skeleton Quality Mode provider with CFG, steps, scheduler, and resolution metadata.
+- Debug reports now store generation provider, mode, preset, and future hooks for IP Adapter and ControlNet.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.

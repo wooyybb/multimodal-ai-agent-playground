@@ -122,7 +122,16 @@ Externally, this layer can be understood as the Prompt Compiler layer. Internall
 
 Responsible for provider-specific generation.
 
-It includes provider routing, provider prompt adaptation, generation agent, and FLUX integration.
+It includes provider routing, provider prompt adaptation, generation planning, generation routing, and provider-specific generation.
+
+v2.0 adds two generation modes:
+
+| Mode | Route | Purpose |
+| --- | --- | --- |
+| Fast Mode | `flux_fast` -> FLUX | Keep the existing lightweight FLUX path. |
+| Quality Mode | `sdxl_quality` -> SDXL skeleton | Prepare higher-fidelity generation for identity, outfit, hair color, eye color, and accessories. |
+
+Quality Mode currently uses an SDXL provider skeleton and stores quality preset metadata. It does not load a real SDXL model yet. Future hooks are reserved for IP Adapter and ControlNet.
 
 ### Evaluation Layer
 
@@ -147,6 +156,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Context Program and Prompt Compiler
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
 - Provider routing and provider prompt adaptation
+- Generation Planner and Generation Router with fast/quality modes
 - FLUX-oriented generation path
 - Multi-metric evaluation
 - Adaptive planning and retry loop
@@ -331,6 +341,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v1.0 RC2 | Responsibility refactoring and framework simplification |
 | v1.0 | Demo polish, CI, and deployment-ready release |
 | v1.7 | Context Cache and Incremental Execution |
+| v2.0 | Generation Quality Upgrade with provider-independent Generation Router |
 
 ## Portfolio Highlights
 

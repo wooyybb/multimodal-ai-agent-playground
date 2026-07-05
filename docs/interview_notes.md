@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v2.0 Generation Quality Upgrade Questions
+
+Q. 왜 Provider Router를 만들었나요?
+A. Generation Layer가 특정 모델 하나에 묶이면 FLUX, SDXL, future IP Adapter/ControlNet 같은 경로를 바꿀 때 workflow 전체가 흔들립니다. Router를 두면 Context Program과 Prompt Rendering은 유지하면서 provider 선택과 preset만 교체할 수 있습니다.
+
+Q. 왜 FLUX만 사용하지 않았나요?
+A. FLUX fast path는 빠르고 기존 workflow에 안정적입니다. 하지만 reference image의 hair color, eye color, outfit, accessories, identity preservation은 더 정밀한 generation control이 필요할 수 있습니다. 그래서 FLUX는 Fast Mode로 유지하고, SDXL Quality Mode skeleton을 추가해 품질 중심 경로를 준비했습니다.
+
+Q. Quality Mode는 어떤 상황에서 사용합니까?
+A. 사용자가 quality, identity, preserve, high fidelity, SDXL 같은 요구를 주거나 reference image 보존이 중요한 경우 Quality Mode를 선택합니다. 이 모드는 CFG, steps, resolution, scheduler 같은 preset을 명확히 기록해 재현성과 debug 가능성을 높입니다.
+
+Q. IP Adapter는 어디에 붙을 예정입니까?
+A. IP Adapter는 Generation Router 이후 SDXL Quality Provider 내부에 붙을 예정입니다. Context Program과 Reference Image Parser가 만든 identity/accessory 정보를 provider 입력으로 넘긴 뒤, IP Adapter가 reference image preservation을 담당하는 구조가 자연스럽습니다. ControlNet도 같은 provider layer의 future hook입니다.
+
 ## v1.7 Context Cache and Incremental Execution Questions
 
 Q. 왜 Cache를 넣었나요?

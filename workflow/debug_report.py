@@ -80,6 +80,14 @@ class DebugReportManager:
                 (self._vision_result(state) or {}).get("latency")
             ),
             "provider": self._safe(state.get("provider")),
+            "generation_provider": self._safe(state.get("generation_provider")),
+            "generation_mode": self._safe(state.get("generation_mode")),
+            "generation_plan": self._safe(state.get("generation_plan")),
+            "cfg": self._safe(state.get("cfg")),
+            "steps": self._safe(state.get("steps")),
+            "scheduler": self._safe(state.get("scheduler")),
+            "resolution": self._safe(state.get("resolution")),
+            "future_hooks": self._safe(state.get("future_hooks")),
             "context_cache": self._safe(state.get("context_cache")),
             "context_cache_path": self._safe(state.get("context_cache_path")),
             "executed_layers": self._safe(state.get("executed_layers", [])),
@@ -259,6 +267,11 @@ class DebugReportManager:
             self._prompt_rendering_preview(state),
         )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
+        self._append_block(
+            lines,
+            "GENERATION ROUTING",
+            self._generation_routing_preview(state),
+        )
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
         self._append_block(
             lines,
@@ -449,6 +462,19 @@ class DebugReportManager:
             "VLM Judge Prompt": state.get("vlm_judge_prompt"),
             "Metric Routing": result.get("metric_routing") or state.get("metric_prompts"),
             "Metric Summary": result.get("metric_summary"),
+        }
+
+    def _generation_routing_preview(self, state):
+        plan = state.get("generation_plan") or {}
+        return {
+            "provider": state.get("generation_provider") or plan.get("provider"),
+            "generation_mode": state.get("generation_mode") or plan.get("generation_mode"),
+            "cfg": state.get("cfg") if state.get("cfg") is not None else plan.get("cfg"),
+            "steps": state.get("steps") or plan.get("steps"),
+            "scheduler": state.get("scheduler") or plan.get("scheduler"),
+            "resolution": state.get("resolution") or plan.get("resolution"),
+            "future_hooks": state.get("future_hooks") or plan.get("future_hooks"),
+            "notes": state.get("generation_notes", []),
         }
 
     def _dino_metric_preview(self, state):

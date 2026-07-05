@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from generation.generation_router import GenerationRouter
 from workflow.agent_state import AgentState
 from workflow.debug_report import DebugReportManager
 from memory.context_cache import ContextCacheManager
@@ -92,7 +93,17 @@ class DynamicExecutionEngine:
             "label": "Compiler",
         },
         "generation": {
-            "keys": ("output_image_path",),
+            "keys": (
+                "output_image_path",
+                "generation_provider",
+                "generation_mode",
+                "generation_plan",
+                "cfg",
+                "steps",
+                "scheduler",
+                "resolution",
+                "future_hooks",
+            ),
             "label": "Generation",
         },
     }
@@ -105,8 +116,13 @@ class DynamicExecutionEngine:
         agent_state.validate()
         state = agent_state.to_dict()
         state.setdefault("agent_trace", [])
-        state["_context_cache"] = cache_manager.load()
+        loaded_cache = cache_manager.load()
+        state["_context_cache"] = loaded_cache
         state["_context_cache_updates"] = {}
+        state["context_cache"] = {
+            "entries": sorted(loaded_cache.keys()),
+            "updated_steps": [],
+        }
         state.setdefault("executed_layers", [])
         state.setdefault("skipped_layers", [])
         state.setdefault("dirty_reasons", [])
@@ -543,10 +559,7 @@ class DynamicExecutionEngine:
     def _run_generation(self, registry, state):
         print("[ExecutionEngine] Initial attempt started.")
         self._print_prompt_preview(state)
-        state["output_image_path"] = registry.call(
-            "generation",
-            state.get("generation_prompt") or state.get("final_prompt", ""),
-        )
+        state.update(self._generate_image(registry, state))
 
     def _run_evaluation(self, registry, state):
         state["score"] = registry.call(
@@ -669,10 +682,12 @@ class DynamicExecutionEngine:
                 label="retry clip",
             )
             print("[ExecutionEngine] Using compressed retry prompt.")
-            state["retry_output_image_path"] = registry.call(
-                "generation",
-                state["retry_prompt"],
-            )
+            retry_state = dict(state)
+            retry_state["generation_prompt"] = state["retry_prompt"]
+            retry_result = self._generate_image(registry, retry_state)
+            state["retry_output_image_path"] = retry_result.get("output_image_path")
+            state["retry_generation_plan"] = retry_result.get("generation_plan")
+            state["retry_generation_provider"] = retry_result.get("generation_provider")
             state["retry_score"] = registry.call(
                 "evaluation",
                 self._evaluation_input_state(state),
@@ -705,6 +720,9 @@ class DynamicExecutionEngine:
                     "negative_prompt": state.get("negative_prompt"),
                     "canonical_prompt": state.get("canonical_prompt"),
                     "provider": state.get("provider"),
+                    "generation_mode": state.get("generation_mode"),
+                    "generation_provider": state.get("generation_provider"),
+                    "generation_plan": state.get("generation_plan"),
                     "provider_prompt": state.get("provider_prompt"),
                     "provider_negative_prompt": state.get("provider_negative_prompt"),
                     "adapter_notes": state.get("adapter_notes"),
@@ -1124,6 +1142,14 @@ class DynamicExecutionEngine:
             "final_prompt": state.get("final_prompt"),
         }
 
+    def _generate_image(self, registry, state):
+        router = GenerationRouter()
+
+        def fallback_generate(prompt):
+            return registry.call("generation", prompt)
+
+        return router.generate(state, fallback_generate)
+
     def _normalize_plan(self, plan):
         normalized = list(plan)
 
@@ -1303,6 +1329,9 @@ class DynamicExecutionEngine:
                 "generation_prompt": state.get("generation_prompt")
                 or state.get("final_prompt"),
                 "provider": state.get("provider"),
+                "requested_provider": state.get("requested_provider"),
+                "generation_mode": state.get("generation_mode"),
+                "user_prompt": state.get("user_prompt"),
                 "provider_negative_prompt": state.get("provider_negative_prompt"),
             }
         return {"step": step}

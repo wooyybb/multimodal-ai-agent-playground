@@ -254,6 +254,47 @@ Debug reports record:
 
 This keeps repeated runs inspectable while avoiding unnecessary work for unchanged planning/context/generation inputs.
 
+## Generation Quality Upgrade v2.0
+
+The Generation Layer is provider-independent at the routing boundary:
+
+```text
+Reference Image
+  |
+  v
+Vision Parser
+  |
+  v
+Context Program
+  |
+  v
+Prompt Rendering
+  |
+  v
+Generation Planner
+  |
+  v
+Generation Router
+  |
+  +-- fast    -> flux_fast    -> FLUX
+  +-- quality -> sdxl_quality -> SDXL skeleton
+  |
+  +-- future  -> IP Adapter / ControlNet hooks
+```
+
+Quality Mode applies a preset before generation:
+
+```json
+{
+  "cfg": 7.5,
+  "steps": 30,
+  "resolution": "1024x1024",
+  "scheduler": "DPM++ 2M Karras"
+}
+```
+
+The current SDXL path is a skeleton provider that creates a mock output image and records provider metadata. It does not load a real SDXL model. This keeps FLUX behavior intact while making room for future reference-image preservation tools such as IP Adapter and ControlNet.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.
