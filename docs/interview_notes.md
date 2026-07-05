@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v2.4 Reference-aware Style Transfer Questions
+
+Q. 왜 Prompt만으로 Style Transfer하지 않았나요?
+A. Prompt는 원하는 스타일을 설명하지만 reference image의 identity, silhouette, outfit, pose 같은 시각적 단서를 직접 고정하지 못합니다. 그래서 style은 LoRA, identity는 IP-Adapter, structure는 ControlNet으로 분리할 수 있는 generation provider 구조가 필요합니다.
+
+Q. LoRA는 왜 학습하지 않았나요?
+A. 이 프로젝트의 목표는 학습 파이프라인이 아니라 agent framework와 provider architecture입니다. LoRA는 공개 또는 로컬 `.safetensors` weight를 inference-only로 로드하는 hook만 제공합니다.
+
+Q. Reference Conditioning 구조의 장점은 무엇인가요?
+A. reference image에서 추출한 identity/style/structure 요구를 prompt와 분리해 provider에 전달할 수 있습니다. 이렇게 하면 prompt engineering과 image conditioning이 서로 다른 책임으로 관리됩니다.
+
+Q. IP Adapter와 LoRA 역할 차이는 무엇인가요?
+A. IP-Adapter는 reference image feature를 사용해 identity/style consistency를 보강합니다. LoRA는 특정 화풍이나 렌더링 스타일을 provider에 추가하는 inference weight입니다.
+
+Q. ControlNet은 무엇을 유지합니까?
+A. ControlNet은 pose, depth, edge 같은 구조 정보를 유지하는 역할입니다. 현재는 OpenPose, Depth, Canny hook placeholder만 있고 실제 ControlNet model은 아직 연결하지 않았습니다.
+
 ## v2.3 IP-Adapter Hook Questions
 
 Q. 왜 prompt-only generation만으로 reference 보존이 어렵나요?

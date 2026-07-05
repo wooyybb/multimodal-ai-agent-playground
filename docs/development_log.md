@@ -127,6 +127,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - `USE_IP_ADAPTER=false` keeps prompt-only generation by default.
 - Missing adapter files or hook failures fall back gracefully and record the reason in debug reports.
 
+## Version 2.4
+
+- Added Style Program generation for reference-aware style transfer.
+- Added inference-only LoRA loader hook for `.safetensors` files.
+- Added ControlNet placeholder hook for OpenPose, Depth, and Canny.
+- SDXL provider now records style program, selected LoRA, IP-Adapter, and ControlNet status in debug output.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.

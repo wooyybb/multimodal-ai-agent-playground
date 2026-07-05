@@ -106,7 +106,12 @@ class SDXLQualityProvider:
             reference_conditioning_enabled=bool(conditioning.get("enabled")),
             conditioning_type=conditioning.get("conditioning_type", "none"),
             ip_adapter_enabled=bool(ip_adapter_status.get("enabled")),
-            used_conditioning_fallback=used_conditioning_fallback,
+            used_conditioning_fallback=bool(
+                ip_adapter_status.get("used_fallback")
+                or lora_status.get("used_fallback")
+                or controlnet_status.get("used_fallback")
+                or used_conditioning_fallback
+            ),
             conditioning_reason=ip_adapter_status.get("reason", ""),
             ip_adapter_status=ip_adapter_status,
             style_program=style_program,

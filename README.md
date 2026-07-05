@@ -141,6 +141,8 @@ Prompt-only generation has limits for reference preservation: text can describe 
 
 v2.3 adds an optional IP-Adapter hook inside the SDXL Quality Provider. `USE_IP_ADAPTER=false` keeps prompt-only generation. When `USE_IP_ADAPTER=true`, the provider attempts `load_ip_adapter(...)` and `set_ip_adapter_scale(...)` if the configured adapter files exist. If loading fails, generation falls back to prompt-only behavior and records the reason in the debug report.
 
+v2.4 completes the Reference-aware Style Transfer pipeline boundary. Generation Planner now creates a `style_program` with style name, style prompt, LoRA name/scale, lighting, color palette, and quality mode. SDXL Quality Provider can attempt LoRA loading from `.safetensors`, keeps an IP-Adapter image hook, and records a ControlNet placeholder for OpenPose, Depth, or Canny. No LoRA training is performed; LoRA is inference-only when local/public weights are available.
+
 ### Evaluation Layer
 
 Responsible for output evaluation and adaptive planning.
@@ -286,6 +288,7 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `USE_IP_ADAPTER` | Optional `true` to attempt SDXL IP-Adapter conditioning. Default is `false`. |
 | `IP_ADAPTER_MODEL_PATH` | Optional path for a local/public IP-Adapter model directory. |
 | `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename passed to `load_ip_adapter`. |
+| `LORA_DIR` | Optional directory for inference-only `.safetensors` LoRA files such as `ghibli`, `anime`, `watercolor`, and `realistic`. |
 
 VLM-only local run on PowerShell:
 
@@ -359,6 +362,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v2.1 | Reference Conditioning Interface |
 | v2.2 | SDXL Quality Provider Integration |
 | v2.3 | Optional IP-Adapter hook for reference-aware SDXL generation |
+| v2.4 | Reference-aware Style Transfer with Style Program, LoRA hook, and ControlNet hook |
 
 ## Portfolio Highlights
 

@@ -390,6 +390,37 @@ The hook records:
 
 This makes reference-aware generation explicit without requiring local IP-Adapter files in the default workflow.
 
+## Reference-aware Style Transfer v2.4
+
+Generation Planner creates a `style_program`:
+
+```json
+{
+  "style_name": "anime",
+  "style_prompt": "clean anime illustration, expressive character design",
+  "lora_name": "anime",
+  "lora_scale": 0.7,
+  "lighting": "clean cel-shaded lighting",
+  "color_palette": ["pastel", "clear skin tone", "accent color"],
+  "quality_mode": true
+}
+```
+
+The SDXL provider now has three extension hooks:
+
+```text
+SDXL Quality Provider
+  |
+  +-- IP Adapter  -> reference image feature conditioning
+  +-- LoRA        -> style-specific inference weights (.safetensors)
+  +-- ControlNet  -> structure preservation placeholder
+        +-- OpenPose
+        +-- Depth
+        +-- Canny
+```
+
+LoRA is inference-only. The project does not train LoRA weights. The loader looks for supported `.safetensors` files such as `ghibli`, `anime`, `watercolor`, and `realistic` under `LORA_DIR` or `models/lora`. If weights are unavailable, the provider records a fallback reason and continues with prompt-only generation.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.
