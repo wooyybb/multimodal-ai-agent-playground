@@ -13,6 +13,7 @@
 | v1.0 RC2 | Responsibility refactoring and framework simplification | Complete |
 | v1.0 | CI, demo polish, deployment-ready release | Planned |
 | v1.1 | Vision Layer upgrade with Florence2 adapter and standard vision schema | Complete |
+| v1.2 | Real LLM Reasoning Layer with OpenAI provider and rule fallback | Complete |
 
 ## Completed Sprints
 
@@ -78,6 +79,7 @@
 - Release Candidate 1: Layer-based framework organization
 - Release Candidate 2: Framework simplification and responsibility refactoring
 - Version 1.1: Vision Layer Upgrade with Florence2 adapter, BLIP fallback, and structured vision result schema
+- Version 1.2: Real LLM Reasoning Layer with OpenAI provider, structured JSON parsing, and rule/mock fallback
 
 ## Planned Sprints
 

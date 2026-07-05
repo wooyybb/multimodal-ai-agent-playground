@@ -7,7 +7,7 @@ class LLMClient:
     def __init__(self, provider: str | None = None):
         self.provider_name = provider or os.getenv("LLM_PROVIDER", "mock")
         self.model_service = AIModelService(self.provider_name)
-        print(f"[LLMClient] Provider: {self.provider_name}")
+        print(f"[LLM Layer] Provider: {self.provider_name}")
 
     def reason(self, state: dict) -> dict:
         return self.model_service.reason(state or {})

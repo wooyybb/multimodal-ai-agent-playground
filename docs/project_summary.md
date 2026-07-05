@@ -50,6 +50,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Adaptive planning and retry are treated as part of the Evaluation Layer's feedback loop.
 - `DebugReportManager` captures state, prompts, traces, metrics, and output paths.
 - `BenchmarkRunner` and `ReportGenerator` support repeatable comparison.
+- The LLM Layer supports optional OpenAI structured JSON reasoning while preserving rule/mock fallback behavior.
 
 ## Technology Stack
 
@@ -64,6 +65,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - FastAPI
 - Gradio
 - Docker
+- Optional OpenAI reasoning
 - Git/GitHub
 - Codex-assisted development
 
@@ -74,6 +76,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Qwen2.5-VL is planned and currently uses BLIP fallback.
 - FLUX is the current generation provider path.
 - Some reasoning remains rule-based by default.
+- OpenAI reasoning is optional and falls back automatically when no API key is available or JSON parsing fails.
 - External provider quality and latency can affect final image quality.
 
 ## Future Improvements

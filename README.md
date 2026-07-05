@@ -128,6 +128,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - DynamicExecutionEngine with layer-readable execution flow
 - ToolRegistry with layer metadata
 - Provider-independent Vision Layer with BLIP default and Florence2 fallback support
+- Optional OpenAI-backed LLM Reasoning Layer with rule/mock fallback
 - Context Program and Prompt Compiler
 - Provider routing and provider prompt adaptation
 - FLUX-oriented generation path
@@ -216,8 +217,19 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `OPENAI_API_KEY` | Optional OpenAI key for LLM reasoning experiments. |
-| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; rule/fallback remains the default behavior. |
+| `OPENAI_MODEL` | Optional OpenAI model name for real LLM reasoning. |
+| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; rule/mock fallback remains the default behavior. |
 | `VLM_PROVIDER` | `blip`, `florence2`, `florence`, `qwen2.5-vl`, or `qwen`; BLIP is the default. |
+
+Optional OpenAI reasoning on PowerShell:
+
+```powershell
+$env:LLM_PROVIDER="openai"
+$env:OPENAI_API_KEY="your_key_here"
+$env:OPENAI_MODEL="gpt-4.1-mini"
+```
+
+Never commit `.env` files or real API keys.
 
 ## Current Limitations
 
@@ -225,7 +237,7 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 - Florence2 is available through the Vision Router and falls back to BLIP if the model cannot be loaded.
 - Qwen2.5-VL is planned and currently uses BLIP fallback.
 - FLUX is the current generation provider path.
-- OpenAI reasoning is optional and falls back to rule-based behavior.
+- OpenAI reasoning is optional. If `OPENAI_API_KEY` is missing, invalid, or returns non-JSON output, the system falls back to rule/mock reasoning.
 - Some adaptive planning and evaluation logic is intentionally rule-based for stability.
 - Image quality depends on external provider behavior.
 

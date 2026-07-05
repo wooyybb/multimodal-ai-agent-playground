@@ -211,6 +211,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Updated ReferenceImageParser to prioritize structured fields before caption fallback.
 - Debug reports now preserve provider, latency, and detailed vision fields.
 
+## Version 1.2
+
+- Connected optional OpenAI reasoning through the existing LLM Layer instead of direct agent calls.
+- Kept rule/mock fallback as the default and as the failure path for missing API keys, request errors, or invalid JSON.
+- Added LLM metadata for provider, fallback status, raw text on parse failure, parse success, and latency.
+- Updated LLM Prompt Critic and LLM Prompt Optimizer so `LLM_PROVIDER=openai` enables real provider attempts.
+- Debug reports now surface LLM provider, fallback, raw response text, context reasoning, critic report, and optimizer report.
+
 ## Release Candidate 1
 
 - Reorganized project communication around six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.

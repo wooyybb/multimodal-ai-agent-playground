@@ -67,6 +67,8 @@ class StrategySelector:
             "used_fallback": result.get("reasoning_used_fallback"),
             "latency": result.get("reasoning_latency"),
             "fallback_reason": result.get("reasoning_fallback_reason"),
+            "raw_text": result.get("llm_reasoning_raw_text")
+            or result.get("raw_text"),
         }
         return next_candidates, next_selected, reasoning
 

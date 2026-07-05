@@ -20,6 +20,8 @@ class LLMPromptOptimizerAgent:
         return result
 
     def _mode(self):
+        if os.getenv("LLM_PROVIDER", "").lower() == "openai":
+            return "llm"
         if os.getenv("LLM_OPTIMIZER_MOCK", "").lower() == "true":
             return "mock"
         if os.getenv("LLM_OPTIMIZER_ENABLED", "").lower() == "true":

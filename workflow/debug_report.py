@@ -71,6 +71,13 @@ class DebugReportManager:
             "user_prompt": self._safe(state.get("user_prompt")),
             "vision_result": self._safe(self._vision_result(state)),
             "provider": self._safe(state.get("provider")),
+            "llm_provider": self._safe(self._llm_summary(state).get("llm_provider")),
+            "llm_used_fallback": self._safe(
+                self._llm_summary(state).get("llm_used_fallback")
+            ),
+            "llm_reasoning_raw_text": self._safe(
+                self._llm_summary(state).get("llm_reasoning_raw_text")
+            ),
             "planner_result": self._safe(state.get("planner_result")),
             "goal_tree": self._safe(state.get("goal_tree")),
             "context_reasoning": self._safe(state.get("context_reasoning")),
@@ -359,6 +366,47 @@ class DebugReportManager:
             "composition_hints": vision_result.get("composition_hints", {}),
             "color_hints": vision_result.get("color_hints", {}),
         }
+
+    def _llm_summary(self, state):
+        context_reasoning = state.get("context_reasoning") or {}
+        critic_report = state.get("llm_prompt_critic_report") or {}
+        optimizer_report = state.get("llm_optimizer_report") or {}
+        hypothesis_reasoning = state.get("hypothesis_reasoning") or {}
+        strategy_reasoning = state.get("strategy_reasoning") or {}
+        sources = (
+            state,
+            context_reasoning,
+            critic_report,
+            optimizer_report,
+            hypothesis_reasoning,
+            strategy_reasoning,
+        )
+        provider = self._first(
+            sources,
+            ("llm_provider", "reasoning_provider"),
+        )
+        used_fallback = self._first(
+            sources,
+            ("llm_used_fallback", "reasoning_used_fallback", "used_fallback"),
+        )
+        raw_text = self._first(
+            sources,
+            ("llm_reasoning_raw_text", "raw_text"),
+        )
+        return {
+            "llm_provider": provider,
+            "llm_used_fallback": used_fallback,
+            "llm_reasoning_raw_text": raw_text,
+        }
+
+    def _first(self, sources, keys):
+        for source in sources:
+            if not isinstance(source, dict):
+                continue
+            for key in keys:
+                if key in source and source.get(key) not in (None, ""):
+                    return source.get(key)
+        return None
 
     def _safe(self, value):
         if value is None or isinstance(value, (str, int, float, bool)):

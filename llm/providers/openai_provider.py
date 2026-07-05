@@ -1,20 +1,23 @@
-import json
 import os
+import time
 
 from llm.providers.base_provider import BaseProvider
 from llm.providers.mock_provider import MockProvider
+from llm.json_parser import JSONParser
 
 
 class OpenAIProvider(BaseProvider):
     def __init__(self):
         self.fallback = MockProvider()
         self.api_key = os.getenv("OPENAI_API_KEY")
-        self.model = os.getenv("OPENAI_MODEL", "gpt-5.5")
+        self.model = os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+        self.parser = JSONParser()
         self.client = self._build_client()
 
     def reason(self, state: dict) -> dict:
         fallback = self.fallback.reason(state or {})
         if not self.client:
+            self._log_result(False, True, 0.0)
             return self._with_fallback_reason(fallback, "OpenAI API key or client unavailable.")
 
         system_prompt = (
@@ -25,9 +28,17 @@ class OpenAIProvider(BaseProvider):
             "task": "reason",
             "input": state or {},
         }
-        parsed, raw_text, used_fallback = self._request_json(system_prompt, user_payload)
+        parsed, raw_text, used_fallback, latency = self._request_json(
+            system_prompt,
+            user_payload,
+        )
         if used_fallback:
-            return self._with_fallback_reason(fallback, "OpenAI response was not valid JSON.", raw_text)
+            return self._with_fallback_reason(
+                fallback,
+                "OpenAI response was not valid JSON.",
+                raw_text,
+                latency,
+            )
 
         return {
             "user_goal": parsed.get("user_goal", fallback["user_goal"]),
@@ -38,6 +49,10 @@ class OpenAIProvider(BaseProvider):
             "priority": parsed.get("priority", fallback["priority"]),
             "mode": "openai",
             "used_fallback": False,
+            "llm_provider": "openai",
+            "llm_used_fallback": False,
+            "llm_json_parse_success": True,
+            "llm_reasoning_latency": latency,
         }
 
     def critic(self, state: dict, mode: str = "mock") -> dict:
@@ -46,6 +61,7 @@ class OpenAIProvider(BaseProvider):
 
         fallback = self.fallback.critic(state or {}, mode="llm")
         if not self.client:
+            self._log_result(False, True, 0.0)
             return self._with_fallback_report(fallback, "OpenAI API key or client unavailable.")
 
         system_prompt = (
@@ -57,12 +73,16 @@ class OpenAIProvider(BaseProvider):
             "task": "critic",
             "input": state or {},
         }
-        parsed, raw_text, used_fallback = self._request_json(system_prompt, user_payload)
+        parsed, raw_text, used_fallback, latency = self._request_json(
+            system_prompt,
+            user_payload,
+        )
         if used_fallback:
             return self._with_fallback_report(
                 fallback,
                 "OpenAI response was not valid JSON.",
                 raw_text,
+                latency,
             )
 
         return {
@@ -78,6 +98,10 @@ class OpenAIProvider(BaseProvider):
             "priority_fix": self._list(parsed.get("priority_fix")),
             "reasoning_summary": parsed.get("reasoning_summary", ""),
             "used_fallback": False,
+            "llm_provider": "openai",
+            "llm_used_fallback": False,
+            "llm_json_parse_success": True,
+            "llm_reasoning_latency": latency,
         }
 
     def optimize(self, state: dict, mode: str = "mock") -> dict:
@@ -86,6 +110,7 @@ class OpenAIProvider(BaseProvider):
 
         fallback = self.fallback.optimize(state or {}, mode="llm")
         if not self.client:
+            self._log_result(False, True, 0.0)
             return self._with_fallback_optimizer(
                 fallback,
                 "OpenAI API key or client unavailable.",
@@ -99,12 +124,16 @@ class OpenAIProvider(BaseProvider):
             "task": "optimize",
             "input": state or {},
         }
-        parsed, raw_text, used_fallback = self._request_json(system_prompt, user_payload)
+        parsed, raw_text, used_fallback, latency = self._request_json(
+            system_prompt,
+            user_payload,
+        )
         if used_fallback:
             return self._with_fallback_optimizer(
                 fallback,
                 "OpenAI response was not valid JSON.",
                 raw_text,
+                latency,
             )
 
         optimized_prompt = parsed.get("optimized_prompt") or (
@@ -119,6 +148,10 @@ class OpenAIProvider(BaseProvider):
                 "reason": parsed.get("reason", "OpenAI optimizer returned structured output."),
                 "changes": self._list(parsed.get("changes")),
                 "used_fallback": False,
+                "llm_provider": "openai",
+                "llm_used_fallback": False,
+                "llm_json_parse_success": True,
+                "llm_reasoning_latency": latency,
             },
         }
 
@@ -135,6 +168,7 @@ class OpenAIProvider(BaseProvider):
             return None
 
     def _request_json(self, system_prompt, user_payload):
+        started = time.perf_counter()
         try:
             response = self.client.responses.create(
                 model=self.model,
@@ -147,50 +181,65 @@ class OpenAIProvider(BaseProvider):
                 ],
             )
             raw_text = getattr(response, "output_text", "") or str(response)
-            return self._parse_json(raw_text)
+            parsed, failed = self.parser.parse(raw_text)
+            latency = round(time.perf_counter() - started, 4)
+            self._log_result(not failed, failed, latency)
+            return parsed, raw_text if failed else "", bool(failed), latency
         except Exception as error:
             print(f"[OpenAIProvider] Warning: OpenAI request failed: {error}")
-            return {}, str(error), True
+            latency = round(time.perf_counter() - started, 4)
+            self._log_result(False, True, latency)
+            return {}, str(error), True, latency
 
-    def _parse_json(self, raw_text):
-        if isinstance(raw_text, dict):
-            return raw_text, json.dumps(raw_text, ensure_ascii=False), False
-        try:
-            parsed = json.loads(raw_text)
-            if isinstance(parsed, dict):
-                return parsed, raw_text, False
-            return {}, raw_text, True
-        except (TypeError, json.JSONDecodeError):
-            return {}, raw_text, True
-
-    def _with_fallback_reason(self, fallback, reason, raw_text=None):
+    def _with_fallback_reason(self, fallback, reason, raw_text=None, latency=0.0):
         result = dict(fallback)
         result["mode"] = "openai_fallback"
         result["used_fallback"] = True
         result["fallback_reason"] = reason
+        result["llm_provider"] = "openai"
+        result["llm_used_fallback"] = True
+        result["llm_json_parse_success"] = False
+        result["llm_reasoning_latency"] = latency
         if raw_text is not None:
             result["raw_text"] = raw_text
+            result["llm_reasoning_raw_text"] = raw_text
         return result
 
-    def _with_fallback_report(self, fallback, reason, raw_text=None):
+    def _with_fallback_report(self, fallback, reason, raw_text=None, latency=0.0):
         result = dict(fallback)
         result["mode"] = "openai_fallback"
         result["used_fallback"] = True
         result["reasoning_summary"] = reason
+        result["llm_provider"] = "openai"
+        result["llm_used_fallback"] = True
+        result["llm_json_parse_success"] = False
+        result["llm_reasoning_latency"] = latency
         if raw_text is not None:
             result["raw_text"] = raw_text
+            result["llm_reasoning_raw_text"] = raw_text
         return result
 
-    def _with_fallback_optimizer(self, fallback, reason, raw_text=None):
+    def _with_fallback_optimizer(self, fallback, reason, raw_text=None, latency=0.0):
         result = dict(fallback)
         report = dict(result.get("llm_optimizer_report") or {})
         report["mode"] = "openai_fallback"
         report["reason"] = reason
         report["used_fallback"] = True
+        report["llm_provider"] = "openai"
+        report["llm_used_fallback"] = True
+        report["llm_json_parse_success"] = False
+        report["llm_reasoning_latency"] = latency
         if raw_text is not None:
             report["raw_text"] = raw_text
+            report["llm_reasoning_raw_text"] = raw_text
         result["llm_optimizer_report"] = report
         return result
+
+    def _log_result(self, parse_success, used_fallback, latency):
+        print("[LLM Layer] Provider: openai")
+        print(f"[LLM Layer] Used fallback: {bool(used_fallback)}")
+        print(f"[LLM Layer] JSON parse success: {bool(parse_success)}")
+        print(f"[LLM Layer] Reasoning latency: {latency}s")
 
     def _list(self, value):
         if value is None:

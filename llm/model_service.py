@@ -8,7 +8,7 @@ class AIModelService:
         self.provider_name = str(provider or os.getenv("LLM_PROVIDER", "mock")).lower()
         self.registry = LLMProviderRegistry()
         self.provider = self.registry.get_provider(self.provider_name)
-        print(f"[AIModelService] Using Provider: {self.provider_name}")
+        print(f"[LLM Layer] Provider: {self.provider_name}")
 
     def reason(self, state: dict) -> dict:
         return self.provider.reason(state or {})

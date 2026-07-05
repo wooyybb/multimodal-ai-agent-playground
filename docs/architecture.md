@@ -121,6 +121,33 @@ characters
 
 This keeps caption parsing as a fallback while allowing Florence2 or future VLM providers to supply richer visual understanding.
 
+## Reasoning Layer v1.2
+
+The framework keeps rule/mock reasoning as the default, but can optionally call OpenAI through the LLM Layer:
+
+```text
+Reasoning Agent
+  |
+  v
+LLMClient / ReasonerRouter
+  |
+  v
+AIModelService
+  |
+  v
+OpenAIProvider
+  |
+  v
+Structured JSON Result
+  |
+  v
+Rule or Mock Fallback if unavailable
+```
+
+Existing agents never call OpenAI directly. They call the shared `llm/` layer, which handles provider selection, JSON parsing, fallback metadata, and latency logging.
+
+OpenAI is used only when `LLM_PROVIDER=openai`. If `OPENAI_API_KEY` is missing, the client cannot load, the request fails, or the response is not valid JSON, the system records fallback metadata and returns the existing rule/mock result.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.
@@ -140,6 +167,7 @@ The project contains many specialized components. Listing every agent makes the 
 - Existing agents and tools are preserved.
 - Florence2 is introduced behind the existing VLM adapter boundary.
 - BLIP remains the default and fallback provider.
+- OpenAI reasoning is optional and isolated behind the LLM Layer.
 - Generation, Evaluation, Adaptive Planning, Memory, FastAPI, Docker, and Benchmark layers are unchanged.
 
 ## Future Work

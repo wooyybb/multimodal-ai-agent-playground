@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v1.2 Real LLM Reasoning Questions
+
+Q. 실제 LLM을 어디에 사용했나요?
+A. Prompt를 바로 생성하는 데 쓰기보다 Context Reasoning, LLM Prompt Critique, Prompt Optimization, Hypothesis/Strategy reasoning처럼 판단과 구조화가 필요한 Reasoning Layer에 사용했습니다. `LLM_PROVIDER=openai`일 때만 OpenAI provider를 시도하고, 기본값은 rule/mock fallback입니다.
+
+Q. 왜 Agent가 OpenAI를 직접 호출하지 않게 했나요?
+A. Agent가 provider API를 직접 호출하면 provider 교체, 테스트, fallback 처리가 어려워집니다. 그래서 Agent는 `LLMClient` 또는 `ReasonerRouter`만 호출하고, 실제 OpenAI 호출은 `llm/` layer의 `AIModelService`와 `OpenAIProvider`가 담당하게 했습니다.
+
+Q. LLM 실패 시 fallback은 어떻게 동작하나요?
+A. `OPENAI_API_KEY`가 없거나 client 로딩 실패, request 실패, JSON parsing 실패가 발생하면 crash하지 않고 기존 rule/mock 결과를 반환합니다. 이때 `llm_provider`, `llm_used_fallback`, `llm_reasoning_raw_text`, parse success, latency가 debug report에 기록됩니다.
+
+Q. 왜 Structured JSON Output이 중요한가요?
+A. Reasoning 결과가 agent state에 병합되려면 문자열 설명보다 dict 구조가 안전합니다. JSON schema를 강제하면 Context Reasoning, Critic Report, Optimizer Report를 Debug Report와 downstream agent가 일관되게 사용할 수 있습니다.
+
 ## v1.1 Vision Layer Questions
 
 Q. BLIP를 제거하지 않고 Florence2를 추가한 이유는 무엇인가요?

@@ -36,4 +36,12 @@ class LLMContextReasoner:
         )
         print(f"[LLMContextReasoner] User Goal: {reasoning['user_goal']}")
         print(f"[LLMContextReasoner] Scene Goal: {reasoning['scene_goal']}")
-        return {"context_reasoning": reasoning}
+        return {
+            "context_reasoning": reasoning,
+            "llm_provider": reasoning.get("llm_provider")
+            or reasoning.get("reasoning_provider"),
+            "llm_used_fallback": reasoning.get("llm_used_fallback")
+            or reasoning.get("reasoning_used_fallback"),
+            "llm_reasoning_raw_text": reasoning.get("llm_reasoning_raw_text")
+            or reasoning.get("raw_text"),
+        }

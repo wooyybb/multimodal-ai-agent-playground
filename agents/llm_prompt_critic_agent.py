@@ -40,6 +40,8 @@ class LLMPromptCriticAgent:
         }
 
     def _mode(self):
+        if os.getenv("LLM_PROVIDER", "").lower() == "openai":
+            return "llm"
         enabled = os.getenv("LLM_PROMPT_CRITIC_ENABLED", "").lower() == "true"
         mock = os.getenv("LLM_PROMPT_CRITIC_MOCK", "").lower() == "true"
         if not enabled:
