@@ -230,6 +230,7 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 - [Architecture](docs/architecture.md)
 - [Layer Map](docs/layer_map.md)
 - [Project Summary](docs/project_summary.md)
+- [Design Specification v1.0](docs/design_spec_v1.md)
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)
 - [Roadmap](docs/roadmap.md)
