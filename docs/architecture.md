@@ -28,7 +28,7 @@ Infrastructure Layer
 | Layer | Responsibility | Internal Examples |
 | --- | --- | --- |
 | Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence-2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
-| Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Compilation, Prompt Validation, Prompt Optimization |
+| Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Rendering Engine, Prompt Validation, Prompt Optimization |
 | Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX |
 | Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
 | Infrastructure Layer | Support runtime, observability, and access. | Memory, History, Debug Report, Benchmark, FastAPI, Gradio |
@@ -125,6 +125,25 @@ This keeps caption parsing as a fallback while allowing Florence-2 to supply ric
 ## Reasoning Boundary
 
 For this v1.1 VLM-only stabilization, LLM reasoning remains on the existing rule/mock fallback path. OpenAI API calls are not required for the default workflow.
+
+## Prompt Rendering Engine v1.2
+
+The Context Layer renders different prompts for different model-facing jobs:
+
+```text
+Context Program
+  |
+  v
+Prompt Rendering Engine
+  |
+  +-- generation_prompt
+  +-- clip_prompt
+  +-- pickscore_prompt
+  +-- vlm_judge_prompt
+  +-- negative_prompt
+```
+
+`generation_prompt` preserves the existing provider generation behavior. `clip_prompt` is a short semantic summary that removes quality-only terms and negative prompt language. `pickscore_prompt` keeps preference-oriented quality, composition, and style cues. `vlm_judge_prompt` is a longer instruction for future visual judging against reference and generated images.
 
 ## Design Boundaries
 

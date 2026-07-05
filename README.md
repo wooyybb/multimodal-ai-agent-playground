@@ -129,6 +129,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Provider-independent Vision Layer with BLIP default and Florence-2 fallback support
 - Rule/mock LLM reasoning fallback for local and free execution
 - Context Program and Prompt Compiler
+- Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
 - Provider routing and provider prompt adaptation
 - FLUX-oriented generation path
 - Multi-metric evaluation
@@ -205,6 +206,7 @@ Debug reports make the framework inspectable.
 
 - `report.json`: machine-readable state snapshot
 - `prompt_preview.txt`: readable prompt lifecycle and trace
+- prompt rendering outputs: generation prompt, CLIP prompt, PickScore prompt, VLM Judge prompt
 - evaluation metrics and retry information
 - output image references
 
@@ -239,6 +241,19 @@ OpenAI API keys are not required for this v1.1 VLM-only setup. Never commit `.en
 - LLM reasoning remains rule/mock fallback for this release focus.
 - Some adaptive planning and evaluation logic is intentionally rule-based for stability.
 - Image quality depends on external provider behavior.
+
+## Prompt Rendering Engine
+
+The framework does not use one prompt for every model-facing task. The Prompt Rendering Engine converts the Context Program into task-specific prompts:
+
+| Prompt | Purpose |
+| --- | --- |
+| `generation_prompt` | Full visual prompt used by the generation provider. |
+| `clip_prompt` | Short semantic summary for CLIP-style image-text similarity. |
+| `pickscore_prompt` | Human preference-oriented prompt preserving style, quality, and composition. |
+| `vlm_judge_prompt` | Longer judging instruction for future reference/generated image comparison. |
+
+The CLIP prompt is intentionally short and removes quality-only terms such as `masterpiece`, `8k`, and `ultra detailed` so evaluation focuses on character, outfit, action, and background semantics.
 
 ## Roadmap
 

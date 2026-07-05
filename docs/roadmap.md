@@ -13,7 +13,7 @@
 | v1.0 RC2 | Responsibility refactoring and framework simplification | Complete |
 | v1.0 | CI, demo polish, deployment-ready release | Planned |
 | v1.1 | VLM-only Vision Layer stabilization with BLIP and Florence-2 fallback | Complete |
-| v1.2 | Real LLM Reasoning Layer | Deferred |
+| v1.2 | Prompt Rendering Engine | Complete |
 
 ## Completed Sprints
 
@@ -79,6 +79,7 @@
 - Release Candidate 1: Layer-based framework organization
 - Release Candidate 2: Framework simplification and responsibility refactoring
 - Version 1.1: VLM-only Vision Layer stabilization with BLIP, Florence-2 fallback, structured vision result schema, ReferenceImageParser, and CharacterProgramBuilder integration
+- Version 1.2: Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompt variants
 
 ## Planned Sprints
 

@@ -219,6 +219,10 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Deferred paid LLM API focus.
 - Keep default reasoning on rule/mock fallback while stabilizing the Vision Layer first.
 - Future work can revisit real LLM reasoning after the VLM/reference image pipeline is stable.
+- Added Prompt Rendering Engine behavior to PromptCompiler.
+- PromptCompiler now renders `generation_prompt`, `clip_prompt`, `pickscore_prompt`, `vlm_judge_prompt`, and `negative_prompt`.
+- ExecutionEngine uses `generation_prompt` for generation and `clip_prompt` for CLIP-style evaluation.
+- Debug reports now store prompt rendering outputs in both `report.json` and `prompt_preview.txt`.
 
 ## Release Candidate 1
 

@@ -115,6 +115,12 @@ class DebugReportManager:
             "llm_optimizer_report": self._safe(state.get("llm_optimizer_report")),
             "provider_prompt": self._safe(state.get("provider_prompt")),
             "compiled_prompt_package": self._safe(state.get("compiled_prompt_package")),
+            "prompt_rendering": self._safe(state.get("prompt_rendering")),
+            "generation_prompt": self._safe(state.get("generation_prompt")),
+            "clip_prompt": self._safe(state.get("clip_prompt")),
+            "pickscore_prompt": self._safe(state.get("pickscore_prompt")),
+            "vlm_judge_prompt": self._safe(state.get("vlm_judge_prompt")),
+            "metric_prompts": self._safe(state.get("metric_prompts")),
             "provider_negative_prompt": self._safe(state.get("provider_negative_prompt")),
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "evaluation_result": self._safe(self._evaluation_result(state)),
@@ -227,6 +233,11 @@ class DebugReportManager:
             "COMPILED PROMPT PACKAGE",
             self._compiled_prompt_package_preview(state.get("compiled_prompt_package")),
         )
+        self._append_block(
+            lines,
+            "PROMPT RENDERING",
+            self._prompt_rendering_preview(state),
+        )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
         self._append_block(
@@ -269,8 +280,24 @@ class DebugReportManager:
             "provider": package.get("provider"),
             "positive_prompt": package.get("positive_prompt"),
             "negative_prompt": package.get("negative_prompt"),
+            "prompt_rendering": package.get("prompt_rendering", {}),
             "prompt_blocks": package.get("prompt_blocks", {}),
             "compiler_notes": package.get("compiler_notes", []),
+        }
+
+    def _prompt_rendering_preview(self, state):
+        rendering = state.get("prompt_rendering") or {}
+        return {
+            "generation_prompt": state.get("generation_prompt")
+            or rendering.get("generation_prompt"),
+            "clip_prompt": state.get("clip_prompt") or rendering.get("clip_prompt"),
+            "pickscore_prompt": state.get("pickscore_prompt")
+            or rendering.get("pickscore_prompt"),
+            "vlm_judge_prompt": state.get("vlm_judge_prompt")
+            or rendering.get("vlm_judge_prompt"),
+            "metric_prompts": state.get("metric_prompts"),
+            "negative_prompt": state.get("negative_prompt")
+            or rendering.get("negative_prompt"),
         }
 
     def _adaptive_plan_preview(self, plan):

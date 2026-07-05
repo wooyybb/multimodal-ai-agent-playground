@@ -442,6 +442,15 @@ class DynamicExecutionEngine:
             self._apply_character_program_context(state)
             self._apply_strategy_context(state)
             self._run_state_step(registry, state, "prompt_compiler")
+            state["metric_prompts"] = {
+                "clip": state.get("clip_prompt"),
+                "pickscore": state.get("pickscore_prompt"),
+                "vlm_judge": state.get("vlm_judge_prompt"),
+            }
+            state["evaluation_prompt"] = state.get("clip_prompt") or state.get(
+                "evaluation_prompt",
+                "",
+            )
             state["agent_trace"].append("PromptCompiler compiled prompt package")
             print("[ExecutionEngine] PromptCompiler compiled prompt package")
         except Exception as error:
@@ -470,7 +479,7 @@ class DynamicExecutionEngine:
         self._print_prompt_preview(state)
         state["output_image_path"] = registry.call(
             "generation",
-            state.get("final_prompt", ""),
+            state.get("generation_prompt") or state.get("final_prompt", ""),
         )
 
     def _run_evaluation(self, registry, state):
@@ -478,7 +487,7 @@ class DynamicExecutionEngine:
             "evaluation",
             state.get("image"),
             state.get("output_image_path"),
-            state.get("evaluation_prompt", ""),
+            state.get("clip_prompt") or state.get("evaluation_prompt", ""),
         )
 
     def _run_reflection(self, registry, state):
@@ -587,6 +596,12 @@ class DynamicExecutionEngine:
                 state["retry_prompt"],
                 label="retry evaluation",
             )
+            state["retry_clip_prompt"] = self._compress_prompt(
+                registry,
+                state["retry_evaluation_prompt"],
+                max_words=40,
+                label="retry clip",
+            )
             print("[ExecutionEngine] Using compressed retry prompt.")
             state["retry_output_image_path"] = registry.call(
                 "generation",
@@ -596,7 +611,7 @@ class DynamicExecutionEngine:
                 "evaluation",
                 state.get("image"),
                 state.get("retry_output_image_path"),
-                state["retry_evaluation_prompt"],
+                state.get("retry_clip_prompt") or state["retry_evaluation_prompt"],
             )
         else:
             print("[ExecutionEngine] Retry skipped.")
@@ -1069,6 +1084,18 @@ class DynamicExecutionEngine:
         print(f"Layout\n{self._preview_section(sections.get('layout'))}")
         print(f"Style\n{self._preview_section(sections.get('style'))}")
         print(f"Lighting\n{self._preview_section(sections.get('lighting'))}")
+        rendering = state.get("prompt_rendering") or {}
+        if rendering:
+            print("Prompt Rendering")
+            print(
+                "generation="
+                f"{self._preview_text(rendering.get('generation_prompt'))}"
+            )
+            print(f"clip={self._preview_text(rendering.get('clip_prompt'))}")
+            print(
+                "pickscore="
+                f"{self._preview_text(rendering.get('pickscore_prompt'))}"
+            )
         print(
             "Negative\n"
             f"{state.get('provider_negative_prompt') or state.get('negative_prompt') or ''}"
@@ -1089,6 +1116,12 @@ class DynamicExecutionEngine:
         if isinstance(section, list):
             return ", ".join(str(item) for item in section[:5])
         return str(section)
+
+    def _preview_text(self, text, max_chars=180):
+        value = str(text or "")
+        if len(value) <= max_chars:
+            return value
+        return value[:max_chars].rstrip() + "..."
 
     def _save_debug_report(self, state):
         try:

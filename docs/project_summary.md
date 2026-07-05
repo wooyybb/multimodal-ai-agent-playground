@@ -34,6 +34,8 @@ In v1.1, the Planning Layer includes a provider-independent Vision Layer. `Visio
 
 The Context Layer converts planning output into Context Program and provider-independent prompt structures.
 
+In v1.2, the Prompt Compiler acts as a Prompt Rendering Engine. It renders separate `generation_prompt`, `clip_prompt`, `pickscore_prompt`, and `vlm_judge_prompt` outputs so each downstream task receives the prompt shape it needs.
+
 The Generation Layer selects the provider, adapts the prompt, and runs image generation.
 
 The Evaluation Layer scores output with CLIP and additional rule-based metrics, then performs reflection, strategy selection, adaptive planning, and retry decisions.
@@ -45,6 +47,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - `DynamicExecutionEngine` runs the planned workflow.
 - `ToolRegistry` isolates step names from concrete classes.
 - `ContextProgramBuilder` and `PromptCompiler` separate semantic context from provider prompts.
+- Prompt Rendering Engine separates generation, CLIP, PickScore, and VLM Judge prompt views.
 - `ProviderRouter` and `ProviderPromptAdapter` isolate generation provider details.
 - `EvaluationAggregator` combines multiple metrics into an explainable score.
 - Adaptive planning and retry are treated as part of the Evaluation Layer's feedback loop.

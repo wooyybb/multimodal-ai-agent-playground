@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.2 Prompt Rendering Engine Questions
+
+Q. 왜 Prompt를 하나만 만들지 않았나요?
+A. Generation, CLIP evaluation, human preference scoring, VLM judging은 같은 문장을 필요로 하지 않습니다. Generation은 풍부한 visual prompt가 유리하지만, CLIP은 짧은 semantic summary가 더 안전합니다. 그래서 Context Program을 여러 model-facing prompt로 렌더링했습니다.
+
+Q. CLIP Prompt는 왜 짧게 만들었나요?
+A. CLIP은 token budget이 짧고 quality-only keyword에 민감할 수 있습니다. `masterpiece`, `8k`, `ultra detailed`, negative prompt 같은 표현을 제거하고 character, outfit, action, background 중심의 40 words 이하 semantic summary를 사용합니다.
+
+Q. Prompt Rendering Engine의 장점은 무엇인가요?
+A. Context Program은 하나로 유지하면서 downstream task마다 다른 prompt view를 만들 수 있습니다. 이 구조는 generation provider, CLIP, PickScore, VLM Judge가 서로 다른 prompt 요구사항을 가져도 Context Engineering 흐름을 깨지 않습니다.
+
 ## v1.1 VLM-only Stabilization Questions
 
 Q. 이번 v1.1에서 집중한 것은 무엇인가요?
