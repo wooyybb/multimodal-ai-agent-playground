@@ -24,6 +24,7 @@
 | v2.2 | Real SDXL Img2Img Integration | Complete |
 | v2.3 | SDXL Style Prompt Renderer | Complete |
 | v2.4 | Real IP-Adapter Integration for SDXL Img2Img | Complete |
+| v2.5 | Long Prompt Structuring for Reference-aware Style Transfer | Complete |
 
 ## Completed Sprints
 
@@ -100,6 +101,7 @@
 - Version 2.2: Real SDXL Img2Img integration with Diffusers `StableDiffusionXLImg2ImgPipeline`, `SDXL_MODEL_ID`, reference image input, strength, and no mock fallback
 - Version 2.3: Provider-specific prompt rendering with dense FLUX prompts and short SDXL style prompts under the 77-token budget
 - Version 2.4: Optional inference-only IP-Adapter integration for SDXL Img2Img with scale, fallback, and debug status
+- Version 2.5: Long user prompts are converted into Style Transfer Program, sanitized, validated, and rendered into FLUX/SDXL/CLIP-specific prompts
 
 ## Planned Sprints
 

@@ -184,6 +184,15 @@ class DebugReportManager:
             "style_prompt_token_count": self._safe(
                 state.get("style_prompt_token_count")
             ),
+            "style_transfer_program": self._safe(state.get("style_transfer_program")),
+            "forbidden_concepts": self._safe(state.get("forbidden_concepts")),
+            "prompt_sanitizer_report": self._safe(
+                state.get("prompt_sanitizer_report")
+            ),
+            "prompt_validation_report": self._safe(
+                state.get("prompt_validation_report")
+            ),
+            "sdxl_style_prompt": self._safe(state.get("sdxl_style_prompt")),
             "clip_prompt": self._safe(state.get("clip_prompt")),
             "pickscore_prompt": self._safe(state.get("pickscore_prompt")),
             "vlm_judge_prompt": self._safe(state.get("vlm_judge_prompt")),
@@ -322,6 +331,22 @@ class DebugReportManager:
         )
         self._append_block(
             lines,
+            "STYLE TRANSFER PROGRAM",
+            state.get("style_transfer_program"),
+        )
+        self._append_block(lines, "FORBIDDEN CONCEPTS", state.get("forbidden_concepts"))
+        self._append_block(
+            lines,
+            "PROMPT SANITIZER",
+            state.get("prompt_sanitizer_report"),
+        )
+        self._append_block(
+            lines,
+            "PROMPT VALIDATION",
+            state.get("prompt_validation_report"),
+        )
+        self._append_block(
+            lines,
             "REFERENCE CONDITIONING",
             self._reference_conditioning_preview(state),
         )
@@ -405,6 +430,8 @@ class DebugReportManager:
             "provider_prompt_type": state.get("provider_prompt_type"),
             "provider_prompt_rendering": state.get("provider_prompt_rendering"),
             "dense_generation_prompt": state.get("dense_generation_prompt"),
+            "sdxl_style_prompt": state.get("sdxl_style_prompt")
+            or rendering.get("sdxl_style_prompt"),
             "style_prompt": state.get("style_prompt"),
             "style_prompt_word_count": state.get("style_prompt_word_count"),
             "style_prompt_token_count": state.get("style_prompt_token_count"),

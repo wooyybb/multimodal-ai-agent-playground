@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v2.5 Long Prompt Structuring Questions
+
+Q. 왜 긴 사용자 프롬프트를 그대로 사용하지 않았나요?
+A. 긴 프롬프트를 그대로 final prompt에 넣으면 여러 Agent가 비슷한 내용을 반복해서 추가하고, 사용자가 제거하라고 한 개념이 reference caption을 통해 다시 살아날 수 있습니다. 그래서 먼저 `style_transfer_program`으로 의도, 스타일, 레이아웃, 금지 개념을 구조화한 뒤 provider별 renderer가 필요한 정보만 선택하도록 했습니다.
+
+Q. Prompt Sanitizer는 어떤 문제를 해결하나요?
+A. 금지 개념 제거, 중복 phrase 제거, semantic duplicate merge, token budget enforcement를 담당합니다. 예를 들어 `anime`, `anime style`, `anime illustration`은 하나의 `anime illustration`로 정리하고, 사용자가 weapon 제거를 요청하면 `sword`, `blade`, `holding a sword` 같은 표현을 generation-facing prompt에서 제거합니다.
+
+Q. 사용자가 제거하라고 한 개념이 VLM caption에 남아 있으면 어떻게 처리하나요?
+A. user forbidden intent를 최우선으로 둡니다. reference caption에 `holding a sword`가 있어도 user prompt가 weapon removal을 요구하면 `forbidden_concepts`에 weapon 계열을 저장하고 Prompt Sanitizer가 final generation prompt, SDXL style prompt, CLIP prompt에서 제거합니다.
+
+Q. SDXL Img2Img prompt를 짧게 유지하는 이유는 무엇인가요?
+A. SDXL Img2Img에서는 reference image가 identity와 구조를 제공하므로 prompt는 style, layout, mood, lighting만 전달하는 편이 안정적입니다. 또한 CLIP/SDXL 계열의 짧은 text budget 문제를 피하기 위해 SDXL style prompt와 CLIP prompt를 77 token 이하로 검증합니다.
+
 ## v2.4 Real IP-Adapter Integration Questions
 
 Q. SDXL Img2Img와 IP-Adapter의 역할 차이는 무엇인가요?

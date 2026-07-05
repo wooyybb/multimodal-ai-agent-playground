@@ -312,6 +312,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added v1.0 RC2 release notes.
 - Added layer-readable ExecutionEngine logs and ToolRegistry metadata without changing core behavior.
 
+## Version 2.5
+
+- Added Style Transfer Program generation for long reference-aware style transfer prompts.
+- Added Prompt Sanitizer to remove forbidden concepts, merge semantic duplicates, deduplicate phrases, and enforce provider token budgets.
+- Added Prompt Validator to check forbidden concept survival, duplicate count, SDXL/CLIP token limits, and style/layout preservation.
+- Debug reports now include `style_transfer_program`, `forbidden_concepts`, `prompt_sanitizer_report`, `prompt_validation_report`, and `sdxl_style_prompt`.
+
 ## Future Work
 
 - Keep this file short.

@@ -157,6 +157,32 @@ Prompt Rendering Engine
 
 `generation_prompt` preserves the existing provider generation behavior. `clip_prompt` is a short semantic summary that removes quality-only terms and negative prompt language. `pickscore_prompt` keeps preference-oriented quality, composition, and style cues. `vlm_judge_prompt` is a longer instruction for future visual judging against reference and generated images.
 
+## Long Prompt Structuring v2.5
+
+Long user prompts are structured before they become model-facing prompts:
+
+```text
+User Prompt
+  |
+  v
+Style Transfer Program
+  |
+  v
+Prompt Sanitizer
+  |
+  v
+Prompt Validator
+  |
+  +-- FLUX dense prompt
+  +-- SDXL Img2Img style prompt
+  +-- CLIP semantic prompt
+  +-- negative prompt
+```
+
+The `style_transfer_program` stores style, layout, pose/expression rules, text rules, negative prompt terms, and `forbidden_concepts`. Korean photobooth prompts are normalized into a vertical four-frame photobooth layout, and ugly-cute / MS Paint prompts are normalized into a rough hand-drawn style program.
+
+User forbidden intent has the highest priority. If the user asks to remove weapons, weapon-related concepts are removed from final generation-facing prompts even when the reference caption contains a sword. The validator records `prompt_validation_report` with forbidden concept survival, duplicate count, SDXL token count, CLIP token count, and required style/layout preservation.
+
 ## Evaluation Prompt Routing v1.3
 
 The Evaluation Layer consumes prompt variants by metric:

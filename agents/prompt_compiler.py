@@ -1,4 +1,7 @@
 from generation.reference_conditioning import ReferenceConditioningBuilder
+from context.prompt_sanitizer import PromptSanitizer
+from context.prompt_validator import PromptValidator
+from context.style_transfer_program import StyleTransferProgramBuilder
 
 
 class PromptCompiler:
@@ -31,19 +34,30 @@ class PromptCompiler:
         context_validation = state.get("context_validation") or {}
         prompt_sections = state.get("prompt_sections") or {}
         negative_prompt = state.get("negative_prompt") or ""
+        style_transfer_program = StyleTransferProgramBuilder().build(state)
+        forbidden_concepts = style_transfer_program.get("forbidden_concepts", [])
+        sanitizer = PromptSanitizer()
 
         print(f"[PromptCompiler] Provider: {provider}")
+        print(f"[PromptCompiler] Forbidden concepts: {forbidden_concepts}")
         prompt_blocks = self._build_prompt_blocks(
             context_program,
             context_reasoning,
             prompt_sections,
         )
-        negative = self._negative_prompt(context_program, negative_prompt)
+        self._apply_style_transfer_program(prompt_blocks, style_transfer_program)
+        negative = sanitizer.merge_negative_prompt(
+            self._negative_prompt(context_program, negative_prompt),
+            style_transfer_program.get("negative_prompt", []),
+        )
 
         if provider == "gpt_image":
             generation_prompt, notes, target_words = self._compile_gpt_image(prompt_blocks)
-        elif provider == "sdxl":
-            generation_prompt, notes, target_words = self._compile_sdxl(prompt_blocks)
+        elif provider in {"sdxl", "sdxl_quality"}:
+            generation_prompt, notes, target_words = self._compile_sdxl(
+                prompt_blocks,
+                style_transfer_program,
+            )
         else:
             generation_prompt, notes, target_words = self._compile_flux(prompt_blocks)
             provider = "flux"
@@ -59,14 +73,27 @@ class PromptCompiler:
             prompt_blocks,
             context_program,
             context_reasoning,
+            style_transfer_program,
+            provider,
+            sanitizer,
+            forbidden_concepts,
+        )
+        sanitizer_report = rendered_prompts.pop("prompt_sanitizer_report")
+        validation_report = PromptValidator().validate(
+            rendered_prompts,
+            style_transfer_program=style_transfer_program,
+            forbidden_concepts=forbidden_concepts,
         )
         reference_conditioning = ReferenceConditioningBuilder().build(state)
         package = {
             "provider": provider,
             "positive_prompt": rendered_prompts["generation_prompt"],
-            "negative_prompt": negative,
+            "negative_prompt": rendered_prompts["negative_prompt"],
             "prompt_blocks": prompt_blocks,
             "prompt_rendering": rendered_prompts,
+            "style_transfer_program": style_transfer_program,
+            "prompt_sanitizer_report": sanitizer_report,
+            "prompt_validation_report": validation_report,
             "reference_conditioning_package": reference_conditioning,
             "compiler_notes": notes,
             "prompt_budget": {
@@ -81,6 +108,10 @@ class PromptCompiler:
         return {
             "compiled_prompt_package": package,
             "reference_conditioning_package": reference_conditioning,
+            "style_transfer_program": style_transfer_program,
+            "forbidden_concepts": forbidden_concepts,
+            "prompt_sanitizer_report": sanitizer_report,
+            "prompt_validation_report": validation_report,
             "prompt_rendering": rendered_prompts,
             **rendered_prompts,
         }
@@ -88,7 +119,9 @@ class PromptCompiler:
     def _provider(self, state):
         routing = state.get("provider_routing") or {}
         return str(
-            state.get("provider")
+            state.get("generation_provider")
+            or (state.get("generation_plan") or {}).get("provider")
+            or state.get("provider")
             or routing.get("selected_provider")
             or routing.get("fallback_provider")
             or "flux"
@@ -167,19 +200,11 @@ class PromptCompiler:
         prompt = self._limit_words(prompt, 110)
         return prompt, ["compiled dense FLUX visual prompt"], 100
 
-    def _compile_sdxl(self, prompt_blocks):
-        prompt = self._join_parts(
-            [
-                prompt_blocks.get("subject"),
-                prompt_blocks.get("style"),
-                prompt_blocks.get("layout"),
-                prompt_blocks.get("lighting"),
-                prompt_blocks.get("quality"),
-            ]
-        )
+    def _compile_sdxl(self, prompt_blocks, style_transfer_program):
+        prompt = self._render_sdxl_style_prompt(prompt_blocks, style_transfer_program)
         prompt = self._clean_prompt(prompt)
-        prompt = self._limit_words(prompt, 130)
-        return prompt, ["compiled SDXL skeleton positive prompt"], 120
+        prompt = self._limit_words(prompt, 60)
+        return prompt, ["compiled SDXL style-only Img2Img prompt"], 60
 
     def _compile_gpt_image(self, prompt_blocks):
         lines = [
@@ -222,6 +247,128 @@ class PromptCompiler:
         prompt_blocks,
         context_program,
         context_reasoning,
+        style_transfer_program,
+        provider,
+        sanitizer,
+        forbidden_concepts,
+    ):
+        sdxl_style_prompt = self._render_sdxl_style_prompt(
+            prompt_blocks,
+            style_transfer_program,
+        )
+        generation_budget = 60 if provider in {"sdxl", "sdxl_quality"} else None
+        generation_clean = sanitizer.sanitize(
+            generation_prompt,
+            forbidden_concepts,
+            provider=provider,
+            max_tokens=generation_budget,
+        )
+        sdxl_clean = sanitizer.sanitize(
+            sdxl_style_prompt,
+            forbidden_concepts,
+            provider="sdxl",
+            max_tokens=60,
+        )
+        clip_clean = sanitizer.sanitize(
+            self._render_clip_prompt(prompt_blocks),
+            forbidden_concepts,
+            provider="clip",
+            max_tokens=40,
+        )
+        pickscore_clean = sanitizer.sanitize(
+            self._render_pickscore_prompt(prompt_blocks),
+            forbidden_concepts,
+            provider="pickscore",
+            max_tokens=None,
+        )
+        vlm_judge_clean = sanitizer.sanitize(
+            self._render_vlm_judge_prompt(
+                prompt_blocks,
+                context_program,
+                context_reasoning,
+            ),
+            forbidden_concepts,
+            provider="vlm_judge",
+            max_tokens=None,
+        )
+        sanitizer_report = {
+            "generation": generation_clean["prompt_sanitizer_report"],
+            "sdxl": sdxl_clean["prompt_sanitizer_report"],
+            "clip": clip_clean["prompt_sanitizer_report"],
+            "pickscore": pickscore_clean["prompt_sanitizer_report"],
+            "vlm_judge": vlm_judge_clean["prompt_sanitizer_report"],
+        }
+        negative_clean = sanitizer.sanitize(
+            negative_prompt,
+            forbidden_concepts=[],
+            provider="negative",
+            max_tokens=None,
+        )
+        return {
+            "generation_prompt": generation_clean["prompt"],
+            "sdxl_style_prompt": sdxl_clean["prompt"],
+            "clip_prompt": clip_clean["prompt"],
+            "pickscore_prompt": pickscore_clean["prompt"],
+            "vlm_judge_prompt": vlm_judge_clean["prompt"],
+            "negative_prompt": negative_clean["prompt"],
+            "prompt_sanitizer_report": sanitizer_report,
+        }
+
+    def _render_sdxl_style_prompt(self, prompt_blocks, style_transfer_program):
+        style = style_transfer_program.get("style") or {}
+        layout = style_transfer_program.get("layout") or {}
+        parts = [
+            style.get("name"),
+            style.get("rendering"),
+            style.get("mood"),
+            style.get("color_palette", []),
+            style.get("texture"),
+            layout.get("format"),
+            layout.get("structure"),
+            layout.get("background"),
+            layout.get("decorations", []),
+            prompt_blocks.get("style"),
+            prompt_blocks.get("lighting"),
+        ]
+        prompt = self._join_parts(parts)
+        return self._remove_identity_terms(prompt)
+
+    def _remove_identity_terms(self, prompt):
+        identity_terms = (
+            "gender",
+            "hair",
+            "hairstyle",
+            "eye color",
+            "eyes",
+            "outfit",
+            "clothing",
+            "clothes",
+            "accessory",
+            "accessories",
+            "weapon",
+            "sword",
+            "female",
+            "male",
+            "woman",
+            "man",
+            "girl",
+            "boy",
+        )
+        phrases = []
+        for phrase in str(prompt or "").split(","):
+            lowered = phrase.lower()
+            if any(term in lowered for term in identity_terms):
+                continue
+            phrases.append(phrase)
+        return ", ".join(phrase.strip() for phrase in phrases if phrase.strip())
+
+    def _legacy_render_prompts(
+        self,
+        generation_prompt,
+        negative_prompt,
+        prompt_blocks,
+        context_program,
+        context_reasoning,
     ):
         clip_prompt = self._render_clip_prompt(prompt_blocks)
         pickscore_prompt = self._render_pickscore_prompt(prompt_blocks)
@@ -237,6 +384,29 @@ class PromptCompiler:
             "vlm_judge_prompt": vlm_judge_prompt,
             "negative_prompt": negative_prompt,
         }
+
+    def _apply_style_transfer_program(self, prompt_blocks, program):
+        style = program.get("style") or {}
+        layout = program.get("layout") or {}
+        style_bits = [
+            style.get("name"),
+            style.get("rendering"),
+            style.get("mood"),
+            style.get("color_palette", []),
+            style.get("texture"),
+        ]
+        layout_bits = [
+            layout.get("format"),
+            layout.get("structure"),
+            layout.get("background"),
+            layout.get("decorations", []),
+        ]
+        prompt_blocks["style"] = self._join_parts(
+            [prompt_blocks.get("style"), style_bits]
+        )
+        prompt_blocks["layout"] = self._join_parts(
+            [prompt_blocks.get("layout"), layout_bits]
+        )
 
     def _render_clip_prompt(self, prompt_blocks):
         semantic = self._join_parts(

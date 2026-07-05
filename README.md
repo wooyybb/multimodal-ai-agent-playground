@@ -118,6 +118,25 @@ Responsible for making generation-ready context.
 
 Externally, this layer can be understood as the Prompt Compiler layer. Internally, it includes Context Program, prompt validation, negative prompt, prompt optimization, and prompt compression.
 
+v2.5 adds Long Prompt Structuring for reference-aware style transfer. Long user prompts are no longer copied directly into the final prompt. They are first converted into a `style_transfer_program`, then rendered into provider-specific prompts.
+
+```text
+Long User Prompt
+  |
+  v
+Style Transfer Program
+  |
+  v
+Prompt Sanitizer / Prompt Validator
+  |
+  +-- FLUX dense prompt
+  +-- SDXL short style prompt
+  +-- CLIP semantic summary
+  +-- negative prompt
+```
+
+The Prompt Sanitizer gives user forbidden intent the highest priority. For example, if the user asks to remove weapons, terms such as `weapon`, `sword`, `blade`, `combat stance`, and `holding a sword` are removed from generation-facing prompts even if the reference caption contains them. The Prompt Validator checks whether forbidden concepts survived, duplicate phrases remain, and SDXL/CLIP prompts stay under the 77-token budget.
+
 ### Generation Layer
 
 Responsible for provider-specific generation.
@@ -173,6 +192,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Rule/mock LLM reasoning fallback for local and free execution
 - Context Program and Prompt Compiler
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
+- Style Transfer Program, Prompt Sanitizer, and Prompt Validator for long prompt structuring
 - Provider routing and provider prompt adaptation
 - Generation Planner and Generation Router with fast/quality modes
 - Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
