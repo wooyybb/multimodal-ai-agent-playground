@@ -105,6 +105,9 @@ class DebugReportManager:
             "ip_adapter_status": self._safe(state.get("ip_adapter_status")),
             "ip_adapter_enabled": self._safe(state.get("ip_adapter_enabled")),
             "ip_adapter_loaded": self._safe(state.get("ip_adapter_loaded")),
+            "ip_adapter_repo_id": self._safe(state.get("ip_adapter_repo_id")),
+            "ip_adapter_subfolder": self._safe(state.get("ip_adapter_subfolder")),
+            "ip_adapter_weight_name": self._safe(state.get("ip_adapter_weight_name")),
             "ip_adapter_scale": self._safe(state.get("ip_adapter_scale")),
             "style_program": self._safe(state.get("style_program")),
             "selected_lora": self._safe(state.get("selected_lora")),
@@ -322,6 +325,11 @@ class DebugReportManager:
             "REFERENCE CONDITIONING",
             self._reference_conditioning_preview(state),
         )
+        self._append_block(
+            lines,
+            "IP-ADAPTER",
+            self._ip_adapter_preview(state),
+        )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(
             lines,
@@ -427,6 +435,15 @@ class DebugReportManager:
             "ip_adapter_loaded": (
                 state.get("ip_adapter_status") or {}
             ).get("loaded"),
+            "ip_adapter_repo_id": (
+                state.get("ip_adapter_status") or {}
+            ).get("repo_id"),
+            "ip_adapter_subfolder": (
+                state.get("ip_adapter_status") or {}
+            ).get("subfolder"),
+            "ip_adapter_weight_name": (
+                state.get("ip_adapter_status") or {}
+            ).get("weight_name"),
             "ip_adapter_scale": (
                 state.get("ip_adapter_status") or {}
             ).get("scale"),
@@ -436,6 +453,27 @@ class DebugReportManager:
             or (state.get("ip_adapter_status") or {}).get("reason"),
             "preserve": package.get("preserve", {}),
             "notes": package.get("notes", []),
+        }
+
+    def _ip_adapter_preview(self, state):
+        status = state.get("ip_adapter_status") or {}
+        return {
+            "enabled": state.get("ip_adapter_enabled", status.get("enabled")),
+            "loaded": state.get("ip_adapter_loaded", status.get("loaded")),
+            "repo_id": state.get("ip_adapter_repo_id", status.get("repo_id")),
+            "subfolder": state.get("ip_adapter_subfolder", status.get("subfolder")),
+            "weight_name": state.get(
+                "ip_adapter_weight_name",
+                status.get("weight_name"),
+            ),
+            "scale": state.get("ip_adapter_scale", status.get("scale")),
+            "fallback": state.get(
+                "used_conditioning_fallback",
+                status.get("used_fallback"),
+            ),
+            "reason": state.get("conditioning_fallback_reason")
+            or status.get("fallback_reason")
+            or status.get("reason"),
         }
 
     def _adaptive_plan_preview(self, plan):
@@ -582,6 +620,9 @@ class DebugReportManager:
             "ip_adapter_status": state.get("ip_adapter_status"),
             "ip_adapter_enabled": state.get("ip_adapter_enabled"),
             "ip_adapter_loaded": state.get("ip_adapter_loaded"),
+            "ip_adapter_repo_id": state.get("ip_adapter_repo_id"),
+            "ip_adapter_subfolder": state.get("ip_adapter_subfolder"),
+            "ip_adapter_weight_name": state.get("ip_adapter_weight_name"),
             "ip_adapter_scale": state.get("ip_adapter_scale"),
             "used_conditioning_fallback": state.get("used_conditioning_fallback"),
             "conditioning_fallback_reason": state.get("conditioning_fallback_reason"),

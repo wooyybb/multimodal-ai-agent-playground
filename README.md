@@ -149,7 +149,7 @@ Prompt-only generation has limits for reference preservation: text can describe 
 
 v2.3 adds provider-specific prompt rendering. FLUX keeps the dense generation prompt. SDXL Img2Img receives a short Style Prompt generated only from `style_program`: style, lighting, quality, mood, camera, rendering, and color palette. Identity terms such as gender, hair, outfit, eye color, and accessories are removed because the reference image supplies identity through Img2Img.
 
-v2.4 connects optional IP-Adapter conditioning inside the SDXL Img2Img provider. SDXL Img2Img preserves reference structure, IP-Adapter strengthens identity/reference feature preservation, and the Style Prompt controls style direction. The adapter is inference-only; no training is performed. If adapter loading fails, the provider falls back to SDXL Img2Img without crashing and records the fallback reason in the debug report.
+v2.4 connects optional IP-Adapter conditioning inside the SDXL Img2Img provider. SDXL Img2Img preserves reference structure, IP-Adapter strengthens identity/reference feature preservation, and the Style Prompt controls style direction. The adapter is inference-only; no training is performed. The default adapter config uses `IP_ADAPTER_REPO_ID=h94/IP-Adapter`, `IP_ADAPTER_SUBFOLDER=sdxl_models`, and `IP_ADAPTER_WEIGHT_NAME=ip-adapter_sdxl.bin`. If adapter loading fails, the provider falls back to SDXL Img2Img without crashing and records the fallback reason in the debug report.
 
 ### Evaluation Layer
 
@@ -296,8 +296,9 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `SDXL_MODEL_ID` | Optional Diffusers model id for SDXL Img2Img. Default is `stabilityai/stable-diffusion-xl-base-1.0`. |
 | `ALLOW_MOCK_GENERATION` | Optional test-only `true` to create an SDXL mock image after an Img2Img failure. Default is `false`. |
 | `USE_IP_ADAPTER` | Optional `true` to attempt SDXL IP-Adapter conditioning. Default is `false`. |
-| `IP_ADAPTER_MODEL_PATH` | Optional path for a local/public IP-Adapter model directory. |
-| `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename passed to `load_ip_adapter`. |
+| `IP_ADAPTER_REPO_ID` | Optional IP-Adapter repo id. Default is `h94/IP-Adapter`. |
+| `IP_ADAPTER_SUBFOLDER` | Optional IP-Adapter subfolder. Default is `sdxl_models`. |
+| `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename. Default is `ip-adapter_sdxl.bin`. |
 | `IP_ADAPTER_SCALE` | Optional IP-Adapter scale. Default is `0.75`. |
 | `LORA_DIR` | Optional directory for inference-only `.safetensors` LoRA files such as `ghibli`, `anime`, `watercolor`, and `realistic`. |
 

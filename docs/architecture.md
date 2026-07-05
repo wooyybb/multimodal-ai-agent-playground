@@ -416,7 +416,7 @@ SDXL Quality Provider
   +-- Style Prompt -> style direction control
 ```
 
-IP-Adapter is optional and inference-only. It is enabled with `USE_IP_ADAPTER=true`, `IP_ADAPTER_MODEL_PATH`, optional `IP_ADAPTER_WEIGHT_NAME`, and `IP_ADAPTER_SCALE` with a default of `0.75`. The provider attempts `pipeline.load_ip_adapter(...)`, applies `pipeline.set_ip_adapter_scale(...)`, and passes `ip_adapter_image=reference_image` during generation. If loading fails, generation falls back to SDXL Img2Img without crashing and records `ip_adapter_enabled`, `ip_adapter_loaded`, `ip_adapter_scale`, `used_conditioning_fallback`, and `conditioning_fallback_reason` in the debug report.
+IP-Adapter is optional and inference-only. It is enabled with `USE_IP_ADAPTER=true`, `IP_ADAPTER_REPO_ID`, `IP_ADAPTER_SUBFOLDER`, `IP_ADAPTER_WEIGHT_NAME`, and `IP_ADAPTER_SCALE` with defaults of `h94/IP-Adapter`, `sdxl_models`, `ip-adapter_sdxl.bin`, and `0.75`. The provider attempts `pipeline.load_ip_adapter(repo_id, subfolder=..., weight_name=...)`, applies `pipeline.set_ip_adapter_scale(...)`, and passes `ip_adapter_image=reference_image` during generation. If loading fails, generation falls back to SDXL Img2Img without crashing and records `ip_adapter_enabled`, `ip_adapter_loaded`, `ip_adapter_repo_id`, `ip_adapter_weight_name`, `ip_adapter_scale`, `used_conditioning_fallback`, and `conditioning_fallback_reason` in the debug report.
 
 ## Design Boundaries
 

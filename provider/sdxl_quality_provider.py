@@ -140,6 +140,9 @@ class SDXLQualityProvider:
             ).get("conditioning_type", "img2img"),
             ip_adapter_enabled=bool(ip_adapter_status.get("enabled")),
             ip_adapter_loaded=bool(ip_adapter_status.get("loaded")),
+            ip_adapter_repo_id=ip_adapter_status.get("repo_id", ""),
+            ip_adapter_subfolder=ip_adapter_status.get("subfolder", ""),
+            ip_adapter_weight_name=ip_adapter_status.get("weight_name", ""),
             ip_adapter_scale=float(ip_adapter_status.get("scale") or 0.75),
             used_conditioning_fallback=bool(ip_adapter_status.get("used_fallback")),
             conditioning_fallback_reason=ip_adapter_status.get("fallback_reason", ""),
@@ -216,17 +219,15 @@ class SDXLQualityProvider:
             "enabled": enabled,
             "loaded": False,
             "requested": enabled,
-            "model_path": os.getenv("IP_ADAPTER_MODEL_PATH", ""),
-            "weight_name": os.getenv("IP_ADAPTER_WEIGHT_NAME", ""),
+            "repo_id": os.getenv("IP_ADAPTER_REPO_ID", "h94/IP-Adapter"),
+            "subfolder": os.getenv("IP_ADAPTER_SUBFOLDER", "sdxl_models"),
+            "weight_name": os.getenv("IP_ADAPTER_WEIGHT_NAME", "ip-adapter_sdxl.bin"),
             "scale": scale,
             "used_fallback": False,
             "fallback_reason": "",
-            "reason": "IP-Adapter disabled",
+            "reason": "IP-Adapter pending load" if enabled else "IP-Adapter disabled",
         }
-        print(f"[IPAdapter] Enabled: {enabled}")
-        print("[IPAdapter] Loaded: False")
-        print(f"[IPAdapter] Scale: {scale}")
-        print("[IPAdapter] Fallback reason: ")
+        self._log_ip_adapter_status(status)
         return status
 
     def _prepare_ip_adapter(self, reference_image):
@@ -239,17 +240,18 @@ class SDXLQualityProvider:
             status["reason"] = status["fallback_reason"]
             self._log_ip_adapter_status(status)
             return status
-        if not status["model_path"]:
+        if not status["repo_id"]:
             status["used_fallback"] = True
-            status["fallback_reason"] = "IP-Adapter fallback: IP_ADAPTER_MODEL_PATH is not set"
+            status["fallback_reason"] = "IP-Adapter fallback: IP_ADAPTER_REPO_ID is not set"
             status["reason"] = status["fallback_reason"]
             self._log_ip_adapter_status(status)
             return status
         try:
-            kwargs = {}
-            if status["weight_name"]:
-                kwargs["weight_name"] = status["weight_name"]
-            self.pipeline.load_ip_adapter(status["model_path"], **kwargs)
+            self.pipeline.load_ip_adapter(
+                status["repo_id"],
+                subfolder=status["subfolder"] or None,
+                weight_name=status["weight_name"] or None,
+            )
             if hasattr(self.pipeline, "set_ip_adapter_scale"):
                 self.pipeline.set_ip_adapter_scale(status["scale"])
             status["loaded"] = True
@@ -265,9 +267,13 @@ class SDXLQualityProvider:
 
     def _log_ip_adapter_status(self, status):
         print(f"[IPAdapter] Enabled: {status.get('enabled')}")
+        print(f"[IPAdapter] Repo: {status.get('repo_id', '')}")
+        print(f"[IPAdapter] Subfolder: {status.get('subfolder', '')}")
+        print(f"[IPAdapter] Weight: {status.get('weight_name', '')}")
         print(f"[IPAdapter] Loaded: {status.get('loaded')}")
         print(f"[IPAdapter] Scale: {status.get('scale')}")
-        print(f"[IPAdapter] Fallback reason: {status.get('fallback_reason', '')}")
+        print(f"[IPAdapter] Fallback: {status.get('used_fallback')}")
+        print(f"[IPAdapter] Reason: {status.get('fallback_reason') or status.get('reason', '')}")
 
     def _ip_adapter_scale(self):
         try:

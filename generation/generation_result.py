@@ -26,6 +26,9 @@ class GenerationResult:
     conditioning_type: str = "none"
     ip_adapter_enabled: bool = False
     ip_adapter_loaded: bool = False
+    ip_adapter_repo_id: str = ""
+    ip_adapter_subfolder: str = ""
+    ip_adapter_weight_name: str = ""
     ip_adapter_scale: float = 0.75
     used_conditioning_fallback: bool = False
     conditioning_fallback_reason: str = ""
