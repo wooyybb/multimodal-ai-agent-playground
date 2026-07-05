@@ -1,3 +1,7 @@
+from llm.openai_reasoner import dumps_payload
+from llm.reasoner_router import ReasonerRouter
+
+
 class PromptOptimizerAgent:
     INTERNAL_TERMS = (
         "image_generation",
@@ -19,6 +23,9 @@ class PromptOptimizerAgent:
         "pose": ["relaxed natural pose"],
     }
     QUALITY_KEYWORDS = ["clear composition", "readable silhouette", "clean details"]
+
+    def __init__(self, reasoner_router=None):
+        self.reasoner_router = reasoner_router or ReasonerRouter()
 
     def run(self, state: dict) -> dict:
         print("[PromptOptimizer] Running...")
@@ -118,7 +125,7 @@ class PromptOptimizerAgent:
         )
         print("[PromptOptimizer] Optimization finished.")
 
-        return {
+        fallback_result = {
             "optimized_prompt": optimized_prompt,
             "canonical_prompt": optimized_prompt,
             "final_prompt": optimized_prompt,
@@ -133,6 +140,49 @@ class PromptOptimizerAgent:
                 "before_score": quality_score,
                 "after_estimated_score": after_estimated_score,
             },
+        }
+        return self._apply_reasoning(state, fallback_result)
+
+    def _apply_reasoning(self, state, fallback_result):
+        system_prompt = (
+            "You are a prompt optimizer. Return only JSON with keys: "
+            "optimized_prompt and optimization_report. "
+            "optimization_report must include reasoning_steps, actions, before_score, "
+            "after_estimated_score, keywords_added, keywords_removed."
+        )
+        user_prompt = dumps_payload(
+            {
+                "task": "prompt_optimizer",
+                "canonical_prompt": state.get("canonical_prompt") or state.get("final_prompt"),
+                "prompt_report": state.get("prompt_report"),
+                "prompt_quality_score": state.get("prompt_quality_score"),
+                "scene_plan": state.get("scene_plan"),
+                "fallback_result": fallback_result,
+            }
+        )
+        result = self.reasoner_router.reason(
+            system_prompt,
+            user_prompt,
+            fallback=fallback_result,
+            schema_name="optimization_report",
+        )
+        optimized_prompt = result.get("optimized_prompt") or fallback_result["optimized_prompt"]
+        optimization_report = result.get("optimization_report")
+        if not isinstance(optimization_report, dict):
+            optimization_report = fallback_result["optimization_report"]
+        optimization_report = dict(optimization_report)
+        optimization_report["reasoning_provider"] = result.get("reasoning_provider")
+        optimization_report["reasoning_used_fallback"] = result.get("reasoning_used_fallback")
+        optimization_report["reasoning_latency"] = result.get("reasoning_latency")
+        if result.get("reasoning_fallback_reason"):
+            optimization_report["reasoning_fallback_reason"] = result.get(
+                "reasoning_fallback_reason"
+            )
+        return {
+            "optimized_prompt": optimized_prompt,
+            "canonical_prompt": optimized_prompt,
+            "final_prompt": optimized_prompt,
+            "optimization_report": optimization_report,
         }
 
     def _remove_internal_terms(self, prompt):

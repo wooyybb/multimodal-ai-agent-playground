@@ -1,4 +1,11 @@
+from llm.openai_reasoner import dumps_payload
+from llm.reasoner_router import ReasonerRouter
+
+
 class StrategySelector:
+    def __init__(self, reasoner_router=None):
+        self.reasoner_router = reasoner_router or ReasonerRouter()
+
     def run(self, state: dict) -> dict:
         print("[StrategySelector] Generating strategies...")
         state = state or {}
@@ -11,11 +18,57 @@ class StrategySelector:
 
         candidates = self._candidate_strategies(score, text, verification)
         selected = self._select_strategy(candidates, verification)
+        candidates, selected, reasoning = self._apply_reasoning(
+            state,
+            candidates,
+            selected,
+        )
         print(f"[StrategySelector] Selected: {selected.get('id')} - {selected.get('title')}")
         return {
             "candidate_strategies": candidates,
             "selected_strategy": selected,
+            "strategy_reasoning": reasoning,
         }
+
+    def _apply_reasoning(self, state, candidates, selected):
+        fallback = {
+            "candidate_strategies": candidates,
+            "selected_strategy": selected,
+        }
+        system_prompt = (
+            "You are a strategy selector. Return only JSON with keys: "
+            "candidate_strategies and selected_strategy. Each strategy should include "
+            "id, title, reason, expected_effect, risk, score."
+        )
+        user_prompt = dumps_payload(
+            {
+                "task": "strategy_selection",
+                "score": state.get("score"),
+                "reflection": state.get("reflection"),
+                "self_verification": state.get("self_verification"),
+                "adaptive_plan": state.get("adaptive_plan"),
+                "fallback": fallback,
+            }
+        )
+        result = self.reasoner_router.reason(
+            system_prompt,
+            user_prompt,
+            fallback=fallback,
+            schema_name="strategy_selection",
+        )
+        next_candidates = result.get("candidate_strategies")
+        next_selected = result.get("selected_strategy")
+        if not isinstance(next_candidates, list):
+            next_candidates = candidates
+        if not isinstance(next_selected, dict):
+            next_selected = selected
+        reasoning = {
+            "provider": result.get("reasoning_provider"),
+            "used_fallback": result.get("reasoning_used_fallback"),
+            "latency": result.get("reasoning_latency"),
+            "fallback_reason": result.get("reasoning_fallback_reason"),
+        }
+        return next_candidates, next_selected, reasoning
 
     def _candidate_strategies(self, score, text, verification):
         candidates = [

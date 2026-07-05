@@ -91,6 +91,7 @@ Do not commit the full `outputs/` folder.
 ## Interview Demo Talking Points
 
 - This is not a prompt-to-image script; it is an inspectable agent framework.
+- The easiest way to explain the project is through six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.
 - Context Program is a structured intermediate representation before prompt compilation.
 - Prompt Compiler converts context into provider-specific prompt packages.
 - Multi-Metric Evaluation is more explainable than CLIP-only scoring.

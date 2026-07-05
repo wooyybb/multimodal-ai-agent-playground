@@ -2,6 +2,50 @@ from workflow.agent_state import AgentState
 
 
 class ToolRegistry:
+    LAYER_METADATA = {
+        "planning": [
+            "goal_planner",
+            "vision",
+            "reference_image_parser",
+            "character_program_builder",
+            "scene_planning",
+        ],
+        "context": [
+            "retrieval",
+            "memory_retrieval",
+            "prompt_compressor",
+            "context_program_builder",
+            "context_program_validator",
+            "prompt_assembler",
+            "prompt_compiler",
+            "negative_prompt",
+        ],
+        "generation": [
+            "provider_router",
+            "provider_prompt_adapter",
+            "generation",
+        ],
+        "evaluation": [
+            "evaluation",
+        ],
+        "reasoning": [
+            "llm_context_reasoner",
+            "prompt_critic",
+            "llm_prompt_critic",
+            "prompt_optimizer",
+            "llm_prompt_optimizer",
+            "reflection",
+            "self_verification",
+            "strategy_selector",
+            "adaptive_planner",
+            "retry",
+        ],
+        "memory_observability": [
+            "memory_load",
+            "memory_save",
+        ],
+    }
+
     def __init__(self):
         self._tools = {}
         self._register_default_tools()
@@ -84,3 +128,9 @@ class ToolRegistry:
 
     def has_tool(self, name: str) -> bool:
         return name in self._tools
+
+    def layer_for(self, tool_name: str) -> str:
+        for layer, tools in self.LAYER_METADATA.items():
+            if tool_name in tools:
+                return layer
+        return "unmapped"

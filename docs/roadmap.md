@@ -9,7 +9,8 @@
 | v0.3 | Context Engineering: Context Program, Validator, Prompt Compiler | Complete |
 | v0.4 | Intelligence Layer: Goal Planning, LLM Layer, Strategy Selection, Self Verification | Complete |
 | v0.5 | Evaluation & Observability: Multi-Metric Evaluation, Debug Report, Benchmark | Complete |
-| v1.0 | Docker, CI, deployment guide, curated demo release | In Progress |
+| v1.0 RC1 | Layer-based architecture cleanup and portfolio documentation | Complete |
+| v1.0 | CI, demo polish, deployment-ready release | Planned |
 
 ## Completed Sprints
 
@@ -71,12 +72,16 @@
 - Sprint 57: Docker and Docker Compose
 - Sprint 58: Reference Image Parser
 - Sprint 59: Real VLM Upgrade Preparation
+- Sprint 60: Real LLM Reasoning Layer
+- Release Candidate 1: Layer-based framework organization
 
 ## Planned Sprints
 
-- Sprint 60: CI validation and Docker smoke tests
-- Sprint 61: Queue-based generation jobs
-- Sprint 62: Deployment dashboard
+- Sprint 61: ExecutionEngine cleanup
+- Sprint 62: AgentState layer organization
+- Sprint 63: CI validation and Docker smoke tests
+- Sprint 64: Queue-based generation jobs
+- Sprint 65: Deployment dashboard
 
 ## Future Work
 

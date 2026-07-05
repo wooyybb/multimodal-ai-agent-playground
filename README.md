@@ -1,156 +1,153 @@
 # Multimodal AI Agent Playground
 
-**Context Engineering based Multi-Agent Framework for Image Generation**
+**Layer-based AI Agent Framework for Multimodal Image Generation**
 
-![Status](https://img.shields.io/badge/status-v1.0_portfolio_ready-blue)
+![Status](https://img.shields.io/badge/status-v1.0_RC1-blue)
 ![Python](https://img.shields.io/badge/Python-3.x-green)
-![AI Agent](https://img.shields.io/badge/Architecture-Multi--Agent-purple)
+![Architecture](https://img.shields.io/badge/Architecture-Layer--based-purple)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-teal)
 ![Gradio](https://img.shields.io/badge/UI-Gradio-orange)
 
-Multimodal AI Agent Playground is a multimodal AI Agent framework that integrates **Vision Understanding**, **LLM Reasoning**, **Context Program**, **Prompt Compiler**, **Provider Routing**, **Generation**, **Multi-Metric Evaluation**, **Reflection**, and **Adaptive Planning** into one inspectable workflow.
+## Project Overview
 
-It is not a simple image generation demo. It is a framework-style project that shows how an AI generation system can reason before generation, evaluate after generation, and improve through an agent loop.
+This project is not a collection of many agents for its own sake. It is a multimodal image generation framework organized into six layers:
+
+1. Planning Layer
+2. Context Layer
+3. Generation Layer
+4. Evaluation Layer
+5. Reasoning Layer
+6. Memory / Observability Layer
+
+The framework turns user input and reference images into structured planning data, builds a provider-independent Context Program, compiles provider-specific prompts, generates images, evaluates outputs, reasons about failures, and records each run for debugging and comparison.
 
 ## Why This Project?
 
 Most image generation demos stop at:
 
 ```text
+User Prompt -> Image Generation -> Result
+```
+
+This project treats image generation as an inspectable AI Agent workflow:
+
+```text
+Understand input
+-> Plan goals and visual context
+-> Build Context Program
+-> Compile provider prompt
+-> Generate image
+-> Evaluate with multiple metrics
+-> Reflect and re-plan
+-> Save memory and debug report
+```
+
+The purpose is to show framework-level engineering: separation of responsibility, provider abstraction, context engineering, evaluation, fallback design, and observability.
+
+## Layer-based Architecture
+
+```text
 User Input
--> Prompt
--> Generation
--> Result
+  |
+  v
+Planning Layer
+  - PlannerAgent
+  - GoalPlanner
+  - ReferenceImageParser
+  - CharacterProgramBuilder
+  |
+  v
+Context Layer
+  - ContextProgramBuilder
+  - ContextProgramValidator
+  - PromptAssembler
+  - PromptCompiler
+  |
+  v
+Generation Layer
+  - ProviderRouter
+  - ProviderPromptAdapter
+  - GenerationAgent
+  |
+  v
+Evaluation Layer
+  - EvaluationAgent
+  - EvaluationAggregator
+  - CLIP / Identity / Prompt / Aesthetic Metrics
+  |
+  v
+Reasoning Layer
+  - ReflectionAgent
+  - SelfVerificationAgent
+  - StrategySelector
+  - AdaptivePlanner
+  |
+  v
+Memory / Observability Layer
+  - MemoryManager
+  - DebugReportManager
+  - BenchmarkRunner
+  - ReportGenerator
 ```
 
-This project builds the full agent loop around image generation:
+## End-to-End Workflow
 
 ```text
-Before Generation
--> Vision Understanding
--> Reference Image Parsing
--> Character Program
--> Goal Planning
--> LLM Context Reasoning
--> Context Program
--> Prompt Compiler
--> Provider Routing
-
-After Generation
--> Multi-Metric Evaluation
--> Reflection
--> Self Verification
--> Strategy Selection
--> Adaptive Planning
--> Retry
--> Memory
--> Debug Report / Benchmark
+Image / User Prompt
+-> Planning Layer
+-> Context Layer
+-> Generation Layer
+-> Evaluation Layer
+-> Reasoning Layer
+-> Memory / Observability Layer
 ```
 
-The goal is to make every decision inspectable: what the system understood, what it prioritized, how it compiled the prompt, how it evaluated the result, and why it decided to retry or re-plan.
+The internal implementation still uses individual Python classes, but the project is explained and maintained through layer ownership.
 
-## Architecture
+## Core Layers
 
-```text
-User
-  |
-  +--> Gradio UI
-  |
-  +--> FastAPI
-          |
-          v
-Vision Layer
-  |
-  v
-Reference Image Parser
-  |
-  v
-LLM Reasoning Layer
-  |
-  v
-Goal Tree / Character Program
-  |
-  v
-Context Program
-  |
-  v
-Prompt Compiler
-  |
-  v
-Provider Layer
-  |
-  v
-Generation
-  |
-  v
-Multi-Metric Evaluation
-  |
-  v
-Reflection
-  |
-  v
-Hypothesis / Strategy Selector
-  |
-  v
-Self Verification
-  |
-  v
-Adaptive Planning
-  |
-  v
-Memory
-  |
-  +--> Debug Report
-  |
-  +--> Benchmark
-```
-
-## Core Features
-
-| Module | Description | Status |
+| Layer | Role | Representative Components |
 | --- | --- | --- |
-| Multi-Agent Orchestration | Coordinates specialized agents through an orchestrator and execution engine. | Implemented |
-| State-based Execution Engine | Runs workflow steps through shared state and dynamic execution. | Implemented |
-| Tool Registry | Registers and invokes agents/tools by name. | Implemented |
-| Multi-VLM Adapter | Keeps BLIP as default while preparing Florence/Qwen-style VLM extension. | Implemented |
-| Reference Image Parser | Extracts structured identity, appearance, style, composition, color, and identity rules from vision output. | Implemented |
-| Character Program | Converts caption/vision result into structured character identity data. | Implemented |
-| Context Program | Builds provider-independent structured context before prompt compilation. | Implemented |
-| Context Validator | Checks context schema and provider compatibility. | Implemented |
-| Goal Planner | Creates goal hierarchy, priorities, and success criteria. | Implemented |
-| Prompt Compiler | Converts Context Program into provider-specific prompt packages. | Implemented |
-| LLM Prompt Critic | Adds semantic prompt critique through the LLM client layer. | Implemented |
-| AI Model Service | Abstracts mock/OpenAI/Gemini/Claude/Ollama-style model providers. | Implemented |
-| Provider Router | Selects provider using config-driven capability rules. | Implemented |
-| Multi-Metric Evaluation | Aggregates CLIP, identity, prompt, and aesthetic metrics. | Implemented |
-| Reflection Loop | Produces improvement direction from evaluation results. | Implemented |
-| Hypothesis Generator | Represented through reflection/adaptive planning findings. | Rule-based |
-| Strategy Selector | Generates candidate strategies and chooses the best one. | Implemented |
-| Self Verification | Checks goal satisfaction and replanning necessity before adaptation. | Implemented |
-| Adaptive Planning | Updates context and retry strategy based on verification/strategy. | Implemented |
-| Debug Report | Saves report JSON, prompt preview, trace, and output references. | Implemented |
-| Benchmark Runner | Runs multiple prompts and stores comparable result JSON. | Implemented |
-| FastAPI | Provides REST API and Swagger docs. | Implemented |
-| Gradio | Provides local interactive demo UI. | Implemented |
+| Planning | Interpret user intent, image references, goals, scene, and character identity. | PlannerAgent, GoalPlanner, ReferenceImageParser |
+| Context | Convert planning output into Context Program and provider-independent prompt structures. | ContextProgramBuilder, PromptCompiler |
+| Generation | Select provider, adapt prompt, and generate image. | ProviderRouter, ProviderPromptAdapter, GenerationAgent |
+| Evaluation | Score generated output with multiple metrics. | EvaluationAgent, EvaluationAggregator |
+| Reasoning | Reflect, verify, select strategy, and adapt plan. | ReflectionAgent, StrategySelector, AdaptivePlanner |
+| Memory / Observability | Save history, debug reports, benchmark outputs, and prompt previews. | MemoryManager, DebugReportManager, BenchmarkRunner |
 
-## Project Structure
+## Key Features
+
+- Layer-based AI Agent architecture
+- DynamicExecutionEngine and ToolRegistry
+- BLIP default VLM with Florence/Qwen adapter skeletons
+- Reference Image Parser and Character Program
+- Context Program and Context Validator
+- Prompt Compiler and Provider Prompt Adapter
+- FLUX-oriented generation path
+- Multi-Metric Evaluation with CLIP and rule-based metrics
+- Reflection, Self Verification, Strategy Selection, Adaptive Planning
+- Optional LLM reasoning with rule fallback
+- Memory, Debug Report, Benchmark Runner, Report Generator
+- Gradio UI and FastAPI service layer
+
+## Repository Structure
 
 ```text
-agents/       Agent classes for planning, reasoning, prompt critique, strategy, and adaptation
-workflow/     Dynamic execution engine, AgentState, debug report, and pipeline facade
-tools/        BLIP, FLUX, CLIP wrappers and VLM adapter implementations
-llm/          LLM client, AIModelService, provider registry, and provider skeletons
-evaluation/   Metric abstraction and evaluation aggregator
+agents/       Agent classes grouped conceptually by planning, context, reasoning, and generation roles
+workflow/     DynamicExecutionEngine, AgentState, debug reports, pipeline facade
+tools/        BLIP, FLUX, CLIP, and VLM adapter tools
+llm/          LLM client, reasoner router, AIModelService, provider skeletons
+evaluation/   Metric abstraction and EvaluationAggregator
 memory/       MemoryManager and run history
-knowledge/    Knowledge/style retrieval resources
+knowledge/    Retrieval knowledge and style library resources
 api/          FastAPI service layer
 ui/           Gradio interface
-benchmark/    Benchmark runner, result files, and report generator
-docs/         Architecture, roadmap, sprint book, prompts, decisions, and interview notes
-outputs/      Runtime output directory; do not use as curated demo assets
+benchmark/    Benchmark runner and report generator
+docs/         Architecture, layer map, roadmap, sprint book, prompts, interview notes
+outputs/      Runtime output directory; do not commit generated outputs
 ```
 
-## How to Run
+## Quick Start
 
 Install dependencies:
 
@@ -188,70 +185,63 @@ Run report generator:
 python -m benchmark.report_generator
 ```
 
-## Run with Docker
-
-Docker and Docker Compose can run the FastAPI service and Gradio UI in the same reproducible environment.
-
-Build and start both services:
+Run with Docker:
 
 ```bash
 docker compose up --build
 ```
 
-FastAPI Swagger:
+FastAPI: `http://127.0.0.1:8000/docs`
 
-```text
-http://127.0.0.1:8000/docs
-```
+Gradio: `http://127.0.0.1:7860`
 
-Gradio UI:
-
-```text
-http://127.0.0.1:7860
-```
-
-Stop services:
+Stop Docker services:
 
 ```bash
 docker compose down
 ```
 
-The Docker setup uses `.env` through `docker-compose.yml`, but real API keys must never be written into `Dockerfile` or committed to Git. Runtime artifacts are mounted from `outputs/`, `memory/`, and `benchmark/` so generated files stay outside the container image.
+## Debug Report / Benchmark
+
+Each run can save:
+
+- `report.json`: machine-readable state snapshot
+- `prompt_preview.txt`: human-readable prompt lifecycle and agent trace
+- output image references
+- evaluation scores and retry information
+
+Benchmark results are saved under `benchmark/results/`. Do not commit runtime outputs or API keys.
 
 ## Environment Variables
-
-Do not commit real keys or `.env` files.
 
 | Variable | Purpose |
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
-| `OPENAI_API_KEY` | Optional key for OpenAI provider experiments. |
-| `LLM_PROVIDER` | Selects LLM provider mode, such as `mock` or `openai`. |
-| `VLM_PROVIDER` | Selects VLM provider mode: `blip`, `florence`, or `qwen`. BLIP is the default. |
+| `OPENAI_API_KEY` | Optional OpenAI key for LLM reasoning experiments. |
+| `LLM_PROVIDER` | `rule`, `mock`, or `openai`; default behavior remains rule/fallback oriented. |
+| `VLM_PROVIDER` | `blip`, `florence`, or `qwen`; BLIP is the default. |
 
 ## Current Limitations
 
-- BLIP is used as the default VLM.
-- Florence-2 and Qwen-VL are prepared as adapter skeletons and currently fall back to BLIP.
-- Reference Image Parser uses the detailed VLM schema, including character, style, composition, and color hints.
+- BLIP is the default VLM; Florence/Qwen adapters currently use BLIP fallback.
 - FLUX is the current generation provider path.
-- OpenAI, Gemini, Claude, and Ollama providers are designed as extensible service boundaries.
-- CLIP-based evaluation is supplemented with rule-based identity, prompt, and aesthetic metrics.
-- Image quality still depends on external model/provider behavior.
-- Some advanced reasoning layers are rule-based or mock-first to keep the framework inspectable.
+- OpenAI reasoning is optional and falls back to rule-based behavior.
+- Some reasoning and evaluation steps are intentionally rule-based for stability.
+- Image quality depends on external model/provider behavior.
 
 ## Roadmap
 
 | Release | Focus |
 | --- | --- |
-| v0.1 | Core Pipeline: Vision, Prompt, Generation, Evaluation, Retry |
-| v0.2 | Multi-Agent Framework: Orchestrator, Registry, Execution Engine |
-| v0.3 | Context Engineering: Context Program, Validator, Prompt Compiler |
-| v0.4 | Intelligence Layer: Goal Planning, LLM Client, Strategy Selection, Self Verification |
-| v0.5 | Evaluation & Observability: Multi-Metric Evaluation, Debug Report, Benchmark |
-| v1.0 | Docker, CI, deployment guide, curated demo release |
+| v0.1 | Core multimodal pipeline |
+| v0.2 | Multi-agent orchestration and registry |
+| v0.3 | Context Engineering and Prompt Compiler |
+| v0.4 | Reasoning loop and provider abstraction |
+| v0.5 | Evaluation, debug reports, benchmark |
+| v1.0 RC1 | Layer-based architecture cleanup |
+| v1.0 | Demo polish, CI, deployment-ready documentation |
 
-## Portfolio Positioning
+## Portfolio Highlights
 
 This project demonstrates:
 
@@ -259,18 +249,21 @@ This project demonstrates:
 - Context Engineering
 - Prompt Engineering
 - Multimodal AI workflow design
-- Backend API design with FastAPI
-- Evaluation pipeline design
-- Framework refactoring and modular system design
-- Debuggability and observability for AI systems
+- Provider abstraction and fallback design
+- Multi-metric evaluation
+- Backend API and UI integration
+- Debuggable AI system design
+- Framework refactoring from feature-based agents into layer-based architecture
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Layer Map](docs/layer_map.md)
 - [Project Summary](docs/project_summary.md)
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)
 - [Roadmap](docs/roadmap.md)
+- [v1.0 RC1 Release Notes](docs/release_notes_v1_rc1.md)
 
 ## License
 

@@ -1,5 +1,31 @@
 # Interview Notes
 
+## v1.0 RC1 Layer-based Questions
+
+Q. 이 프로젝트는 단순 이미지 생성 데모와 무엇이 다른가요?
+A. 단순 데모는 보통 prompt를 넣고 이미지를 받는 흐름에서 끝납니다. 이 프로젝트는 Planning, Context, Generation, Evaluation, Reasoning, Memory / Observability Layer로 나누어 입력 이해부터 평가, 재계획, 기록까지 관리합니다. 그래서 결과만 보는 것이 아니라 시스템이 무엇을 이해했고 왜 그런 결정을 했는지 추적할 수 있습니다.
+
+Q. 왜 Layer 구조로 정리했나요?
+A. Agent 수가 많아지면 개별 클래스 이름만으로는 전체 구조를 이해하기 어렵습니다. Layer 구조는 각 Agent가 어떤 책임 영역에 속하는지 보여주기 위한 설명 방식입니다. 기능을 새로 만든 것이 아니라, 기존 기능을 유지하면서 유지보수와 포트폴리오 설명이 쉬운 구조로 정리했습니다.
+
+Q. Agent가 많아졌을 때 복잡도를 어떻게 관리했나요?
+A. DynamicExecutionEngine은 실행 순서를 관리하고, ToolRegistry는 step 이름과 실제 Agent 객체를 분리합니다. 문서에서는 각 Agent를 6개 Layer에 배치해 책임을 정리했습니다. 이 방식은 새로운 Agent가 추가되어도 어느 Layer에 속하는지 먼저 결정하게 만들어 구조적 복잡도를 줄입니다.
+
+Q. Planning Layer와 Reasoning Layer의 차이는 무엇인가요?
+A. Planning Layer는 생성 전에 user intent, reference image, goal, scene, character identity를 해석합니다. Reasoning Layer는 생성 후 evaluation 결과를 바탕으로 실패 원인, 전략 선택, self verification, adaptive planning을 수행합니다. 즉 Planning은 사전 계획이고 Reasoning은 결과 기반 판단과 재계획입니다.
+
+Q. Context Program은 왜 필요한가요?
+A. Prompt 문자열을 바로 만들면 provider 제약, memory, retrieval, character identity, layout 정보가 섞여 관리하기 어렵습니다. Context Program은 이런 정보를 provider-independent structured object로 정리합니다. 이후 PromptCompiler가 이 구조를 FLUX, SDXL, GPT Image 같은 provider별 prompt package로 변환할 수 있습니다.
+
+Q. Adaptive Planning은 단순 Retry와 무엇이 다른가요?
+A. Retry는 다시 생성할지 여부를 판단하는 정책에 가깝습니다. Adaptive Planning은 왜 실패했는지 분석하고, character priority, layout rule, style balance 같은 context update를 만들어 다음 생성 전략을 바꿉니다. 그래서 단순 반복이 아니라 re-planning loop에 가깝습니다.
+
+Q. Evaluation Layer를 왜 Multi-Metric 구조로 만들었나요?
+A. CLIP similarity 하나만으로는 identity preservation, prompt completeness, aesthetic quality를 충분히 설명하기 어렵습니다. Multi-Metric Evaluation은 CLIP, Identity, Prompt, Aesthetic metric을 분리하고 weighted score와 reason을 남깁니다. 이 구조는 나중에 PickScore, DINO, VLM Judge 같은 metric을 추가하기 쉽습니다.
+
+Q. 이 프로젝트를 실제 서비스로 확장한다면 무엇을 개선하겠습니까?
+A. 먼저 Docker/CI smoke test, queue-based async generation, persistent database, object storage, auth, monitoring을 추가해야 합니다. 그 다음 multi-session memory와 benchmark dashboard를 붙여 운영 중 품질 변화를 추적할 수 있게 만들겠습니다. 또한 VLM Judge나 stronger VLM을 추가해 reference image parsing과 evaluation 품질을 높일 수 있습니다.
+
 ## Key Portfolio Questions
 
 Q. 이 프로젝트는 단순 이미지 생성 데모와 무엇이 다른가요?
@@ -73,6 +99,15 @@ A. specialist output을 canonical prompt로 조립하는 책임을 분리하기 
 
 Q. Context Engineering이란?
 A. Agent가 사용할 task, memory, retrieval, scene, provider constraint를 구조화하는 작업입니다.
+
+Q. Rule 기반과 LLM 기반 Reasoning 차이는?
+A. Rule 기반은 빠르고 결정적이며 fallback에 적합합니다. LLM 기반 Reasoning은 semantic conflict, priority, strategy처럼 문맥 해석이 필요한 판단에 강하지만 API 실패와 JSON parsing 실패 가능성이 있으므로 항상 rule fallback을 유지합니다.
+
+Q. 왜 Reasoner Provider Router를 만들었나요?
+A. Agent가 OpenAI 같은 특정 provider를 직접 호출하면 교체와 테스트가 어려워집니다. ReasonerRouter는 `LLM_PROVIDER`에 따라 rule, openai, gemini skeleton, claude skeleton을 선택하고 같은 JSON interface로 결과를 반환합니다.
+
+Q. LLM 실패 시 어떻게 동작하나요?
+A. API key가 없거나 client import가 실패하거나 JSON parsing이 실패하면 기존 rule 결과를 그대로 fallback으로 사용합니다. Debug metadata에는 provider, fallback 여부, latency, fallback reason을 남깁니다.
 
 Q. 왜 LLM을 Prompt 생성에 쓰지 않고 Reasoning에 먼저 사용했나요?
 A. Prompt를 바로 생성하게 하면 내부 의도 해석과 provider prompt가 섞이기 쉽습니다. 먼저 semantic planning을 구조화하면 rule-based agent와 prompt compiler가 더 안정적으로 사용할 수 있습니다.

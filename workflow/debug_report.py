@@ -112,8 +112,12 @@ class DebugReportManager:
             "initial_output_image_path": self._safe(state.get("output_image_path")),
             "initial_score": self._safe(state.get("score")),
             "self_verification": self._safe(state.get("self_verification")),
+            "hypothesis": self._safe(state.get("hypothesis")),
+            "hypothesis_evidence": self._safe(state.get("hypothesis_evidence")),
+            "hypothesis_reasoning": self._safe(state.get("hypothesis_reasoning")),
             "candidate_strategies": self._safe(state.get("candidate_strategies")),
             "selected_strategy": self._safe(state.get("selected_strategy")),
+            "strategy_reasoning": self._safe(state.get("strategy_reasoning")),
             "adaptive_plan": self._safe(state.get("adaptive_plan")),
             "retry_needed": self._safe(state.get("retry_needed")),
             "raw_suggested_prompt": self._safe(state.get("raw_suggested_prompt")),
@@ -189,6 +193,7 @@ class DebugReportManager:
             self._strategy_preview(
                 state.get("candidate_strategies"),
                 state.get("selected_strategy"),
+                state.get("strategy_reasoning"),
             ),
         )
         self._append_block(
@@ -258,13 +263,14 @@ class DebugReportManager:
             "Confidence": plan.get("confidence"),
         }
 
-    def _strategy_preview(self, candidates, selected):
+    def _strategy_preview(self, candidates, selected, reasoning=None):
         selected = selected or {}
         return {
             "Candidates": candidates or [],
             "Selected": selected,
             "Reason": selected.get("reason"),
             "Expected Effect": selected.get("expected_effect"),
+            "Reasoning": reasoning or {},
         }
 
     def _self_verification_preview(self, verification):

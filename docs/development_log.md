@@ -195,6 +195,21 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - ReferenceImageParser now prioritizes VLM hints before falling back to caption parsing.
 - Debug reports show detailed VLM fields including provider, fallback status, composition hints, and color hints.
 
+## Sprint 60
+
+- Added a common Reasoning Layer with `BaseReasoner`, `OpenAIReasoner`, `ReasonerRouter`, and `JSONParser`.
+- Default reasoning remains rule-based.
+- `LLM_PROVIDER=openai` enables optional OpenAI JSON reasoning when an API key and client are available.
+- PromptCritic, PromptOptimizer, LLMContextReasoner, StrategySelector, and HypothesisGenerator can use structured reasoning with automatic fallback.
+- Debug reports can include strategy and hypothesis reasoning metadata.
+
+## Release Candidate 1
+
+- Reorganized project communication around six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.
+- Updated README and architecture docs as layer-based portfolio documentation.
+- Added Layer Map and v1.0 RC1 release notes.
+- Preserved core workflow and avoided new model, agent, tool, API, or metric functionality.
+
 ## Future Work
 
 - Keep this file short.

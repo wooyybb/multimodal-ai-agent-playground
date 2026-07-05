@@ -1,5 +1,8 @@
 from collections import Counter
 
+from llm.openai_reasoner import dumps_payload
+from llm.reasoner_router import ReasonerRouter
+
 
 class PromptCriticAgent:
     REQUIRED_SECTIONS = {
@@ -18,6 +21,9 @@ class PromptCriticAgent:
         "anime style",
     )
 
+    def __init__(self, reasoner_router=None):
+        self.reasoner_router = reasoner_router or ReasonerRouter()
+
     def run(
         self,
         state_or_canonical_prompt,
@@ -31,6 +37,7 @@ class PromptCriticAgent:
                 prompt_sections=state.get("prompt_sections", {}),
                 scene_plan=state.get("scene_plan"),
             )
+            report = self._apply_reasoning(state, report)
             return {
                 "prompt_report": report,
                 "prompt_quality_score": report.get("quality_score", 100),
@@ -76,6 +83,48 @@ class PromptCriticAgent:
             "warnings": warnings,
             "quality_score": quality_score,
             "suggestions": suggestions,
+        }
+
+    def _apply_reasoning(self, state, fallback_report):
+        system_prompt = (
+            "You are a prompt critic. Return only JSON with keys: "
+            "duplicate_keywords, missing_sections, warnings, quality_score, suggestions. "
+            "Do not include markdown."
+        )
+        user_prompt = dumps_payload(
+            {
+                "task": "prompt_critic",
+                "canonical_prompt": state.get("canonical_prompt") or state.get("final_prompt"),
+                "prompt_sections": state.get("prompt_sections"),
+                "scene_plan": state.get("scene_plan"),
+                "fallback_report": fallback_report,
+            }
+        )
+        result = self.reasoner_router.reason(
+            system_prompt,
+            user_prompt,
+            fallback=fallback_report,
+            schema_name="prompt_report",
+        )
+        return {
+            "duplicate_keywords": self._as_list(
+                result.get("duplicate_keywords", fallback_report.get("duplicate_keywords", []))
+            ),
+            "missing_sections": self._as_list(
+                result.get("missing_sections", fallback_report.get("missing_sections", []))
+            ),
+            "warnings": self._as_list(result.get("warnings", fallback_report.get("warnings", []))),
+            "quality_score": self._as_int(
+                result.get("quality_score", fallback_report.get("quality_score", 100)),
+                default=fallback_report.get("quality_score", 100),
+            ),
+            "suggestions": self._as_list(
+                result.get("suggestions", fallback_report.get("suggestions", []))
+            ),
+            "reasoning_provider": result.get("reasoning_provider"),
+            "reasoning_used_fallback": result.get("reasoning_used_fallback"),
+            "reasoning_latency": result.get("reasoning_latency"),
+            "reasoning_fallback_reason": result.get("reasoning_fallback_reason"),
         }
 
     def _find_duplicate_keywords(self, prompt):
@@ -145,3 +194,16 @@ class PromptCriticAgent:
         if len(words) < 20:
             score -= 15
         return max(0, score)
+
+    def _as_list(self, value):
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return value
+        return [value]
+
+    def _as_int(self, value, default=100):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return int(default)

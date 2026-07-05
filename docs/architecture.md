@@ -1,153 +1,92 @@
 # Architecture
 
-This document summarizes the current v1.0-oriented architecture of Multimodal AI Agent Playground.
+This document describes the v1.0 RC1 architecture of Multimodal AI Agent Playground using a layer-based view.
 
-## Layered View
+## Layer Diagram
 
 ```text
-User
+User Input
   |
-  +--> Gradio UI
+  v
+Planning Layer
   |
-  +--> FastAPI Service Layer
-          |
-          v
-Planner / Execution Layer
+  v
+Context Layer
   |
-  +--> PlannerAgent
-  +--> DynamicExecutionEngine
-  +--> ToolRegistry
-  +--> AgentState
-          |
-          v
-Vision and Context Layer
+  v
+Generation Layer
   |
-  +--> VisionAgent
-  +--> VLMRouter: BLIP default, Florence/Qwen skeletons
-  +--> ReferenceImageParser
-  +--> CharacterProgramBuilder
-  +--> GoalPlanner
-  +--> LLMContextReasoner
-  +--> RetrievalAgent
-  +--> ContextProgramBuilder
-  +--> ContextProgramValidator
-          |
-          v
-Prompt Layer
+  v
+Evaluation Layer
   |
-  +--> PromptAssembler
-  +--> PromptCritic / LLMPromptCriticAgent
-  +--> PromptOptimizer / LLMPromptOptimizerAgent
-  +--> PromptCompiler
-          |
-          v
-Provider Layer
+  v
+Reasoning Layer
   |
-  +--> ProviderRouter
-  +--> ProviderPromptAdapter
-  +--> AIModelService
-          |
-          v
-Generation and Evaluation Layer
-  |
-  +--> GenerationAgent
-  +--> EvaluationAgent
-  +--> EvaluationAggregator
-  +--> CLIP / Identity / Prompt / Aesthetic Metrics
-          |
-          v
-Reasoning Loop
-  |
-  +--> ReflectionAgent
-  +--> SelfVerificationAgent
-  +--> StrategySelector
-  +--> AdaptivePlanner
-  +--> RetryAgent
-          |
-          v
-Observability and Memory
-  |
-  +--> MemoryManager
-  +--> DebugReportManager
-  +--> BenchmarkRunner
-  +--> ReportGenerator
+  v
+Memory / Observability Layer
 ```
+
+## Layer Responsibilities
+
+| Layer | Responsibility | Representative Components |
+| --- | --- | --- |
+| Planning Layer | Interpret request, reference image, goal, scene, and character identity. | PlannerAgent, GoalPlanner, ReferenceImageParser, CharacterProgramBuilder |
+| Context Layer | Convert planning outputs into structured Context Program and prompt program. | ContextProgramBuilder, ContextProgramValidator, PromptAssembler, PromptCompiler |
+| Generation Layer | Select provider, adapt prompt, and generate image. | ProviderRouter, ProviderPromptAdapter, GenerationAgent |
+| Evaluation Layer | Evaluate generated image through multiple metrics. | EvaluationAgent, EvaluationAggregator, CLIP/Identity/Prompt/Aesthetic metrics |
+| Reasoning Layer | Analyze failures, verify goals, select strategy, and adapt plan. | ReflectionAgent, SelfVerificationAgent, StrategySelector, AdaptivePlanner |
+| Memory / Observability Layer | Store run history, debug reports, benchmark outputs, and prompt previews. | MemoryManager, DebugReportManager, BenchmarkRunner, ReportGenerator |
 
 ## Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    U[User] --> UI[Gradio]
-    U --> API[FastAPI]
-    UI --> ENG[DynamicExecutionEngine]
-    API --> ENG
-    ENG --> REG[ToolRegistry]
-    REG --> V[VisionAgent]
-    V --> VLM[VLMRouter: BLIP default]
-    VLM --> RIP[ReferenceImageParser]
-    RIP --> CPB[CharacterProgramBuilder]
-    REG --> GP[GoalPlanner]
-    REG --> LCR[LLMContextReasoner]
-    REG --> RET[Retrieval / Memory Retrieval]
-    CPB --> CP[ContextProgramBuilder]
-    GP --> CP
-    LCR --> CP
-    RET --> CP
-    CP --> CV[ContextProgramValidator]
-    CV --> PA[PromptAssembler]
-    PA --> PC[PromptCritic]
-    PC --> PO[PromptOptimizer]
-    PO --> COMP[PromptCompiler]
-    COMP --> ROUTER[ProviderRouter]
-    ROUTER --> ADAPT[ProviderPromptAdapter]
-    ADAPT --> GEN[GenerationAgent]
-    GEN --> EVAL[EvaluationAgent]
-    EVAL --> AGG[EvaluationAggregator]
-    AGG --> METRICS[CLIP / Identity / Prompt / Aesthetic]
-    METRICS --> REF[ReflectionAgent]
-    REF --> VER[SelfVerificationAgent]
-    VER --> STR[StrategySelector]
-    STR --> AP[AdaptivePlanner]
-    AP --> COMP
-    AP --> RETRY[RetryAgent]
-    RETRY --> MEM[MemoryManager]
-    MEM --> DBG[Debug Report]
-    DBG --> BENCH[Benchmark / Report]
+    U[User Input] --> P[Planning Layer]
+    P --> C[Context Layer]
+    C --> G[Generation Layer]
+    G --> E[Evaluation Layer]
+    E --> R[Reasoning Layer]
+    R --> C
+    R --> M[Memory / Observability Layer]
+    G --> M
+    E --> M
+
+    P -.examples.-> PEX[PlannerAgent / GoalPlanner / ReferenceImageParser]
+    C -.examples.-> CEX[ContextProgramBuilder / PromptCompiler]
+    G -.examples.-> GEX[ProviderRouter / GenerationAgent]
+    E -.examples.-> EEX[EvaluationAggregator / CLIP Metric]
+    R -.examples.-> REX[Reflection / StrategySelector / AdaptivePlanner]
+    M -.examples.-> MEX[MemoryManager / DebugReport / Benchmark]
 ```
 
 ## Runtime Flow
 
-1. User provides an image and/or prompt through Gradio or FastAPI.
-2. Planner and execution engine initialize state and execution order.
-3. Vision layer extracts standard `vision_result`, parses Reference Image structure, and builds Character Program.
-4. GoalPlanner creates Goal Tree and priority hierarchy.
-5. ContextProgramBuilder creates structured provider-independent context.
-6. ContextProgramValidator checks schema and provider compatibility.
-7. Prompt layer assembles, critiques, optimizes, and compiles provider prompt package.
-8. Provider layer selects and adapts generation provider input.
-9. GenerationAgent creates an output image.
-10. EvaluationAggregator computes weighted score across CLIP and rule metrics.
-11. Reflection and Self Verification analyze the result.
-12. StrategySelector chooses a candidate strategy.
-13. AdaptivePlanner updates context and retry prompt if needed.
-14. Memory, debug report, and benchmark artifacts preserve observability.
+1. User provides an image and/or text prompt through Gradio or FastAPI.
+2. Planning Layer builds goals, reference image structure, scene intent, and character program.
+3. Context Layer creates and validates Context Program, then compiles provider-specific prompt packages.
+4. Generation Layer selects a provider and generates an image.
+5. Evaluation Layer scores the output with CLIP and rule-based metrics.
+6. Reasoning Layer reflects, verifies, selects a strategy, and may adapt the next prompt.
+7. Memory / Observability Layer saves history, debug reports, and benchmark artifacts.
 
-## Key Boundaries
+## Key Design Boundaries
 
-- UI/API do not know internal agent details.
-- ToolRegistry isolates execution engine from concrete agent classes.
-- Context Program separates semantic context from provider prompt text.
-- Reference Image Parser separates structured visual identity/context from plain captions.
-- Standard VLM schema keeps BLIP, Florence-2, and Qwen-VL adapters interchangeable.
-- PromptCompiler separates provider-independent context from provider-specific prompt packages.
-- EvaluationAggregator separates metric computation from reflection/retry policy.
-- SelfVerificationAgent checks whether replanning is necessary before strategy selection.
-- DebugReportManager keeps AI workflow observability separate from generation logic.
+- UI/API should not know individual agent internals.
+- Planning produces structured intent and visual understanding, not final model prompts.
+- Context Program is provider-independent.
+- PromptCompiler converts Context Program into provider-specific prompt packages.
+- Generation provider details are isolated behind routing and adapter layers.
+- Evaluation is metric-based and explainable.
+- Reasoning is optional-LLM capable but rule fallback remains the default stability path.
+- Observability is treated as a first-class layer through debug reports and benchmark outputs.
+
+## Why Layer-based Organization?
+
+The project contains many agents, but the important architecture is not the number of classes. The important idea is that each class belongs to a layer with a clear responsibility. This makes the framework easier to explain, maintain, test, and extend.
 
 ## Future Work
 
-- Docker and CI for v1.0 release
-- Queue-based generation
-- Multi-session memory
-- Benchmark dashboard
-- VLM Judge and real multi-metric expansion
+- ExecutionEngine cleanup using the same layer naming.
+- AgentState organization by layer-owned fields.
+- CI checks for compile, import, and Docker smoke tests.
+- Demo polish and curated release assets.

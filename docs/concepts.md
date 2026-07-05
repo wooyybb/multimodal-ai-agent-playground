@@ -178,3 +178,11 @@ Standard VLM Schema는 모든 vision-language provider가 같은 형태의 `visi
 ## VLM Adapter Upgrade
 
 VLM Adapter Upgrade는 BLIP의 빠른 기본 실행을 유지하면서 Florence-2 또는 Qwen-VL 같은 더 강한 모델을 나중에 연결할 수 있게 하는 준비 작업입니다. 현재 Florence/Qwen adapter는 skeleton이며 `VLM_PROVIDER`로 선택되면 BLIP fallback을 사용합니다.
+
+## Reasoning Layer
+
+Reasoning Layer는 rule 기반 판단과 실제 LLM 기반 판단을 같은 interface 뒤에 둡니다. 기본값은 rule fallback이며, `LLM_PROVIDER=openai`일 때만 OpenAIReasoner가 JSON reasoning을 시도합니다.
+
+## Structured JSON Output
+
+Structured JSON Output은 LLM 응답을 agent state에 안전하게 병합하기 위한 계약입니다. JSON parsing이 실패하면 `JSONParser`가 실패를 표시하고 `ReasonerRouter`는 기존 rule 결과를 fallback으로 유지합니다.
