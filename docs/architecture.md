@@ -155,9 +155,21 @@ clip_prompt       -> CLIP Metric
 generation_prompt + context_program -> Prompt Metric
 pickscore_prompt  -> Aesthetic / future PickScore-style metric
 vlm_judge_prompt  -> VLM Judge skeleton
+reference image + generated image -> DINO Identity Metric
 ```
 
 CLIP does not receive the full generation prompt. This keeps evaluation under the short CLIP text budget and prevents quality-only tags or negative prompt terms from distorting semantic alignment.
+
+## DINO Identity Metric v1.4
+
+DINO complements CLIP instead of replacing it:
+
+```text
+CLIP: prompt text <-> generated image semantic alignment
+DINO: reference image <-> generated image visual consistency
+```
+
+When a reference image and generated image are available, the DINO metric attempts to use `facebook/dinov2-small` through the existing `torch` and `transformers` stack. If the model cannot be loaded or either image is missing, the metric returns an enabled=false fallback result and the Evaluation Layer uses the existing rule-based identity score.
 
 ## Design Boundaries
 

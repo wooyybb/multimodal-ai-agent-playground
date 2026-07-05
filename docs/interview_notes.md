@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.4 DINO Identity Metric Questions
+
+Q. 왜 CLIP 외에 DINO를 추가했나요?
+A. CLIP은 text-image semantic alignment에 강하지만 reference image와 generated image가 시각적으로 같은 캐릭터를 유지하는지는 직접 평가하기 어렵습니다. DINO는 image-image feature similarity를 통해 identity consistency를 보완합니다.
+
+Q. CLIP과 DINO의 평가 관점은 어떻게 다른가요?
+A. CLIP은 prompt text와 generated image가 의미적으로 맞는지 봅니다. DINO는 reference image와 generated image의 visual feature가 얼마나 유사한지 봅니다. 그래서 CLIP은 “요청과 맞는가”, DINO는 “참조 이미지의 시각적 정체성을 유지했는가”에 가깝습니다.
+
+Q. reference image 기반 생성에서 DINO가 왜 유용한가요?
+A. reference image 기반 생성에서는 outfit, silhouette, accessory, overall visual identity가 중요합니다. DINO는 텍스트 prompt에 드러나지 않는 visual consistency를 image-image 관점으로 평가할 수 있어 Character Preservation 품질을 설명하는 데 유용합니다.
+
 ## v1.3 Evaluation Prompt Routing Questions
 
 Q. 왜 generation prompt를 그대로 CLIP에 넣지 않았나요?

@@ -233,6 +233,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added disabled skeleton metric results for VLM Judge and DINO identity without loading new models.
 - Evaluation result now includes semantic alignment, identity preservation, prompt consistency, aesthetic quality, overall score, weighted score, metric summary, and routing info.
 
+## Version 1.4
+
+- Added DINO Identity Metric for reference image to generated image visual consistency.
+- DINO uses `facebook/dinov2-small` through `torch` and `transformers` when available.
+- If reference/generated image or model loading is unavailable, DINO returns `enabled=false` without crashing.
+- Evaluation weighting now uses CLIP 0.40, DINO 0.25, Prompt 0.20, Aesthetic 0.15 when DINO is enabled.
+- If DINO is disabled, identity preservation falls back to the existing rule-based identity metric.
+
 ## Release Candidate 1
 
 - Reorganized project communication around six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.

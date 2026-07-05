@@ -265,9 +265,16 @@ The Evaluation Layer routes prompts by metric instead of sending the full genera
 | Prompt Metric | `generation_prompt` compared with `context_program`. |
 | Aesthetic Metric | `pickscore_prompt`, then `generation_prompt` fallback. |
 | VLM Judge | `vlm_judge_prompt` skeleton, disabled by default. |
-| DINO Identity | Skeleton metric, disabled by default. |
+| DINO Identity | Reference image to generated image visual consistency. |
 
 This avoids CLIP token overflow. CLIP has a short text budget, commonly 77 tokens, so long generation prompts with quality tags and negative prompt terms are not suitable for image-text similarity scoring.
+
+CLIP and DINO evaluate different things:
+
+- CLIP: text-image semantic alignment.
+- DINO: reference image to generated image visual identity consistency.
+
+If no reference image or generated image is available, the DINO metric is disabled gracefully and the Evaluation Layer falls back to the existing rule-based identity heuristic.
 
 ## Roadmap
 

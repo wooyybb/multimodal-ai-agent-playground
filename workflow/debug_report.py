@@ -127,6 +127,7 @@ class DebugReportManager:
             "metric_routing_info": self._safe(
                 (self._evaluation_result(state) or {}).get("metric_routing")
             ),
+            "dino_identity_metric": self._safe(self._metric_result(state, "dino_identity")),
             "metrics": self._safe((self._evaluation_result(state) or {}).get("metrics")),
             "weighted_score": self._safe(
                 (self._evaluation_result(state) or {}).get("weighted_score")
@@ -252,6 +253,11 @@ class DebugReportManager:
             lines,
             "EVALUATION",
             self._evaluation_preview(state),
+        )
+        self._append_block(
+            lines,
+            "DINO IDENTITY METRIC",
+            self._dino_metric_preview(state),
         )
         self._append_block(lines, "AGENT TRACE", "\n".join(state.get("agent_trace", [])))
         return "\n".join(lines).strip() + "\n"
@@ -379,6 +385,13 @@ class DebugReportManager:
         score = state.get("score")
         return getattr(score, "evaluation_result", None)
 
+    def _metric_result(self, state, name):
+        result = self._evaluation_result(state) or {}
+        for item in result.get("metrics") or []:
+            if isinstance(item, dict) and item.get("name") == name:
+                return item
+        return {}
+
     def _evaluation_preview(self, state):
         result = self._evaluation_result(state) or {}
         metrics = result.get("metrics") or []
@@ -409,6 +422,25 @@ class DebugReportManager:
             "VLM Judge Prompt": state.get("vlm_judge_prompt"),
             "Metric Routing": result.get("metric_routing") or state.get("metric_prompts"),
             "Metric Summary": result.get("metric_summary"),
+        }
+
+    def _dino_metric_preview(self, state):
+        result = self._evaluation_result(state) or {}
+        metrics = result.get("metrics") or []
+        dino = next(
+            (
+                item
+                for item in metrics
+                if isinstance(item, dict) and item.get("name") == "dino_identity"
+            ),
+            {},
+        )
+        return {
+            "enabled": dino.get("enabled"),
+            "score": dino.get("score"),
+            "reason": dino.get("reason"),
+            "used_fallback": dino.get("used_fallback"),
+            "model": dino.get("model"),
         }
 
     def _vision_result_preview(self, vision_result):

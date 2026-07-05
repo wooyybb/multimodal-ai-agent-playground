@@ -38,6 +38,8 @@ In v1.2, the Prompt Compiler acts as a Prompt Rendering Engine. It renders separ
 
 In v1.3, the Evaluation Layer routes those prompt variants by metric. CLIP uses `clip_prompt`, Prompt Metric compares `generation_prompt` with `context_program`, and Aesthetic Metric uses `pickscore_prompt` when available.
 
+In v1.4, DINO Identity Metric adds reference-image to generated-image visual consistency scoring. CLIP remains responsible for text-image semantic alignment.
+
 The Generation Layer selects the provider, adapts the prompt, and runs image generation.
 
 The Evaluation Layer scores output with CLIP and additional rule-based metrics, then performs reflection, strategy selection, adaptive planning, and retry decisions.
@@ -51,6 +53,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - `ContextProgramBuilder` and `PromptCompiler` separate semantic context from provider prompts.
 - Prompt Rendering Engine separates generation, CLIP, PickScore, and VLM Judge prompt views.
 - Evaluation Prompt Routing prevents generation prompt overflow in CLIP-style metrics.
+- DINO Identity Metric complements CLIP with image-image consistency scoring.
 - `ProviderRouter` and `ProviderPromptAdapter` isolate generation provider details.
 - `EvaluationAggregator` combines multiple metrics into an explainable score.
 - Adaptive planning and retry are treated as part of the Evaluation Layer's feedback loop.
@@ -68,6 +71,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Florence2 adapter with BLIP fallback
 - FLUX
 - CLIP
+- DINOv2 small through Transformers when available
 - FastAPI
 - Gradio
 - Docker
