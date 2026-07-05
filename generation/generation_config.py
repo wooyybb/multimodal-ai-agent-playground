@@ -9,6 +9,7 @@ class GenerationConfig:
     height: int = 1024
     steps: int = 4
     cfg: float | None = None
+    strength: float = 0.55
     scheduler: str = "schnell"
     resolution: str = "1024x1024"
 
@@ -23,6 +24,7 @@ class GenerationConfig:
             height=height,
             steps=int(plan.get("steps") or 4),
             cfg=plan.get("cfg"),
+            strength=float(plan.get("strength") or 0.55),
             scheduler=plan.get("scheduler") or "schnell",
             resolution=f"{width}x{height}",
         )

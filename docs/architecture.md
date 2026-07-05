@@ -29,7 +29,7 @@ Infrastructure Layer
 | --- | --- | --- |
 | Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence-2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
 | Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Rendering Engine, Prompt Validation, Prompt Optimization |
-| Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX |
+| Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX, SDXL Img2Img |
 | Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
 | Infrastructure Layer | Support runtime, observability, and access. | Memory, History, Debug Report, Benchmark, FastAPI, Gradio |
 
@@ -277,7 +277,7 @@ Generation Planner
 Generation Router
   |
   +-- fast    -> flux_fast    -> FLUX
-  +-- quality -> sdxl_quality -> SDXL skeleton
+  +-- quality -> sdxl_quality -> SDXL Img2Img
   |
   +-- future  -> IP Adapter / ControlNet hooks
 ```
@@ -293,11 +293,11 @@ Quality Mode applies a preset before generation:
 }
 ```
 
-The current SDXL path is a skeleton provider that creates a mock output image and records provider metadata. It does not load a real SDXL model. This keeps FLUX behavior intact while making room for future reference-image preservation tools such as IP Adapter and ControlNet.
+The current SDXL path uses Diffusers `StableDiffusionXLImg2ImgPipeline`. It loads the configured SDXL model, opens the reference image as a PIL image, resizes it to the generation resolution, and calls Img2Img with prompt, negative prompt, steps, CFG, and strength. If model loading or generation fails, it returns a clear fallback status and does not create a mock image. FLUX behavior remains intact.
 
 ## Reference Conditioning Interface v2.1
 
-Prompt-only generation remains the default, but the Context Layer now prepares a provider-facing reference conditioning package:
+The Context Layer prepares a provider-facing reference conditioning package:
 
 ```json
 {
@@ -318,7 +318,7 @@ Prompt-only generation remains the default, but the Context Layer now prepares a
 }
 ```
 
-When quality mode or reference preservation is requested, the package is enabled with `conditioning_type="ip_adapter_planned"` and a note that real IP-Adapter integration is not active yet. Provider adapters preserve this package and add a note when the current provider does not support reference conditioning.
+When quality mode or reference preservation is requested, the package can be used by SDXL Img2Img through its `reference_image_path`. IP-Adapter and ControlNet fields remain future extension points.
 
 Future integration point:
 
@@ -353,16 +353,17 @@ Quality Mode uses a `GenerationConfig` object:
   "height": 1024,
   "steps": 30,
   "cfg": 7.5,
+  "strength": 0.55,
   "scheduler": "DPM++ 2M Karras",
   "resolution": "1024x1024"
 }
 ```
 
-Providers return a `GenerationResult` with output path, backend, mode, config, latency, prompt length, notes, and fallback status. The SDXL provider can attempt `diffusers.StableDiffusionXLPipeline` only when explicitly enabled through `SDXL_ENABLE_DIFFUSERS=true`; otherwise it uses a safe mock fallback. Reference Conditioning remains prompt-only for now, with IP-Adapter and ControlNet kept as provider-layer hooks.
+Providers return a `GenerationResult` with output path, backend, mode, config, latency, prompt length, notes, and fallback status. The SDXL provider uses `diffusers.StableDiffusionXLImg2ImgPipeline` with `SDXL_MODEL_ID`, reference image, `strength`, steps, CFG, and resolution. Reference Conditioning now has a real Img2Img path, while IP-Adapter and ControlNet remain future provider-layer hooks.
 
 ## IP-Adapter Hook v2.3
 
-SDXL Quality Provider reads `reference_conditioning_package` and can optionally attempt IP-Adapter conditioning.
+SDXL Quality Provider keeps the IP-Adapter integration point documented, but the current Img2Img sprint does not activate IP-Adapter.
 
 ```text
 Reference Conditioning Package
@@ -370,12 +371,9 @@ Reference Conditioning Package
   v
 SDXL Quality Provider
   |
-  +-- USE_IP_ADAPTER=false -> prompt-only generation
+  +-- current -> Img2Img reference image
   |
-  +-- USE_IP_ADAPTER=true
-        |
-        +-- load_ip_adapter(IP_ADAPTER_MODEL_PATH, weight_name=...)
-        +-- set_ip_adapter_scale(identity_strength)
+  +-- future  -> load_ip_adapter(...)
         +-- fallback to prompt-only if unavailable
 ```
 
@@ -388,7 +386,7 @@ The hook records:
 - `conditioning_reason`
 - `ip_adapter_status`
 
-This makes reference-aware generation explicit without requiring local IP-Adapter files in the default workflow.
+This makes the future reference-aware conditioning point explicit while keeping the current real backend focused on Img2Img.
 
 ## Reference-aware Style Transfer v2.4
 
@@ -406,7 +404,7 @@ Generation Planner creates a `style_program`:
 }
 ```
 
-The SDXL provider now has three extension hooks:
+The SDXL generation layer has three planned extension hooks:
 
 ```text
 SDXL Quality Provider
@@ -419,7 +417,7 @@ SDXL Quality Provider
         +-- Canny
 ```
 
-LoRA is inference-only. The project does not train LoRA weights. The loader looks for supported `.safetensors` files such as `ghibli`, `anime`, `watercolor`, and `realistic` under `LORA_DIR` or `models/lora`. If weights are unavailable, the provider records a fallback reason and continues with prompt-only generation.
+LoRA is planned as inference-only. The current Img2Img sprint does not train or load LoRA weights. IP-Adapter and ControlNet remain provider-layer extension points after the real Img2Img backend.
 
 ## Design Boundaries
 

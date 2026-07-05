@@ -129,19 +129,27 @@ v2.0 adds two generation modes:
 | Mode | Route | Purpose |
 | --- | --- | --- |
 | Fast Mode | `flux_fast` -> FLUX | Keep the existing lightweight FLUX path. |
-| Quality Mode | `sdxl_quality` -> SDXL skeleton | Prepare higher-fidelity generation for identity, outfit, hair color, eye color, and accessories. |
+| Quality Mode | `sdxl_quality` -> SDXL Img2Img | Use the reference image through Diffusers `StableDiffusionXLImg2ImgPipeline`. |
 
-Quality Mode currently uses an SDXL provider skeleton and stores quality preset metadata. It does not load a real SDXL model yet. Future hooks are reserved for IP Adapter and ControlNet.
+Quality Mode uses a real Diffusers SDXL Img2Img backend. It loads `StableDiffusionXLImg2ImgPipeline`, resizes the reference image to the configured resolution, and generates from `prompt + reference_image + strength`.
 
-v2.2 keeps FLUX as the default provider and adds an SDXL Quality Provider interface. `GENERATION_PROVIDER=flux_fast` selects Fast Mode, while `GENERATION_PROVIDER=sdxl_quality` selects Quality Mode. SDXL uses the same generation interface and records `resolution`, `steps`, `cfg`, `scheduler`, `latency`, and prompt length in the debug report. Real `diffusers` execution is optional and disabled by default; otherwise the provider uses a safe mock fallback.
+v2.2 keeps FLUX as the default provider and adds real SDXL Img2Img integration. `GENERATION_PROVIDER=flux_fast` selects Fast Mode, while `GENERATION_PROVIDER=sdxl_quality` selects Quality Mode. SDXL records `model_id`, `resolution`, `steps`, `cfg`, `strength`, `latency`, prompt length, `generation_is_mock=false`, and `fallback_reason` in the debug report. If the SDXL model cannot be loaded or the reference image is missing, the provider returns a clear error status and does not create a mock image. The FLUX fast path is unchanged.
+
+SDXL Img2Img requires `diffusers` and `accelerate`. They are listed in `requirements.txt`; if your local environment reports an accelerate-related loading error, reinstall the runtime dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Test-only mock output is disabled by default. It is only allowed when `ALLOW_MOCK_GENERATION=true`, and debug reports record `generation_is_mock`, `fallback_reason`, `generation_error_type`, `generation_error_repr`, `generation_error_stage`, and `generation_error_traceback`.
 
 v2.1 adds a Reference Conditioning Interface. Current generation is still prompt-only, but the Prompt Compiler now creates a `reference_conditioning_package` that future providers can use for img2img, IP-Adapter, or ControlNet.
 
 Prompt-only generation has limits for reference preservation: text can describe hair color, eye color, outfit, identity, and accessories, but it cannot directly bind visual features from the reference image. The conditioning package keeps those preservation requirements explicit until real reference-conditioned providers are attached.
 
-v2.3 adds an optional IP-Adapter hook inside the SDXL Quality Provider. `USE_IP_ADAPTER=false` keeps prompt-only generation. When `USE_IP_ADAPTER=true`, the provider attempts `load_ip_adapter(...)` and `set_ip_adapter_scale(...)` if the configured adapter files exist. If loading fails, generation falls back to prompt-only behavior and records the reason in the debug report.
+v2.3 documents the IP-Adapter hook position for future reference-aware conditioning. The current v2.2 Img2Img backend does not activate IP-Adapter yet; reference awareness comes from the Img2Img reference image.
 
-v2.4 completes the Reference-aware Style Transfer pipeline boundary. Generation Planner now creates a `style_program` with style name, style prompt, LoRA name/scale, lighting, color palette, and quality mode. SDXL Quality Provider can attempt LoRA loading from `.safetensors`, keeps an IP-Adapter image hook, and records a ControlNet placeholder for OpenPose, Depth, or Canny. No LoRA training is performed; LoRA is inference-only when local/public weights are available.
+v2.4 completes the Reference-aware Style Transfer pipeline boundary at the architecture level. Generation Planner can still create a `style_program`, but this Img2Img sprint does not activate LoRA, ControlNet, or IP-Adapter. Those remain future provider-layer extension points.
 
 ### Evaluation Layer
 
@@ -284,7 +292,8 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `LLM_PROVIDER` | Use `rule` or `mock` for the current free/local setup. |
 | `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
 | `GENERATION_PROVIDER` | `flux_fast` or `sdxl_quality`; default is `flux_fast`. |
-| `SDXL_ENABLE_DIFFUSERS` | Optional `true` to attempt real `diffusers` SDXL execution when dependencies and model access are available. |
+| `SDXL_MODEL_ID` | Optional Diffusers model id for SDXL Img2Img. Default is `stabilityai/stable-diffusion-xl-base-1.0`. |
+| `ALLOW_MOCK_GENERATION` | Optional test-only `true` to create an SDXL mock image after an Img2Img failure. Default is `false`. |
 | `USE_IP_ADAPTER` | Optional `true` to attempt SDXL IP-Adapter conditioning. Default is `false`. |
 | `IP_ADAPTER_MODEL_PATH` | Optional path for a local/public IP-Adapter model directory. |
 | `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename passed to `load_ip_adapter`. |
@@ -307,7 +316,8 @@ OpenAI API keys are not required for this v1.1 VLM-only setup. Never commit `.en
 
 - BLIP is the default VLM.
 - Florence-2 is available through the Vision Router and falls back to BLIP if the model cannot be loaded.
-- FLUX is the current generation provider path.
+- FLUX is the default fast generation provider path.
+- SDXL Img2Img is available through `GENERATION_PROVIDER=sdxl_quality` when Diffusers dependencies, model access, and a reference image are available.
 - LLM reasoning remains rule/mock fallback for this release focus.
 - Some adaptive planning and evaluation logic is intentionally rule-based for stability.
 - Image quality depends on external provider behavior.

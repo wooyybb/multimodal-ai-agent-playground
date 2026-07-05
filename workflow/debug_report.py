@@ -85,7 +85,19 @@ class DebugReportManager:
             "generation_plan": self._safe(state.get("generation_plan")),
             "generation_config": self._safe(state.get("generation_config")),
             "generation_prompt_length": self._safe(state.get("prompt_length")),
+            "generation_is_mock": self._safe(state.get("generation_is_mock")),
+            "fallback_reason": self._safe(state.get("fallback_reason")),
+            "generation_error_type": self._safe(state.get("generation_error_type")),
+            "generation_error_repr": self._safe(state.get("generation_error_repr")),
+            "generation_error_stage": self._safe(state.get("generation_error_stage")),
+            "generation_error_traceback": self._safe(
+                state.get("generation_error_traceback")
+            ),
+            "model_id": self._safe(state.get("model_id")),
+            "device": self._safe(state.get("device")),
+            "dtype": self._safe(state.get("dtype")),
             "cfg": self._safe(state.get("cfg")),
+            "strength": self._safe(state.get("strength")),
             "steps": self._safe(state.get("steps")),
             "scheduler": self._safe(state.get("scheduler")),
             "resolution": self._safe(state.get("resolution")),
@@ -523,12 +535,26 @@ class DebugReportManager:
             "generation_mode": state.get("generation_mode") or plan.get("generation_mode"),
             "generation_config": state.get("generation_config"),
             "prompt_length": state.get("prompt_length"),
+            "model_id": state.get("model_id"),
+            "device": state.get("device"),
+            "dtype": state.get("dtype"),
             "cfg": state.get("cfg") if state.get("cfg") is not None else plan.get("cfg"),
+            "strength": (
+                state.get("strength")
+                if state.get("strength") is not None
+                else plan.get("strength")
+            ),
             "steps": state.get("steps") or plan.get("steps"),
             "scheduler": state.get("scheduler") or plan.get("scheduler"),
             "resolution": state.get("resolution") or plan.get("resolution"),
             "future_hooks": state.get("future_hooks") or plan.get("future_hooks"),
             "ip_adapter_status": state.get("ip_adapter_status"),
+            "generation_is_mock": state.get("generation_is_mock"),
+            "fallback_reason": state.get("fallback_reason"),
+            "generation_error_type": state.get("generation_error_type"),
+            "generation_error_repr": state.get("generation_error_repr"),
+            "generation_error_stage": state.get("generation_error_stage"),
+            "generation_error_traceback": state.get("generation_error_traceback"),
             "notes": state.get("generation_notes", []),
         }
 

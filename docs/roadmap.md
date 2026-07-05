@@ -21,7 +21,7 @@
 | v1.7 | Context Cache and Incremental Execution | Complete |
 | v2.0 | Generation Quality Upgrade | Complete |
 | v2.1 | Reference Conditioning Interface | Complete |
-| v2.2 | SDXL Quality Provider Integration | Complete |
+| v2.2 | Real SDXL Img2Img Integration | Complete |
 | v2.3 | IP-Adapter Hook Integration | Complete |
 | v2.4 | Reference-aware Style Transfer Pipeline | Complete |
 
@@ -97,7 +97,7 @@
 - Version 1.7: Context Cache, dirty checks, skipped layer reporting, and incremental execution
 - Version 2.0: Provider-independent Generation Router with FLUX Fast Mode and SDXL Quality Mode skeleton
 - Version 2.1: Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
-- Version 2.2: SDXL Quality Provider interface with GenerationConfig, GenerationResult, env-based routing, and safe fallback
+- Version 2.2: Real SDXL Img2Img integration with Diffusers `StableDiffusionXLImg2ImgPipeline`, `SDXL_MODEL_ID`, reference image input, strength, and no mock fallback
 - Version 2.3: Optional IP-Adapter hook in SDXL provider with prompt-only fallback
 - Version 2.4: Style Program, inference-only LoRA hook, ControlNet placeholder, and reference-aware style transfer debug trace
 

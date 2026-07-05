@@ -12,6 +12,16 @@ class GenerationResult:
     prompt_length: int = 0
     generation_notes: list[str] = field(default_factory=list)
     used_fallback: bool = False
+    generation_is_mock: bool = False
+    fallback_reason: str = ""
+    generation_error_type: str = ""
+    generation_error_repr: str = ""
+    generation_error_traceback: str = ""
+    generation_error_stage: str = ""
+    model_id: str = ""
+    strength: float | None = None
+    device: str = ""
+    dtype: str = ""
     reference_conditioning_enabled: bool = False
     conditioning_type: str = "none"
     ip_adapter_enabled: bool = False

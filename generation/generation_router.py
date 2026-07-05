@@ -47,11 +47,16 @@ class GenerationRouter:
             result = result.to_dict()
         latency = round(perf_counter() - started, 4)
         result.setdefault("latency", latency)
+        provider_generation_config = result.get("generation_config") or {}
         result["generation_plan"] = plan
-        result["generation_config"] = config.to_dict()
+        result["generation_config"] = {
+            **config.to_dict(),
+            **provider_generation_config,
+        }
         result["generation_mode"] = plan.get("generation_mode")
         result["generation_provider"] = provider_name
         result["cfg"] = plan.get("cfg")
+        result["strength"] = plan.get("strength") if plan.get("strength") is not None else config.strength
         result["steps"] = plan.get("steps")
         result["scheduler"] = plan.get("scheduler")
         result["resolution"] = plan.get("resolution")
@@ -67,11 +72,36 @@ class GenerationRouter:
         result.setdefault("selected_lora", plan.get("selected_lora") or "")
         result.setdefault("lora_status", {})
         result.setdefault("controlnet_status", {})
+        result.setdefault("generation_is_mock", False)
+        result.setdefault("fallback_reason", "")
+        result.setdefault("generation_error_type", "")
+        result.setdefault("generation_error_repr", "")
+        result.setdefault("generation_error_traceback", "")
+        result.setdefault("generation_error_stage", "")
+        result.setdefault("model_id", "")
+        result.setdefault("device", "")
+        result.setdefault("dtype", "")
+        if result.get("strength") is None:
+            result["strength"] = config.strength
         print(f"[GenerationRouter] Provider: {provider_name}")
         print(f"[GenerationRouter] Mode: {result['generation_mode']}")
         print(f"[GenerationRouter] Resolution: {result.get('resolution')}")
         print(f"[GenerationRouter] Steps: {result.get('steps')}")
         print(f"[GenerationRouter] CFG: {result.get('cfg')}")
+        print(f"[GenerationRouter] Strength: {result.get('strength')}")
+        if result.get("device"):
+            print(f"[GenerationRouter] Device: {result.get('device')}")
+        if result.get("dtype"):
+            print(f"[GenerationRouter] Dtype: {result.get('dtype')}")
         print(f"[GenerationRouter] Latency: {result.get('latency')}s")
+        if result.get("fallback_reason"):
+            print(f"[GenerationRouter] Fallback reason: {result.get('fallback_reason')}")
+        if result.get("generation_error_type"):
+            print(
+                "[GenerationRouter] Generation error: "
+                f"{result.get('generation_error_type')} "
+                f"{result.get('generation_error_repr')}"
+            )
+        print(f"[GenerationRouter] Mock generation: {result.get('generation_is_mock')}")
         print(f"[GenerationRouter] Output: {result.get('output_image_path')}")
         return result

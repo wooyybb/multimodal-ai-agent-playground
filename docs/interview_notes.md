@@ -33,11 +33,23 @@ A. Crash하지 않고 prompt-only fallback으로 계속 진행합니다. `used_c
 
 ## v2.2 SDXL Quality Provider Questions
 
+Q. 왜 Txt2Img가 아니라 Img2Img를 선택했나요?
+A. 목표가 단순 이미지 생성이 아니라 reference-aware style transfer이기 때문입니다. Txt2Img는 reference image를 직접 입력으로 사용하지 않지만, Img2Img는 원본 이미지를 generation 초기 조건으로 사용하므로 identity, outfit, pose, composition 같은 시각적 단서를 보존하기 좋습니다.
+
+Q. Img2Img가 Identity Preservation에 유리한 이유는 무엇인가요?
+A. Prompt는 identity를 텍스트로 설명할 뿐이지만 Img2Img는 reference image 자체를 입력으로 사용합니다. 따라서 hair color, outfit, silhouette, pose 같은 요소가 latent 변환 과정에 반영되어 prompt-only 방식보다 보존 가능성이 높습니다.
+
+Q. Strength는 무엇을 의미하나요?
+A. `strength`는 reference image를 얼마나 강하게 변형할지 조절하는 값입니다. 낮을수록 원본 구조를 더 많이 유지하고, 높을수록 prompt와 style 변화가 강해집니다. 기본값은 0.55로, 보존과 변형 사이의 균형을 목표로 합니다.
+
+Q. 왜 IP-Adapter보다 먼저 Img2Img를 구현했나요?
+A. Img2Img는 Diffusers SDXL pipeline의 기본 기능으로 reference image를 실제 generation에 연결하는 가장 단순한 첫 단계입니다. 이 경로가 안정화되면 그 다음에 IP-Adapter를 추가해 identity feature conditioning을 더 정밀하게 강화할 수 있습니다.
+
 Q. 왜 FLUX와 SDXL을 함께 사용했나요?
 A. FLUX는 빠르고 현재 workflow에서 안정적인 기본 generation path입니다. SDXL은 negative prompt, img2img, ControlNet, IP-Adapter 같은 reference-aware 확장과 잘 맞는 품질 중심 provider로 설계하기 좋습니다. 그래서 FLUX는 Fast Mode로 유지하고 SDXL은 Quality Mode로 추가했습니다.
 
 Q. Fast Mode와 Quality Mode의 차이는 무엇인가요?
-A. Fast Mode는 `flux_fast`를 사용해 빠른 생성과 기존 호환성을 우선합니다. Quality Mode는 `sdxl_quality`를 사용하고 1024x1024, 30 steps, CFG 7.5, scheduler preset을 기록해 reference preservation과 style transfer 확장을 준비합니다.
+A. Fast Mode는 `flux_fast`를 사용해 빠른 생성과 기존 호환성을 우선합니다. Quality Mode는 `sdxl_quality`를 사용하고 1024x1024, 30 steps, CFG 7.5, strength 0.55로 실제 SDXL Img2Img generation을 수행합니다.
 
 Q. 왜 Provider Router를 유지했나요?
 A. Provider 선택을 generation code 안에 하드코딩하면 FLUX, SDXL, future IP-Adapter/ControlNet 경로가 섞입니다. Router를 유지하면 환경변수나 planner 결정으로 provider를 바꾸면서도 Prompt Rendering, Evaluation, Debug Report는 같은 contract를 사용할 수 있습니다.
