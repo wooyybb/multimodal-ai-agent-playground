@@ -6,7 +6,9 @@ class AestheticMetric(BaseMetric):
 
     def evaluate(self, state: dict) -> dict:
         prompt = str(
-            state.get("provider_prompt")
+            state.get("pickscore_prompt")
+            or state.get("generation_prompt")
+            or state.get("provider_prompt")
             or state.get("final_prompt")
             or ""
         )
@@ -21,4 +23,6 @@ class AestheticMetric(BaseMetric):
         if negative:
             score += 0.1
 
-        return self._result(score, "rule-based aesthetic prompt structure check")
+        result = self._result(score, "rule-based aesthetic prompt structure check")
+        result["prompt_type"] = "pickscore_prompt" if state.get("pickscore_prompt") else "generation_prompt"
+        return result

@@ -6,7 +6,8 @@ class IdentityMetric(BaseMetric):
 
     def evaluate(self, state: dict) -> dict:
         prompt = str(
-            state.get("provider_prompt")
+            state.get("generation_prompt")
+            or state.get("provider_prompt")
             or state.get("final_prompt")
             or ""
         ).lower()

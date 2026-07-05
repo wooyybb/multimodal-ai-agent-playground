@@ -9,9 +9,21 @@ class ClipMetric(BaseMetric):
         self.clip_tool = clip_tool or ClipTool()
 
     def evaluate(self, state: dict) -> dict:
+        prompt, prompt_type = self._select_prompt(state)
+        print(f"[CLIPMetric] Using prompt type: {prompt_type}")
         score = self.clip_tool.evaluate(
             state.get("reference_image"),
             state.get("generated_image_path"),
-            state.get("final_prompt", ""),
+            prompt,
         )
-        return self._result(score, "CLIP image-text similarity")
+        result = self._result(score, "CLIP image-text similarity")
+        result["prompt_type"] = prompt_type
+        result["prompt"] = prompt
+        return result
+
+    def _select_prompt(self, state):
+        for key in ("clip_prompt", "evaluation_prompt", "provider_prompt", "user_prompt"):
+            prompt = state.get(key)
+            if prompt:
+                return str(prompt), key
+        return "", "empty"

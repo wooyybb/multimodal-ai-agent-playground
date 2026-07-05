@@ -145,6 +145,20 @@ Prompt Rendering Engine
 
 `generation_prompt` preserves the existing provider generation behavior. `clip_prompt` is a short semantic summary that removes quality-only terms and negative prompt language. `pickscore_prompt` keeps preference-oriented quality, composition, and style cues. `vlm_judge_prompt` is a longer instruction for future visual judging against reference and generated images.
 
+## Evaluation Prompt Routing v1.3
+
+The Evaluation Layer consumes prompt variants by metric:
+
+```text
+generation_prompt -> Generation Provider
+clip_prompt       -> CLIP Metric
+generation_prompt + context_program -> Prompt Metric
+pickscore_prompt  -> Aesthetic / future PickScore-style metric
+vlm_judge_prompt  -> VLM Judge skeleton
+```
+
+CLIP does not receive the full generation prompt. This keeps evaluation under the short CLIP text budget and prevents quality-only tags or negative prompt terms from distorting semantic alignment.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

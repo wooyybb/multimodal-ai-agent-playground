@@ -485,7 +485,7 @@ class DynamicExecutionEngine:
     def _run_evaluation(self, registry, state):
         state["score"] = registry.call(
             "evaluation",
-            state.get("image"),
+            self._evaluation_input_state(state),
             state.get("output_image_path"),
             state.get("clip_prompt") or state.get("evaluation_prompt", ""),
         )
@@ -609,7 +609,7 @@ class DynamicExecutionEngine:
             )
             state["retry_score"] = registry.call(
                 "evaluation",
-                state.get("image"),
+                self._evaluation_input_state(state),
                 state.get("retry_output_image_path"),
                 state.get("retry_clip_prompt") or state["retry_evaluation_prompt"],
             )
@@ -1036,6 +1036,26 @@ class DynamicExecutionEngine:
         word_count = len(evaluation_prompt.split())
         print(f"[ExecutionEngine] {label} prompt word count: {word_count}")
         return evaluation_prompt
+
+    def _evaluation_input_state(self, state):
+        return {
+            "reference_image": state.get("image"),
+            "reference_image_context": state.get("reference_image"),
+            "character_program": state.get("character_program"),
+            "context_program": state.get("context_program"),
+            "compiled_prompt_package": state.get("compiled_prompt_package"),
+            "generation_prompt": state.get("generation_prompt"),
+            "clip_prompt": state.get("clip_prompt"),
+            "pickscore_prompt": state.get("pickscore_prompt"),
+            "vlm_judge_prompt": state.get("vlm_judge_prompt"),
+            "metric_prompts": state.get("metric_prompts"),
+            "provider_prompt": state.get("provider_prompt"),
+            "provider_negative_prompt": state.get("provider_negative_prompt"),
+            "negative_prompt": state.get("negative_prompt"),
+            "evaluation_prompt": state.get("evaluation_prompt"),
+            "user_prompt": state.get("user_prompt"),
+            "final_prompt": state.get("final_prompt"),
+        }
 
     def _normalize_plan(self, plan):
         normalized = list(plan)

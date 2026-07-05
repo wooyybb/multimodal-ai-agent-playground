@@ -255,6 +255,20 @@ The framework does not use one prompt for every model-facing task. The Prompt Re
 
 The CLIP prompt is intentionally short and removes quality-only terms such as `masterpiece`, `8k`, and `ultra detailed` so evaluation focuses on character, outfit, action, and background semantics.
 
+## Evaluation Prompt Routing
+
+The Evaluation Layer routes prompts by metric instead of sending the full generation prompt everywhere:
+
+| Metric | Prompt Route |
+| --- | --- |
+| CLIP | `clip_prompt`, then `evaluation_prompt`, then provider/user fallback. |
+| Prompt Metric | `generation_prompt` compared with `context_program`. |
+| Aesthetic Metric | `pickscore_prompt`, then `generation_prompt` fallback. |
+| VLM Judge | `vlm_judge_prompt` skeleton, disabled by default. |
+| DINO Identity | Skeleton metric, disabled by default. |
+
+This avoids CLIP token overflow. CLIP has a short text budget, commonly 77 tokens, so long generation prompts with quality tags and negative prompt terms are not suitable for image-text similarity scoring.
+
 ## Roadmap
 
 | Release | Focus |

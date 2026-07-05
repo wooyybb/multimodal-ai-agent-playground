@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.3 Evaluation Prompt Routing Questions
+
+Q. 왜 generation prompt를 그대로 CLIP에 넣지 않았나요?
+A. generation prompt는 provider가 이미지를 만들기 위해 풍부한 style, quality, layout, negative-related context를 포함할 수 있습니다. CLIP similarity는 짧은 semantic alignment 평가에 적합하므로 긴 generation prompt를 그대로 넣으면 token overflow나 평가 왜곡이 생길 수 있습니다.
+
+Q. CLIP prompt를 따로 만든 이유는 무엇인가요?
+A. CLIP은 짧은 text budget, 보통 77 token 제한을 갖습니다. 그래서 character, outfit, action, background 같은 핵심 의미만 남긴 `clip_prompt`를 사용하고 `masterpiece`, `8k`, `ultra detailed`, negative prompt 같은 평가에 불필요한 표현은 제거했습니다.
+
+Q. metric별 prompt routing 구조의 장점은 무엇인가요?
+A. metric마다 평가 목적이 다르기 때문에 같은 prompt를 쓰면 품질이 떨어집니다. CLIP은 semantic summary, Prompt Metric은 `generation_prompt + context_program`, Aesthetic Metric은 `pickscore_prompt`, VLM Judge는 긴 비교 지시문을 사용하도록 분리하면 평가 layer를 확장하기 쉽고 debug report도 명확해집니다.
+
 ## v1.2 Prompt Rendering Engine Questions
 
 Q. 왜 Prompt를 하나만 만들지 않았나요?

@@ -14,6 +14,7 @@
 | v1.0 | CI, demo polish, deployment-ready release | Planned |
 | v1.1 | VLM-only Vision Layer stabilization with BLIP and Florence-2 fallback | Complete |
 | v1.2 | Prompt Rendering Engine | Complete |
+| v1.3 | Evaluation Prompt Routing | Complete |
 
 ## Completed Sprints
 
@@ -80,6 +81,7 @@
 - Release Candidate 2: Framework simplification and responsibility refactoring
 - Version 1.1: VLM-only Vision Layer stabilization with BLIP, Florence-2 fallback, structured vision result schema, ReferenceImageParser, and CharacterProgramBuilder integration
 - Version 1.2: Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompt variants
+- Version 1.3: Evaluation Prompt Routing with CLIP prompt isolation and skeleton VLM Judge/DINO metrics
 
 ## Planned Sprints
 

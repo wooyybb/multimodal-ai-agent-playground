@@ -30,14 +30,22 @@ class EvaluationAggregator:
                 "[EvaluationAggregator] Metric: "
                 f"{result['name']} Score: {result['score']:.4f}"
             )
+        metric_results.extend(self._planned_metric_skeletons())
 
         weighted_score = self._weighted_score(metric_results)
+        categories = self._category_scores(metric_results, weighted_score)
         summary = self._summary(metric_results, weighted_score)
         print(f"[EvaluationAggregator] Weighted: {weighted_score:.4f}")
         return {
             "metrics": metric_results,
+            "semantic_alignment": categories["semantic_alignment"],
+            "identity_preservation": categories["identity_preservation"],
+            "prompt_consistency": categories["prompt_consistency"],
+            "aesthetic_quality": categories["aesthetic_quality"],
+            "overall_score": weighted_score,
             "weighted_score": weighted_score,
             "metric_summary": summary,
+            "metric_routing": self._metric_routing(state),
         }
 
     def _weighted_score(self, metric_results):
@@ -51,9 +59,56 @@ class EvaluationAggregator:
             return 0.0
         return round(weighted / total_weight, 4)
 
+    def _category_scores(self, metric_results, weighted_score):
+        metric_map = {
+            item.get("name"): item.get("score", 0.0)
+            for item in metric_results
+            if isinstance(item, dict)
+        }
+        return {
+            "semantic_alignment": metric_map.get("clip", 0.0),
+            "identity_preservation": metric_map.get("identity", 0.0),
+            "prompt_consistency": metric_map.get("prompt", 0.0),
+            "aesthetic_quality": metric_map.get("aesthetic", 0.0),
+            "overall_score": weighted_score,
+        }
+
     def _summary(self, metric_results, weighted_score):
         parts = [
             f"{item['name']}={item['score']:.2f}"
             for item in metric_results
         ]
         return f"weighted={weighted_score:.2f}; " + ", ".join(parts)
+
+    def _planned_metric_skeletons(self):
+        return [
+            {
+                "name": "vlm_judge",
+                "score": 0.0,
+                "enabled": False,
+                "reason": "VLM judge is planned but not enabled",
+            },
+            {
+                "name": "dino_identity",
+                "score": 0.0,
+                "enabled": False,
+                "reason": "DINO identity metric is planned but not enabled",
+            },
+        ]
+
+    def _metric_routing(self, state):
+        return {
+            "clip": "clip_prompt"
+            if state.get("clip_prompt")
+            else "evaluation_prompt"
+            if state.get("evaluation_prompt")
+            else "provider_prompt"
+            if state.get("provider_prompt")
+            else "user_prompt",
+            "prompt": "generation_prompt + context_program",
+            "aesthetic": "pickscore_prompt"
+            if state.get("pickscore_prompt")
+            else "generation_prompt",
+            "vlm_judge": "vlm_judge_prompt (skeleton disabled)",
+            "dino_identity": "reference/generated image identity metric (skeleton disabled)",
+        }

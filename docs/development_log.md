@@ -224,6 +224,15 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - ExecutionEngine uses `generation_prompt` for generation and `clip_prompt` for CLIP-style evaluation.
 - Debug reports now store prompt rendering outputs in both `report.json` and `prompt_preview.txt`.
 
+## Version 1.3
+
+- Added Evaluation Prompt Routing.
+- CLIP Metric now prioritizes `clip_prompt` and records the prompt type used.
+- Prompt Metric compares `generation_prompt` with `context_program`.
+- Aesthetic Metric prioritizes `pickscore_prompt`.
+- Added disabled skeleton metric results for VLM Judge and DINO identity without loading new models.
+- Evaluation result now includes semantic alignment, identity preservation, prompt consistency, aesthetic quality, overall score, weighted score, metric summary, and routing info.
+
 ## Release Candidate 1
 
 - Reorganized project communication around six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.

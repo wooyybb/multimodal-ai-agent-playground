@@ -124,6 +124,9 @@ class DebugReportManager:
             "provider_negative_prompt": self._safe(state.get("provider_negative_prompt")),
             "evaluation_prompt": self._safe(state.get("evaluation_prompt")),
             "evaluation_result": self._safe(self._evaluation_result(state)),
+            "metric_routing_info": self._safe(
+                (self._evaluation_result(state) or {}).get("metric_routing")
+            ),
             "metrics": self._safe((self._evaluation_result(state) or {}).get("metrics")),
             "weighted_score": self._safe(
                 (self._evaluation_result(state) or {}).get("weighted_score")
@@ -240,6 +243,11 @@ class DebugReportManager:
         )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
+        self._append_block(
+            lines,
+            "EVALUATION PROMPT ROUTING",
+            self._evaluation_prompt_routing_preview(state),
+        )
         self._append_block(
             lines,
             "EVALUATION",
@@ -380,10 +388,27 @@ class DebugReportManager:
             "Identity": metric_map.get("identity", {}),
             "Prompt": metric_map.get("prompt", {}),
             "Aesthetic": metric_map.get("aesthetic", {}),
+            "VLM Judge": metric_map.get("vlm_judge", {}),
+            "DINO Identity": metric_map.get("dino_identity", {}),
+            "Semantic Alignment": result.get("semantic_alignment"),
+            "Identity Preservation": result.get("identity_preservation"),
+            "Prompt Consistency": result.get("prompt_consistency"),
+            "Aesthetic Quality": result.get("aesthetic_quality"),
+            "Overall": result.get("overall_score"),
             "Weighted": result.get("weighted_score", state.get("score")),
             "Summary": result.get("metric_summary"),
             "retry": state.get("retry_needed"),
             "best_score": state.get("best_score"),
+        }
+
+    def _evaluation_prompt_routing_preview(self, state):
+        result = self._evaluation_result(state) or {}
+        return {
+            "CLIP Prompt": state.get("clip_prompt") or state.get("evaluation_prompt"),
+            "PickScore Prompt": state.get("pickscore_prompt"),
+            "VLM Judge Prompt": state.get("vlm_judge_prompt"),
+            "Metric Routing": result.get("metric_routing") or state.get("metric_prompts"),
+            "Metric Summary": result.get("metric_summary"),
         }
 
     def _vision_result_preview(self, vision_result):
