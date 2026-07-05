@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v2.4 Real IP-Adapter Integration Questions
+
+Q. SDXL Img2Img와 IP-Adapter의 역할 차이는 무엇인가요?
+A. SDXL Img2Img는 reference image의 구조와 composition을 generation 시작점으로 사용합니다. IP-Adapter는 reference image feature를 별도로 주입해 identity, hair, outfit, visual style 보존을 강화합니다.
+
+Q. Style Prompt는 어떤 역할인가요?
+A. Style Prompt는 identity를 설명하지 않고 style, lighting, quality, mood, camera, rendering만 제어합니다. Identity는 reference image와 IP-Adapter가 담당합니다.
+
+Q. IP-Adapter가 실패하면 workflow는 어떻게 동작하나요?
+A. Crash하지 않고 SDXL Img2Img prompt/style-only 경로로 fallback합니다. Debug Report에는 `ip_adapter_enabled`, `ip_adapter_loaded`, `ip_adapter_scale`, `used_conditioning_fallback`, `conditioning_fallback_reason`이 저장됩니다.
+
+Q. 학습 없이 어떻게 IP-Adapter를 사용하나요?
+A. 이 프로젝트는 adapter를 학습하지 않습니다. 공개 또는 로컬 adapter weight를 `IP_ADAPTER_MODEL_PATH`와 `IP_ADAPTER_WEIGHT_NAME`으로 지정해 inference-only로 로드합니다.
+
 ## v2.3 SDXL Style Prompt Renderer Questions
 
 Q. 왜 SDXL에서는 Prompt를 줄였나요?

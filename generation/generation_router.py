@@ -85,7 +85,10 @@ class GenerationRouter:
         result.setdefault("reference_conditioning_enabled", False)
         result.setdefault("conditioning_type", "none")
         result.setdefault("ip_adapter_enabled", False)
+        result.setdefault("ip_adapter_loaded", False)
+        result.setdefault("ip_adapter_scale", 0.75)
         result.setdefault("used_conditioning_fallback", False)
+        result.setdefault("conditioning_fallback_reason", "")
         result.setdefault("conditioning_reason", "")
         result.setdefault("ip_adapter_status", {})
         result.setdefault("style_program", plan.get("style_program", {}))
@@ -113,6 +116,8 @@ class GenerationRouter:
             print(f"[GenerationRouter] Device: {result.get('device')}")
         if result.get("dtype"):
             print(f"[GenerationRouter] Dtype: {result.get('dtype')}")
+        print(f"[GenerationRouter] IP-Adapter enabled: {result.get('ip_adapter_enabled')}")
+        print(f"[GenerationRouter] IP-Adapter loaded: {result.get('ip_adapter_loaded')}")
         print(f"[GenerationRouter] Latency: {result.get('latency')}s")
         if result.get("fallback_reason"):
             print(f"[GenerationRouter] Fallback reason: {result.get('fallback_reason')}")

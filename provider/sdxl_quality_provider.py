@@ -50,10 +50,12 @@ class SDXLQualityProvider:
         output_path = ""
         used_fallback = False
         generation_is_mock = False
+        ip_adapter_status = self._ip_adapter_status()
         notes = [
             "real SDXL Img2Img backend",
             "StableDiffusionXLImg2ImgPipeline",
-            "IP-Adapter, ControlNet, and LoRA are not active in this sprint",
+            "IP-Adapter is optional and inference-only",
+            "ControlNet and LoRA are not active in this sprint",
         ]
 
         try:
@@ -61,12 +63,17 @@ class SDXLQualityProvider:
             reference_image = self._load_reference_image(state, config)
             error_stage = "pipeline_loading"
             self._load_pipeline()
+            ip_adapter_status = self._prepare_ip_adapter(reference_image)
+            if ip_adapter_status.get("fallback_reason"):
+                notes.append(ip_adapter_status["fallback_reason"])
+                fallback_reason = ip_adapter_status["fallback_reason"]
             error_stage = "generation"
             output_path = self._run_img2img_pipeline(
                 prompt=prompt,
                 negative_prompt=negative_prompt,
                 reference_image=reference_image,
                 config=config,
+                ip_adapter_status=ip_adapter_status,
             )
             print("[SDXL] Generation Finished")
         except Exception as error:
@@ -109,6 +116,7 @@ class SDXLQualityProvider:
                 "backend": "StableDiffusionXLImg2ImgPipeline",
                 "device": self.device,
                 "dtype": self.torch_dtype_name,
+                "ip_adapter": ip_adapter_status,
             },
             latency=latency,
             prompt_length=len(str(prompt or "").split()),
@@ -130,13 +138,13 @@ class SDXLQualityProvider:
             conditioning_type=(
                 state.get("reference_conditioning_package") or {}
             ).get("conditioning_type", "img2img"),
-            ip_adapter_enabled=False,
-            used_conditioning_fallback=False,
-            conditioning_reason="SDXL Img2Img uses the reference image directly; IP-Adapter is not active.",
-            ip_adapter_status={
-                "enabled": False,
-                "reason": "IP-Adapter not implemented in this Img2Img sprint",
-            },
+            ip_adapter_enabled=bool(ip_adapter_status.get("enabled")),
+            ip_adapter_loaded=bool(ip_adapter_status.get("loaded")),
+            ip_adapter_scale=float(ip_adapter_status.get("scale") or 0.75),
+            used_conditioning_fallback=bool(ip_adapter_status.get("used_fallback")),
+            conditioning_fallback_reason=ip_adapter_status.get("fallback_reason", ""),
+            conditioning_reason=ip_adapter_status.get("reason", ""),
+            ip_adapter_status=ip_adapter_status,
             style_program=state.get("style_program") or {},
             selected_lora="",
             lora_status={
@@ -149,19 +157,29 @@ class SDXLQualityProvider:
             },
         )
 
-    def _run_img2img_pipeline(self, prompt, negative_prompt, reference_image, config):
+    def _run_img2img_pipeline(
+        self,
+        prompt,
+        negative_prompt,
+        reference_image,
+        config,
+        ip_adapter_status=None,
+    ):
         output_dir = Path("outputs")
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "output_sdxl_img2img.png"
         print("[SDXL] Generating with StableDiffusionXLImg2ImgPipeline...")
-        result = self.pipeline(
-            prompt=str(prompt or ""),
-            negative_prompt=negative_prompt or None,
-            image=reference_image,
-            strength=self._strength(config),
-            num_inference_steps=self._steps(config),
-            guidance_scale=self._cfg(config),
-        )
+        kwargs = {
+            "prompt": str(prompt or ""),
+            "negative_prompt": negative_prompt or None,
+            "image": reference_image,
+            "strength": self._strength(config),
+            "num_inference_steps": self._steps(config),
+            "guidance_scale": self._cfg(config),
+        }
+        if (ip_adapter_status or {}).get("loaded"):
+            kwargs["ip_adapter_image"] = reference_image
+        result = self.pipeline(**kwargs)
         result.images[0].save(output_path)
         return str(output_path)
 
@@ -186,6 +204,76 @@ class SDXLQualityProvider:
             use_safetensors=True,
         )
         self.pipeline = self.pipeline.to(self.device)
+
+    def _ip_adapter_status(self):
+        enabled = str(os.getenv("USE_IP_ADAPTER") or "false").lower() in {
+            "1",
+            "true",
+            "yes",
+        }
+        scale = self._ip_adapter_scale()
+        status = {
+            "enabled": enabled,
+            "loaded": False,
+            "requested": enabled,
+            "model_path": os.getenv("IP_ADAPTER_MODEL_PATH", ""),
+            "weight_name": os.getenv("IP_ADAPTER_WEIGHT_NAME", ""),
+            "scale": scale,
+            "used_fallback": False,
+            "fallback_reason": "",
+            "reason": "IP-Adapter disabled",
+        }
+        print(f"[IPAdapter] Enabled: {enabled}")
+        print("[IPAdapter] Loaded: False")
+        print(f"[IPAdapter] Scale: {scale}")
+        print("[IPAdapter] Fallback reason: ")
+        return status
+
+    def _prepare_ip_adapter(self, reference_image):
+        status = self._ip_adapter_status()
+        if not status["enabled"]:
+            return status
+        if reference_image is None:
+            status["used_fallback"] = True
+            status["fallback_reason"] = "IP-Adapter fallback: reference image is not available"
+            status["reason"] = status["fallback_reason"]
+            self._log_ip_adapter_status(status)
+            return status
+        if not status["model_path"]:
+            status["used_fallback"] = True
+            status["fallback_reason"] = "IP-Adapter fallback: IP_ADAPTER_MODEL_PATH is not set"
+            status["reason"] = status["fallback_reason"]
+            self._log_ip_adapter_status(status)
+            return status
+        try:
+            kwargs = {}
+            if status["weight_name"]:
+                kwargs["weight_name"] = status["weight_name"]
+            self.pipeline.load_ip_adapter(status["model_path"], **kwargs)
+            if hasattr(self.pipeline, "set_ip_adapter_scale"):
+                self.pipeline.set_ip_adapter_scale(status["scale"])
+            status["loaded"] = True
+            status["reason"] = "IP-Adapter loaded"
+        except Exception as error:
+            status["loaded"] = False
+            status["used_fallback"] = True
+            message = str(error) or repr(error)
+            status["fallback_reason"] = f"IP-Adapter fallback: {message}"
+            status["reason"] = status["fallback_reason"]
+        self._log_ip_adapter_status(status)
+        return status
+
+    def _log_ip_adapter_status(self, status):
+        print(f"[IPAdapter] Enabled: {status.get('enabled')}")
+        print(f"[IPAdapter] Loaded: {status.get('loaded')}")
+        print(f"[IPAdapter] Scale: {status.get('scale')}")
+        print(f"[IPAdapter] Fallback reason: {status.get('fallback_reason', '')}")
+
+    def _ip_adapter_scale(self):
+        try:
+            return float(os.getenv("IP_ADAPTER_SCALE") or 0.75)
+        except (TypeError, ValueError):
+            return 0.75
 
     def _mock_generation_allowed(self):
         return str(os.getenv("ALLOW_MOCK_GENERATION") or "false").lower() in {

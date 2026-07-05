@@ -401,25 +401,22 @@ Generation Planner creates a `style_program`:
   "lora_name": "anime",
   "lora_scale": 0.7,
   "lighting": "clean cel-shaded lighting",
-  "color_palette": ["pastel", "clear skin tone", "accent color"],
+  "color_palette": ["pastel", "clear base color", "accent color"],
   "quality_mode": true
 }
 ```
 
-The SDXL generation layer has three planned extension hooks:
+The SDXL generation layer now separates three responsibilities:
 
 ```text
 SDXL Quality Provider
   |
-  +-- IP Adapter  -> reference image feature conditioning
-  +-- LoRA        -> style-specific inference weights (.safetensors)
-  +-- ControlNet  -> structure preservation placeholder
-        +-- OpenPose
-        +-- Depth
-        +-- Canny
+  +-- Img2Img      -> reference structure preservation
+  +-- IP-Adapter   -> identity / reference feature preservation
+  +-- Style Prompt -> style direction control
 ```
 
-LoRA is planned as inference-only. The current Img2Img sprint does not train or load LoRA weights. IP-Adapter and ControlNet remain provider-layer extension points after the real Img2Img backend.
+IP-Adapter is optional and inference-only. It is enabled with `USE_IP_ADAPTER=true`, `IP_ADAPTER_MODEL_PATH`, optional `IP_ADAPTER_WEIGHT_NAME`, and `IP_ADAPTER_SCALE` with a default of `0.75`. The provider attempts `pipeline.load_ip_adapter(...)`, applies `pipeline.set_ip_adapter_scale(...)`, and passes `ip_adapter_image=reference_image` during generation. If loading fails, generation falls back to SDXL Img2Img without crashing and records `ip_adapter_enabled`, `ip_adapter_loaded`, `ip_adapter_scale`, `used_conditioning_fallback`, and `conditioning_fallback_reason` in the debug report.
 
 ## Design Boundaries
 

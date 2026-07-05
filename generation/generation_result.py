@@ -25,7 +25,10 @@ class GenerationResult:
     reference_conditioning_enabled: bool = False
     conditioning_type: str = "none"
     ip_adapter_enabled: bool = False
+    ip_adapter_loaded: bool = False
+    ip_adapter_scale: float = 0.75
     used_conditioning_fallback: bool = False
+    conditioning_fallback_reason: str = ""
     conditioning_reason: str = ""
     ip_adapter_status: dict = field(default_factory=dict)
     style_program: dict = field(default_factory=dict)

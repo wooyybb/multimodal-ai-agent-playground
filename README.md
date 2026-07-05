@@ -149,7 +149,7 @@ Prompt-only generation has limits for reference preservation: text can describe 
 
 v2.3 adds provider-specific prompt rendering. FLUX keeps the dense generation prompt. SDXL Img2Img receives a short Style Prompt generated only from `style_program`: style, lighting, quality, mood, camera, rendering, and color palette. Identity terms such as gender, hair, outfit, eye color, and accessories are removed because the reference image supplies identity through Img2Img.
 
-v2.4 completes the Reference-aware Style Transfer pipeline boundary at the architecture level. Generation Planner can still create a `style_program`, but this Img2Img sprint does not activate LoRA, ControlNet, or IP-Adapter. Those remain future provider-layer extension points.
+v2.4 connects optional IP-Adapter conditioning inside the SDXL Img2Img provider. SDXL Img2Img preserves reference structure, IP-Adapter strengthens identity/reference feature preservation, and the Style Prompt controls style direction. The adapter is inference-only; no training is performed. If adapter loading fails, the provider falls back to SDXL Img2Img without crashing and records the fallback reason in the debug report.
 
 ### Evaluation Layer
 
@@ -298,6 +298,7 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | `USE_IP_ADAPTER` | Optional `true` to attempt SDXL IP-Adapter conditioning. Default is `false`. |
 | `IP_ADAPTER_MODEL_PATH` | Optional path for a local/public IP-Adapter model directory. |
 | `IP_ADAPTER_WEIGHT_NAME` | Optional adapter weight filename passed to `load_ip_adapter`. |
+| `IP_ADAPTER_SCALE` | Optional IP-Adapter scale. Default is `0.75`. |
 | `LORA_DIR` | Optional directory for inference-only `.safetensors` LoRA files such as `ghibli`, `anime`, `watercolor`, and `realistic`. |
 
 VLM-only local run on PowerShell:

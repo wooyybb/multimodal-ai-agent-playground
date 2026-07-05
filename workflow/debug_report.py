@@ -103,6 +103,9 @@ class DebugReportManager:
             "resolution": self._safe(state.get("resolution")),
             "future_hooks": self._safe(state.get("future_hooks")),
             "ip_adapter_status": self._safe(state.get("ip_adapter_status")),
+            "ip_adapter_enabled": self._safe(state.get("ip_adapter_enabled")),
+            "ip_adapter_loaded": self._safe(state.get("ip_adapter_loaded")),
+            "ip_adapter_scale": self._safe(state.get("ip_adapter_scale")),
             "style_program": self._safe(state.get("style_program")),
             "selected_lora": self._safe(state.get("selected_lora")),
             "lora_status": self._safe(state.get("lora_status")),
@@ -113,6 +116,9 @@ class DebugReportManager:
             "conditioning_type": self._safe(state.get("conditioning_type")),
             "used_conditioning_fallback": self._safe(
                 state.get("used_conditioning_fallback")
+            ),
+            "conditioning_fallback_reason": self._safe(
+                state.get("conditioning_fallback_reason")
             ),
             "conditioning_reason": self._safe(state.get("conditioning_reason")),
             "context_cache": self._safe(state.get("context_cache")),
@@ -418,7 +424,14 @@ class DebugReportManager:
             "ip_adapter_enabled": (
                 state.get("ip_adapter_status") or {}
             ).get("enabled"),
+            "ip_adapter_loaded": (
+                state.get("ip_adapter_status") or {}
+            ).get("loaded"),
+            "ip_adapter_scale": (
+                state.get("ip_adapter_status") or {}
+            ).get("scale"),
             "fallback": state.get("used_conditioning_fallback"),
+            "fallback_reason": state.get("conditioning_fallback_reason"),
             "reason": state.get("conditioning_reason")
             or (state.get("ip_adapter_status") or {}).get("reason"),
             "preserve": package.get("preserve", {}),
@@ -567,6 +580,11 @@ class DebugReportManager:
             "resolution": state.get("resolution") or plan.get("resolution"),
             "future_hooks": state.get("future_hooks") or plan.get("future_hooks"),
             "ip_adapter_status": state.get("ip_adapter_status"),
+            "ip_adapter_enabled": state.get("ip_adapter_enabled"),
+            "ip_adapter_loaded": state.get("ip_adapter_loaded"),
+            "ip_adapter_scale": state.get("ip_adapter_scale"),
+            "used_conditioning_fallback": state.get("used_conditioning_fallback"),
+            "conditioning_fallback_reason": state.get("conditioning_fallback_reason"),
             "generation_is_mock": state.get("generation_is_mock"),
             "fallback_reason": state.get("fallback_reason"),
             "generation_error_type": state.get("generation_error_type"),
