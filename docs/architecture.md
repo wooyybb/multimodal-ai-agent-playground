@@ -215,6 +215,45 @@ The aggregator always exports:
 
 Weighted score uses only enabled metrics. If all weighted metrics are disabled, `weighted_score` is `0.0` and `used_fallback` becomes `true`. This keeps Reflection, Retry, Debug Report, FastAPI, Gradio, and Benchmark consumers compatible with a stable score contract.
 
+## Context Cache and Incremental Execution v1.7
+
+The Execution Engine can skip selected layers when their input signature has not changed.
+
+```text
+Input
+  |
+  v
+Planning Layer
+  |
+  v
+Dirty Check
+  |
+  +-- cache hit  -> restore artifact and skip step
+  +-- cache miss -> run step and update cache
+  |
+  v
+Context / Generation / Evaluation
+```
+
+Cached artifacts:
+
+- `goal_tree`
+- `caption` and `vision_result`
+- `reference_image`
+- `character_program`
+- `context_program`
+- prompt compiler outputs such as `generation_prompt`, `clip_prompt`, and `compiled_prompt_package`
+- `output_image_path` when the generation prompt is unchanged and the cached image file exists
+
+Debug reports record:
+
+- `executed_layers`
+- `skipped_layers`
+- `dirty_reasons`
+- `context_cache_path`
+
+This keeps repeated runs inspectable while avoiding unnecessary work for unchanged planning/context/generation inputs.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

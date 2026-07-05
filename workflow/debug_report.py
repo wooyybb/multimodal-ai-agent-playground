@@ -80,6 +80,11 @@ class DebugReportManager:
                 (self._vision_result(state) or {}).get("latency")
             ),
             "provider": self._safe(state.get("provider")),
+            "context_cache": self._safe(state.get("context_cache")),
+            "context_cache_path": self._safe(state.get("context_cache_path")),
+            "executed_layers": self._safe(state.get("executed_layers", [])),
+            "skipped_layers": self._safe(state.get("skipped_layers", [])),
+            "dirty_reasons": self._safe(state.get("dirty_reasons", [])),
             "llm_provider": self._safe(self._llm_summary(state).get("llm_provider")),
             "llm_used_fallback": self._safe(
                 self._llm_summary(state).get("llm_used_fallback")
@@ -161,6 +166,17 @@ class DebugReportManager:
     def _build_prompt_preview(self, state):
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
+        self._append_block(
+            lines,
+            "INCREMENTAL EXECUTION",
+            {
+                "context_cache": state.get("context_cache"),
+                "context_cache_path": state.get("context_cache_path"),
+                "executed_layers": state.get("executed_layers", []),
+                "skipped_layers": state.get("skipped_layers", []),
+                "dirty_reasons": state.get("dirty_reasons", []),
+            },
+        )
         self._append_block(lines, "GOAL TREE", state.get("goal_tree"))
         self._append_block(
             lines,

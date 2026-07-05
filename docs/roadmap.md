@@ -18,6 +18,7 @@
 | v1.4 | DINO Identity Metric Integration | Complete |
 | v1.5 | Florence Vision Parser Upgrade | Complete |
 | v1.6 | Evaluation Layer Stabilization | Complete |
+| v1.7 | Context Cache and Incremental Execution | Complete |
 
 ## Completed Sprints
 
@@ -88,6 +89,7 @@
 - Version 1.4: DINO Identity Metric for reference-generated image visual consistency
 - Version 1.5: Florence Vision Parser with caption, detailed caption, object detection, and structured reference parsing
 - Version 1.6: Evaluation schema stabilization, metric fallback, and enabled-metric weighted scoring
+- Version 1.7: Context Cache, dirty checks, skipped layer reporting, and incremental execution
 
 ## Planned Sprints
 

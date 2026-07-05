@@ -224,9 +224,36 @@ Debug reports make the framework inspectable.
 - `prompt_preview.txt`: readable prompt lifecycle and trace
 - prompt rendering outputs: generation prompt, CLIP prompt, PickScore prompt, VLM Judge prompt
 - evaluation metrics and retry information
+- incremental execution fields: executed layers, skipped layers, dirty reasons, and context cache path
 - output image references
 
 Benchmark results are saved under `benchmark/results/`. Runtime outputs and API keys should not be committed.
+
+## Incremental Execution
+
+v1.7 adds a lightweight Context Cache for repeated runs. The Execution Engine computes signatures for stable artifacts and skips selected work when inputs are unchanged.
+
+Cached artifacts include:
+
+- planner goal tree
+- vision result and caption
+- reference image parse
+- character program
+- context program
+- prompt compiler outputs
+- generated image path when the generation prompt is unchanged and the file still exists
+
+Skip examples:
+
+```text
+Vision unchanged      -> Skip Vision
+Reference unchanged   -> Skip Reference Parser
+Context unchanged     -> Skip Context Program Builder
+Prompt unchanged      -> Skip Prompt Compiler
+Generation unchanged  -> Skip Generation
+```
+
+Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, so cache behavior can be inspected after each run.
 
 ## Environment Variables
 
@@ -303,6 +330,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v1.0 RC1 | Layer-based documentation cleanup |
 | v1.0 RC2 | Responsibility refactoring and framework simplification |
 | v1.0 | Demo polish, CI, and deployment-ready release |
+| v1.7 | Context Cache and Incremental Execution |
 
 ## Portfolio Highlights
 

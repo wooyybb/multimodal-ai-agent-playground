@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.7 Context Cache and Incremental Execution Questions
+
+Q. 왜 Cache를 넣었나요?
+A. 같은 reference image와 prompt로 반복 실험할 때 Vision, Reference Parsing, Context Program 같은 안정적인 결과를 매번 다시 계산할 필요가 없습니다. Context Cache는 이런 중간 산출물을 저장해 재실행 비용을 줄이고, debug report로 어떤 step이 skip되었는지 설명할 수 있게 합니다.
+
+Q. Incremental Execution의 장점은 무엇인가요?
+A. 변경된 부분만 다시 실행하므로 반복 실험이 빨라지고, 실패 원인을 좁히기 쉬워집니다. 예를 들어 prompt compiler 입력이 같으면 compiler를 skip하고, generation prompt와 output file이 같으면 generation도 skip할 수 있습니다.
+
+Q. 서비스에서는 어떤 효과가 있나요?
+A. 서비스 환경에서는 같은 입력을 다시 요청하거나 사용자가 일부 옵션만 바꾸는 일이 많습니다. Incremental Execution은 비용이 큰 모델 호출과 이미지 생성을 줄이고, 응답 시간과 운영 비용을 낮추는 기반이 됩니다.
+
 ## v1.6 Evaluation Layer Stabilization Questions
 
 Q. Evaluation Layer에서 fallback을 둔 이유는?

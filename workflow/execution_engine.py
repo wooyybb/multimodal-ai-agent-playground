@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from workflow.agent_state import AgentState
 from workflow.debug_report import DebugReportManager
+from memory.context_cache import ContextCacheManager
 
 
 class DynamicExecutionEngine:
@@ -47,13 +50,66 @@ class DynamicExecutionEngine:
         "memory_save",
     ]
 
+    CACHE_RULES = {
+        "goal_planner": {
+            "keys": ("goal_tree",),
+            "label": "Planner Goal",
+        },
+        "vision": {
+            "keys": ("caption", "vision_result"),
+            "label": "Vision",
+        },
+        "reference_image_parser": {
+            "keys": ("reference_image",),
+            "label": "Reference Parser",
+        },
+        "character_program_builder": {
+            "keys": ("character_program",),
+            "label": "Character Program",
+        },
+        "context_program_builder": {
+            "keys": (
+                "context_program",
+                "context_program_summary",
+                "context_program_version",
+            ),
+            "label": "Context",
+        },
+        "prompt_compiler": {
+            "keys": (
+                "compiled_prompt_package",
+                "prompt_rendering",
+                "generation_prompt",
+                "clip_prompt",
+                "pickscore_prompt",
+                "vlm_judge_prompt",
+                "negative_prompt",
+                "provider_prompt",
+                "provider_negative_prompt",
+                "metric_prompts",
+                "evaluation_prompt",
+            ),
+            "label": "Compiler",
+        },
+        "generation": {
+            "keys": ("output_image_path",),
+            "label": "Generation",
+        },
+    }
+
     def run(self, execution_plan: list[str], registry, state: dict) -> dict:
         print("[ExecutionEngine] Starting dynamic execution...")
 
+        cache_manager = ContextCacheManager()
         agent_state = AgentState.from_dict(state)
         agent_state.validate()
         state = agent_state.to_dict()
         state.setdefault("agent_trace", [])
+        state["_context_cache"] = cache_manager.load()
+        state["_context_cache_updates"] = {}
+        state.setdefault("executed_layers", [])
+        state.setdefault("skipped_layers", [])
+        state.setdefault("dirty_reasons", [])
         planner_goal_tree = (state.get("planner_result") or {}).get("goal_tree")
         if planner_goal_tree and not state.get("goal_tree"):
             state["goal_tree"] = planner_goal_tree
@@ -77,7 +133,14 @@ class DynamicExecutionEngine:
                     state["agent_trace"].append(message)
                     continue
 
+                if self._try_skip_step(step, state):
+                    state["agent_trace"].append(f"ExecutionEngine skipped {step}")
+                    continue
+
+                print(f"[ExecutionEngine] Run {self._cache_step_label(step)}")
                 handler(registry, state)
+                self._record_cache_step(step, state)
+                self._record_executed_step(registry, step, state)
                 state["agent_trace"].append(f"ExecutionEngine completed {step}")
             except Exception as error:
                 message = f"ExecutionEngine error in {step}: {error}"
@@ -89,7 +152,10 @@ class DynamicExecutionEngine:
         print("[ExecutionEngine] Dynamic execution completed.")
         final_state = AgentState.from_dict(state)
         final_state.validate()
-        return final_state.to_dict()
+        final_dict = final_state.to_dict()
+        final_dict.pop("_context_cache", None)
+        final_dict.pop("_context_cache_updates", None)
+        return final_dict
 
     def _run_memory_load(self, registry, state):
         state["last_run"] = registry.call("memory_load")
@@ -624,6 +690,7 @@ class DynamicExecutionEngine:
     def _run_memory_save(self, registry, state):
         state["memory_saved"] = False
         state["history_path"] = None
+        self._save_context_cache(state)
         self._save_debug_report(state)
 
         try:
@@ -1080,6 +1147,175 @@ class DynamicExecutionEngine:
             insert_at = normalized.index("adaptive_planner")
             normalized.insert(insert_at, "strategy_selector")
         return normalized
+
+    def _try_skip_step(self, step, state):
+        rule = self.CACHE_RULES.get(step)
+        if not rule:
+            return False
+
+        cache_entry = (state.get("_context_cache") or {}).get(step) or {}
+        signature = self._cache_signature(step, state)
+        if not cache_entry:
+            self._record_dirty_reason(state, step, "no cache entry")
+            return False
+        if cache_entry.get("signature") != signature:
+            self._record_dirty_reason(state, step, "input signature changed")
+            return False
+
+        artifacts = cache_entry.get("artifacts") or {}
+        required_keys = rule.get("keys") or ()
+        if not all(key in artifacts for key in required_keys):
+            self._record_dirty_reason(state, step, "cached artifact missing")
+            return False
+        if step == "generation" and not self._cached_output_available(artifacts):
+            self._record_dirty_reason(state, step, "cached generated image missing")
+            return False
+
+        state.update({key: artifacts.get(key) for key in required_keys})
+        if step == "vision" and isinstance(state.get("caption"), dict):
+            caption_data = state["caption"]
+            state["vision_result"] = caption_data.get("vision_result") or state.get("vision_result")
+            state["caption"] = caption_data.get("caption", "")
+        message = f"Skip {rule['label']}"
+        print(f"[ExecutionEngine] {message}")
+        state.setdefault("skipped_layers", []).append(
+            {
+                "step": step,
+                "layer": rule["label"],
+                "reason": "cache hit",
+            }
+        )
+        return True
+
+    def _cache_step_label(self, step):
+        rule = self.CACHE_RULES.get(step)
+        return rule["label"] if rule else step
+
+    def _record_cache_step(self, step, state):
+        rule = self.CACHE_RULES.get(step)
+        if not rule:
+            return
+        artifacts = {
+            key: state.get(key)
+            for key in rule.get("keys", ())
+            if state.get(key) not in (None, "", [], {})
+        }
+        if not artifacts:
+            return
+        if step == "vision":
+            artifacts["caption"] = str(state.get("caption") or "")
+            vision_result = state.get("vision_result") or getattr(
+                state.get("caption"),
+                "vision_result",
+                None,
+            )
+            if vision_result:
+                artifacts["vision_result"] = vision_result
+
+        state.setdefault("_context_cache_updates", {})[step] = {
+            "signature": self._cache_signature(step, state),
+            "artifacts": artifacts,
+        }
+
+    def _save_context_cache(self, state):
+        manager = ContextCacheManager()
+        cache = dict(state.get("_context_cache") or {})
+        updates = state.get("_context_cache_updates") or {}
+        if not updates:
+            state["context_cache_path"] = None
+            return
+        cache.update(updates)
+        state["context_cache_path"] = manager.save(cache)
+        state["context_cache"] = {
+            "entries": sorted(cache.keys()),
+            "updated_steps": sorted(updates.keys()),
+        }
+
+    def _record_executed_step(self, registry, step, state):
+        state.setdefault("executed_layers", []).append(
+            {
+                "step": step,
+                "layer": self._layer_label(registry, step),
+            }
+        )
+
+    def _record_dirty_reason(self, state, step, reason):
+        state.setdefault("dirty_reasons", []).append(
+            {
+                "step": step,
+                "reason": reason,
+            }
+        )
+
+    def _cache_signature(self, step, state):
+        manager = ContextCacheManager()
+        payload = self._cache_payload(step, state)
+        return manager.signature(payload)
+
+    def _cache_payload(self, step, state):
+        if step == "goal_planner":
+            return {
+                "user_prompt": state.get("user_prompt"),
+                "provider": state.get("provider"),
+            }
+        if step == "vision":
+            return {"image": state.get("image")}
+        if step == "reference_image_parser":
+            return {
+                "vision_result": self._vision_result_for_cache(state),
+                "caption": str(state.get("caption") or ""),
+                "user_prompt": state.get("user_prompt"),
+            }
+        if step == "character_program_builder":
+            return {
+                "reference_image": state.get("reference_image"),
+                "caption": str(state.get("caption") or ""),
+                "user_prompt": state.get("user_prompt"),
+            }
+        if step == "context_program_builder":
+            return {
+                "goal_tree": state.get("goal_tree"),
+                "reference_image": state.get("reference_image"),
+                "character_program": state.get("character_program"),
+                "scene_plan": state.get("scene_plan"),
+                "character_section": state.get("character_section"),
+                "style_section": state.get("style_section"),
+                "layout_section": state.get("layout_section"),
+                "pose_section": state.get("pose_section"),
+                "expression_section": state.get("expression_section"),
+                "lighting_section": state.get("lighting_section"),
+                "negative_section": state.get("negative_section"),
+                "user_prompt": state.get("user_prompt"),
+                "provider": state.get("provider"),
+            }
+        if step == "prompt_compiler":
+            return {
+                "context_program": state.get("context_program"),
+                "context_validation": state.get("context_validation"),
+                "context_reasoning": state.get("context_reasoning"),
+                "provider": state.get("provider"),
+                "provider_routing": state.get("provider_routing"),
+                "prompt_sections": state.get("prompt_sections"),
+                "negative_prompt": state.get("negative_prompt"),
+            }
+        if step == "generation":
+            return {
+                "generation_prompt": state.get("generation_prompt")
+                or state.get("final_prompt"),
+                "provider": state.get("provider"),
+                "provider_negative_prompt": state.get("provider_negative_prompt"),
+            }
+        return {"step": step}
+
+    def _vision_result_for_cache(self, state):
+        vision_result = state.get("vision_result")
+        if vision_result:
+            return vision_result
+        return getattr(state.get("caption"), "vision_result", None)
+
+    def _cached_output_available(self, artifacts):
+        output_path = artifacts.get("output_image_path")
+        return bool(output_path and Path(str(output_path)).exists())
 
     def _run_state_step(self, registry, state, step):
         print(f"[{self._layer_label(registry, step)}] Running state-based step: {step}")

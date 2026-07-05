@@ -92,6 +92,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - CLIP/DINO failures return disabled fallback metric results instead of crashing the workflow.
 - Debug report preview now shows a human-readable Evaluation Result block with metric status and reasons.
 
+## Version 1.7
+
+- Added Context Cache support under `memory/context_cache.json`.
+- ExecutionEngine now performs dirty checks before selected planning, context, compiler, and generation steps.
+- Unchanged artifacts can be restored from cache and marked as skipped.
+- Debug reports now include executed layers, skipped layers, dirty reasons, and context cache path.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.
