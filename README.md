@@ -132,7 +132,10 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
+pip install fastapi uvicorn gradio
 ```
+
+`requirements.txt` keeps the core model/runtime dependencies. FastAPI, Uvicorn, and Gradio are installed separately for service/UI execution and are also installed in the Docker image.
 
 Run Gradio:
 
@@ -234,4 +237,4 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 
 ## License
 
-TODO: Add a project license before public release.
+No license has been selected yet. Add a license before public distribution.

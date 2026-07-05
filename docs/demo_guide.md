@@ -4,6 +4,13 @@ This guide is for interviews, portfolio demos, and quick local validation.
 
 ## 1. Run Gradio Demo
 
+Install local UI/API dependencies if they are not already installed:
+
+```bash
+pip install -r requirements.txt
+pip install fastapi uvicorn gradio
+```
+
 ```bash
 python main.py
 ```

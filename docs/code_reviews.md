@@ -28,9 +28,9 @@ Code review focuses on behavioral regressions, unclear boundaries, missing valid
 - Does it keep runtime outputs out of curated docs?
 - Does `compileall` pass?
 
-## TODO
+## Pull Request Review Links
 
-Add per-sprint review links when the project starts using pull requests.
+Per-sprint pull request review links will be added when the project starts using pull requests.
 
 ## Sprint43 Review
 
