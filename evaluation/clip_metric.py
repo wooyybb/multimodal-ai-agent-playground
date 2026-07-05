@@ -11,12 +11,20 @@ class ClipMetric(BaseMetric):
     def evaluate(self, state: dict) -> dict:
         prompt, prompt_type = self._select_prompt(state)
         print(f"[CLIPMetric] Using prompt type: {prompt_type}")
-        score = self.clip_tool.evaluate(
-            state.get("reference_image"),
-            state.get("generated_image_path"),
-            prompt,
-        )
-        result = self._result(score, "CLIP image-text similarity")
+        try:
+            score = self.clip_tool.evaluate(
+                state.get("reference_image"),
+                state.get("generated_image_path"),
+                prompt,
+            )
+            result = self._result(score, "CLIP image-text similarity")
+        except Exception as error:
+            result = self._result(
+                0.0,
+                f"CLIP metric unavailable: {error}",
+                enabled=False,
+                used_fallback=True,
+            )
         result["prompt_type"] = prompt_type
         result["prompt"] = prompt
         return result

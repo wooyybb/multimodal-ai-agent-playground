@@ -85,6 +85,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Standard vision results now include structured `objects`, `regions`, and `ocr` skeleton fields.
 - `ReferenceImageParser` prioritizes object detection results before detailed captions and caption fallback.
 
+## Version 1.6
+
+- Stabilized Evaluation Result and Metric Result schemas.
+- Weighted score now uses enabled metrics only.
+- CLIP/DINO failures return disabled fallback metric results instead of crashing the workflow.
+- Debug report preview now shows a human-readable Evaluation Result block with metric status and reasons.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.

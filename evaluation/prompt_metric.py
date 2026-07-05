@@ -15,6 +15,7 @@ class PromptMetric(BaseMetric):
             or package.get("positive_prompt")
             or state.get("provider_prompt")
             or state.get("final_prompt")
+            or state.get("user_prompt")
             or ""
         ).lower()
         negative_prompt = str(

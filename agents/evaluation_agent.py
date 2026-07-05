@@ -27,7 +27,12 @@ class EvaluationAgent:
         evaluation_result = self.aggregator.evaluate(
             evaluation_state
         )
-        score = evaluation_result.get("overall_score", evaluation_result.get("weighted_score", 0.0))
+        score = evaluation_result.get(
+            "weighted_score",
+            evaluation_result.get("overall_score", 0.0),
+        )
+        evaluation_result["score"] = score
+        evaluation_result.setdefault("best_score", score)
         print(f"[EvaluationAgent] Score: {score}")
         return EvaluationScore(score, evaluation_result)
 

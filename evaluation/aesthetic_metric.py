@@ -10,6 +10,7 @@ class AestheticMetric(BaseMetric):
             or state.get("generation_prompt")
             or state.get("provider_prompt")
             or state.get("final_prompt")
+            or state.get("user_prompt")
             or ""
         )
         negative = str(state.get("provider_negative_prompt") or state.get("negative_prompt") or "")

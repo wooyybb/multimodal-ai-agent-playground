@@ -251,7 +251,7 @@ class DebugReportManager:
         )
         self._append_block(
             lines,
-            "EVALUATION",
+            "EVALUATION RESULT",
             self._evaluation_preview(state),
         )
         self._append_block(
@@ -397,19 +397,30 @@ class DebugReportManager:
         metrics = result.get("metrics") or []
         metric_map = {item.get("name"): item for item in metrics if isinstance(item, dict)}
         return {
+            "semantic_alignment": result.get("semantic_alignment"),
+            "identity_preservation": result.get("identity_preservation"),
+            "prompt_consistency": result.get("prompt_consistency"),
+            "aesthetic_quality": result.get("aesthetic_quality"),
+            "overall_score": result.get("overall_score"),
+            "weighted_score": result.get("weighted_score", state.get("score")),
+            "metric_summary": result.get("metric_summary"),
+            "used_fallback": result.get("used_fallback"),
+            "Metrics": [
+                {
+                    "name": item.get("name"),
+                    "score": item.get("score"),
+                    "enabled": item.get("enabled"),
+                    "reason": item.get("reason"),
+                }
+                for item in metrics
+                if isinstance(item, dict)
+            ],
             "CLIP": metric_map.get("clip", {}),
             "Identity": metric_map.get("identity", {}),
             "Prompt": metric_map.get("prompt", {}),
             "Aesthetic": metric_map.get("aesthetic", {}),
             "VLM Judge": metric_map.get("vlm_judge", {}),
             "DINO Identity": metric_map.get("dino_identity", {}),
-            "Semantic Alignment": result.get("semantic_alignment"),
-            "Identity Preservation": result.get("identity_preservation"),
-            "Prompt Consistency": result.get("prompt_consistency"),
-            "Aesthetic Quality": result.get("aesthetic_quality"),
-            "Overall": result.get("overall_score"),
-            "Weighted": result.get("weighted_score", state.get("score")),
-            "Summary": result.get("metric_summary"),
             "retry": state.get("retry_needed"),
             "best_score": state.get("best_score"),
         }

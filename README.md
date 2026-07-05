@@ -289,8 +289,12 @@ CLIP and DINO evaluate different things:
 
 - CLIP: text-image semantic alignment.
 - DINO: reference image to generated image visual identity consistency.
+- Prompt Metric: generation prompt and context program consistency.
+- Aesthetic Metric: lightweight heuristic for quality, composition, and prompt structure.
 
-If no reference image or generated image is available, the DINO metric is disabled gracefully and the Evaluation Layer falls back to the existing rule-based identity heuristic.
+If any metric fails, the workflow continues. CLIP and DINO return disabled fallback results when their model, input, or image data is unavailable. Prompt and Aesthetic metrics fall back to `user_prompt` when richer prompt variants are missing.
+
+The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`, `semantic_alignment`, `identity_preservation`, `prompt_consistency`, `aesthetic_quality`, `overall_score`, `weighted_score`, `metric_summary`, and `used_fallback`. Weighted score is calculated from enabled metrics only, using default weights for CLIP, DINO, Prompt, and Aesthetic metrics.
 
 ## Roadmap
 

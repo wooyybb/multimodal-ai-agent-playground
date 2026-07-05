@@ -183,6 +183,38 @@ DINO: reference image <-> generated image visual consistency
 
 When a reference image and generated image are available, the DINO metric attempts to use `facebook/dinov2-small` through the existing `torch` and `transformers` stack. If the model cannot be loaded or either image is missing, the metric returns an enabled=false fallback result and the Evaluation Layer uses the existing rule-based identity score.
 
+## Evaluation Layer Stabilization v1.6
+
+Every metric returns the same schema:
+
+```json
+{
+  "name": "",
+  "score": 0.0,
+  "enabled": true,
+  "reason": "",
+  "used_fallback": false
+}
+```
+
+The aggregator always exports:
+
+```json
+{
+  "metrics": [],
+  "semantic_alignment": 0.0,
+  "identity_preservation": 0.0,
+  "prompt_consistency": 0.0,
+  "aesthetic_quality": 0.0,
+  "overall_score": 0.0,
+  "weighted_score": 0.0,
+  "metric_summary": "",
+  "used_fallback": false
+}
+```
+
+Weighted score uses only enabled metrics. If all weighted metrics are disabled, `weighted_score` is `0.0` and `used_fallback` becomes `true`. This keeps Reflection, Retry, Debug Report, FastAPI, Gradio, and Benchmark consumers compatible with a stable score contract.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

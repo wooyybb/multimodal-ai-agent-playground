@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.6 Evaluation Layer Stabilization Questions
+
+Q. Evaluation Layer에서 fallback을 둔 이유는?
+A. CLIP, DINO 같은 metric은 모델 로드, 이미지 경로, 토큰 길이, 실행 환경에 따라 실패할 수 있습니다. 하나의 metric 실패가 전체 generation workflow를 중단하면 agent loop가 불안정해지므로, 각 metric은 disabled fallback result를 반환하고 workflow는 계속 진행합니다.
+
+Q. weighted score는 어떻게 계산하나요?
+A. Aggregator는 enabled=true인 metric만 사용합니다. 기본 weight는 CLIP 0.40, DINO 0.25, Prompt 0.20, Aesthetic 0.15입니다. disabled metric은 weight 계산에서 제외하고, 모든 weighted metric이 disabled이면 weighted_score는 0.0이며 used_fallback=true로 기록합니다.
+
+Q. CLIP과 DINO를 함께 쓰는 이유는?
+A. CLIP은 text-image semantic alignment에 강하고, DINO는 reference image와 generated image 사이의 visual consistency를 보는 데 적합합니다. 둘은 대체 관계가 아니라 보완 관계라서 prompt alignment와 identity preservation을 분리해 설명할 수 있습니다.
+
 ## v1.5 Florence Vision Parser Questions
 
 Q. 왜 Florence를 Caption 모델로만 쓰지 않았나요?
