@@ -33,28 +33,36 @@ class ReferenceImageParser:
         vision_result = state.get("vision_result") or self._vision_result_from_caption(
             state.get("caption")
         )
+        structured = self._has_structured_fields(vision_result)
+        characters = vision_result.get("characters") or []
+        objects = vision_result.get("objects") or []
+        style = vision_result.get("style") or {}
+        colors = vision_result.get("colors") or {}
+        composition = vision_result.get("composition") or {}
         character_hints = vision_result.get("character_hints") or {}
         composition_hints = vision_result.get("composition_hints") or {}
         color_hints = vision_result.get("color_hints") or {}
         caption = str(state.get("caption") or vision_result.get("caption") or "")
         user_prompt = str(state.get("user_prompt") or "")
         scene_plan = state.get("scene_plan") or {}
-        text = " ".join(
-            [
-                caption,
-                str(vision_result.get("detailed_description") or ""),
-                " ".join(vision_result.get("objects") or []),
-                " ".join(vision_result.get("style_hints") or []),
-                user_prompt,
-            ]
-        ).lower()
+        text = self._vision_text(
+            vision_result,
+            caption,
+            user_prompt,
+            structured=structured,
+        )
 
         reference_image = {
-            "identity": self._identity(text, scene_plan, character_hints),
-            "appearance": self._appearance(text, character_hints),
-            "style": self._style(text),
-            "composition": self._composition(text, scene_plan, composition_hints),
-            "colors": self._colors(text, color_hints),
+            "identity": self._identity(text, scene_plan, character_hints, characters),
+            "appearance": self._appearance(text, character_hints, characters, objects),
+            "style": self._style(text, style),
+            "composition": self._composition(
+                text,
+                scene_plan,
+                composition_hints,
+                composition,
+            ),
+            "colors": self._colors(text, color_hints, colors),
             "identity_rules": self._identity_rules(text),
         }
 
@@ -66,19 +74,52 @@ class ReferenceImageParser:
     def _vision_result_from_caption(self, caption):
         return getattr(caption, "vision_result", {}) or {}
 
-    def _identity(self, text, scene_plan, character_hints):
-        gender = character_hints.get("gender", "")
+    def _has_structured_fields(self, vision_result):
+        return any(
+            bool(vision_result.get(key))
+            for key in ("characters", "objects", "style", "colors", "composition")
+        )
+
+    def _vision_text(self, vision_result, caption, user_prompt, structured):
+        if structured:
+            return " ".join(
+                [
+                    self._stringify(vision_result.get("characters") or []),
+                    self._stringify(vision_result.get("objects") or []),
+                    self._stringify(vision_result.get("style") or {}),
+                    self._stringify(vision_result.get("colors") or {}),
+                    self._stringify(vision_result.get("composition") or {}),
+                    user_prompt,
+                ]
+            ).lower()
+        return " ".join(
+            [
+                caption,
+                str(
+                    vision_result.get("detailed_caption")
+                    or vision_result.get("detailed_description")
+                    or ""
+                ),
+                " ".join(vision_result.get("objects") or []),
+                " ".join(vision_result.get("style_hints") or []),
+                user_prompt,
+            ]
+        ).lower()
+
+    def _identity(self, text, scene_plan, character_hints, characters):
+        first_character = characters[0] if characters and isinstance(characters[0], dict) else {}
+        gender = first_character.get("gender") or character_hints.get("gender", "")
         if any(word in text for word in ("woman", "girl", "female", "lady")):
             gender = gender or "female"
         elif any(word in text for word in ("man", "boy", "male", "gentleman")):
             gender = gender or "male"
 
         estimated_age = ""
-        if any(word in text for word in ("girl", "boy", "child", "kid")):
+        if self._contains_word(text, ("girl", "boy", "child", "kid")):
             estimated_age = "young"
-        elif any(word in text for word in ("woman", "man", "adult")):
+        elif self._contains_word(text, ("woman", "man", "adult")):
             estimated_age = "adult"
-        elif any(word in text for word in ("elderly", "old", "senior")):
+        elif self._contains_word(text, ("elderly", "old", "senior")):
             estimated_age = "senior"
 
         species = "human"
@@ -100,24 +141,36 @@ class ReferenceImageParser:
             "role": role,
         }
 
-    def _appearance(self, text, character_hints):
+    def _appearance(self, text, character_hints, characters, objects):
+        first_character = characters[0] if characters and isinstance(characters[0], dict) else {}
         hint_accessories = character_hints.get("accessories") or []
+        character_accessories = first_character.get("accessories") or []
         parsed_accessories = [word for word in self.ACCESSORY_WORDS if word in text]
         return {
-            "hair": character_hints.get("hair") or self._hair(text),
+            "hair": first_character.get("hair") or character_hints.get("hair") or self._hair(text),
             "hair_color": self._first_color_before(text, "hair"),
             "eye_color": self._first_color_before(text, "eyes"),
             "skin": self._skin(text),
-            "outfit": character_hints.get("outfit") or self._outfit(text),
-            "accessories": self._unique([*hint_accessories, *parsed_accessories]),
+            "outfit": first_character.get("outfit")
+            or character_hints.get("outfit")
+            or self._outfit(text),
+            "accessories": self._unique(
+                [*hint_accessories, *character_accessories, *objects, *parsed_accessories]
+            ),
         }
 
-    def _style(self, text):
+    def _style(self, text, style=None):
+        style = style or {}
+        keywords = style.get("keywords") or []
+        rendering = style.get("rendering") or ""
         anime = 0.92 if "anime" in text else 0.72 if "webtoon" in text else 0.35
+        if any("anime" in str(item).lower() for item in keywords):
+            anime = max(anime, 0.92)
         realism = 0.86 if "realistic" in text or "photo" in text else 0.11 if anime > 0.7 else 0.45
         lineart = 0.87 if "line art" in text or "webtoon" in text or "anime" in text else 0.3
-        rendering = ""
-        if "webtoon" in text:
+        if rendering:
+            pass
+        elif "webtoon" in text:
             rendering = "soft webtoon"
         elif "line art" in text:
             rendering = "clean line art"
@@ -132,32 +185,48 @@ class ReferenceImageParser:
             "rendering": rendering,
         }
 
-    def _composition(self, text, scene_plan, composition_hints):
-        camera = composition_hints.get("camera") or scene_plan.get("camera_view") or ""
-        if "close up" in text or "close-up" in text:
-            camera = "close_up"
-        elif "full body" in text:
-            camera = "full_body"
-        elif "portrait" in text:
-            camera = "medium"
-        elif not camera:
-            camera = "eye_level"
+    def _composition(self, text, scene_plan, composition_hints, composition=None):
+        composition = composition or {}
+        camera = (
+            composition.get("camera")
+            or composition_hints.get("camera")
+            or scene_plan.get("camera_view")
+            or ""
+        )
+        if not camera:
+            if "close up" in text or "close-up" in text:
+                camera = "close_up"
+            elif "full body" in text:
+                camera = "full_body"
+            elif "portrait" in text:
+                camera = "medium"
+            else:
+                camera = "eye_level"
 
-        framing = composition_hints.get("framing") or scene_plan.get("layout_type") or ""
-        if "photobooth" in text:
-            framing = "photobooth strip"
-        elif "poster" in text:
-            framing = "poster"
-        elif "portrait" in text:
-            framing = "portrait"
-        elif not framing:
-            framing = "single subject"
+        framing = (
+            composition.get("framing")
+            or composition_hints.get("framing")
+            or scene_plan.get("layout_type")
+            or ""
+        )
+        if not framing:
+            if "photobooth" in text:
+                framing = "photobooth strip"
+            elif "poster" in text:
+                framing = "poster"
+            elif "portrait" in text:
+                framing = "portrait"
+            else:
+                framing = "single subject"
 
-        viewpoint = composition_hints.get("viewpoint") or "front"
-        if "side view" in text:
-            viewpoint = "side"
-        elif "above" in text:
-            viewpoint = "slightly_above"
+        viewpoint = composition.get("viewpoint") or composition_hints.get("viewpoint") or ""
+        if not viewpoint:
+            if "side view" in text:
+                viewpoint = "side"
+            elif "above" in text:
+                viewpoint = "slightly_above"
+            else:
+                viewpoint = "front"
 
         return {
             "camera": camera,
@@ -165,13 +234,20 @@ class ReferenceImageParser:
             "viewpoint": viewpoint,
         }
 
-    def _colors(self, text, color_hints):
+    def _colors(self, text, color_hints, colors=None):
+        colors = colors or {}
         dominant = self._unique(
-            [*(color_hints.get("dominant") or []), *[color for color in self.COLOR_WORDS if color in text]]
+            [
+                *(colors.get("dominant") or []),
+                *(color_hints.get("dominant") or []),
+                *[color for color in self.COLOR_WORDS if color in text],
+            ]
         )
         accent = [
             color
-            for color in self._unique([*(color_hints.get("accent") or []), *dominant])
+            for color in self._unique(
+                [*(colors.get("accent") or []), *(color_hints.get("accent") or []), *dominant]
+            )
             if color in ("gold", "silver", "red", "blue", "pink", "purple")
         ]
         return {
@@ -231,3 +307,15 @@ class ReferenceImageParser:
                 result.append(value)
                 seen.add(key)
         return result
+
+    def _stringify(self, value):
+        if isinstance(value, dict):
+            return " ".join(self._stringify(item) for item in value.values())
+        if isinstance(value, list):
+            return " ".join(self._stringify(item) for item in value)
+        return str(value or "")
+
+    def _contains_word(self, text, words):
+        normalized = text.replace("-", " ").replace("_", " ")
+        tokens = {token.strip(".,:;()[]{}") for token in normalized.split()}
+        return any(word in tokens for word in words)

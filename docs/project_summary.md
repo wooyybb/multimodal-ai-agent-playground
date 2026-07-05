@@ -30,6 +30,8 @@ This keeps the project understandable even as the number of internal agents grow
 
 The Planning Layer interprets the user request, image reference, goal tree, scene plan, and character identity.
 
+In v1.1, the Planning Layer includes a provider-independent Vision Layer. `VisionAgent` uses `VLMRouter` to select BLIP by default, Florence2 when requested, or planned Qwen2.5-VL support. All providers return the same structured `vision_result`, so the Reference Image Parser can read `characters`, `objects`, `style`, `colors`, and `composition` before falling back to caption parsing.
+
 The Context Layer converts planning output into Context Program and provider-independent prompt structures.
 
 The Generation Layer selects the provider, adapts the prompt, and runs image generation.
@@ -56,6 +58,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Transformers
 - Hugging Face
 - BLIP
+- Florence2 adapter with BLIP fallback
 - FLUX
 - CLIP
 - FastAPI
@@ -67,7 +70,8 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 ## Current Limitations
 
 - BLIP remains the default VLM.
-- Florence/Qwen adapters are prepared as skeletons with fallback.
+- Florence2 can be selected through `VLM_PROVIDER=florence2`; if the model cannot load, the system falls back to BLIP and records `used_fallback=true`.
+- Qwen2.5-VL is planned and currently uses BLIP fallback.
 - FLUX is the current generation provider path.
 - Some reasoning remains rule-based by default.
 - External provider quality and latency can affect final image quality.
@@ -78,5 +82,5 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Queue-based async generation.
 - Multi-session memory.
 - Benchmark dashboard.
-- Stronger VLM and VLM Judge integration.
+- Stronger VLM output parsing and VLM Judge integration.
 - More explicit AgentState organization by layer.

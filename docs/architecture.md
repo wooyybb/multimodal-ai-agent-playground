@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the v1.0 RC2 responsibility-based architecture of Multimodal AI Agent Playground.
+This document describes the responsibility-based architecture of Multimodal AI Agent Playground, including the v1.1 Vision Layer upgrade.
 
 ## Target Architecture
 
@@ -27,7 +27,7 @@ Infrastructure Layer
 
 | Layer | Responsibility | Internal Examples |
 | --- | --- | --- |
-| Planning Layer | Understand user intent and reference image. | Vision, Goal Planning, Reference Parsing, Character Extraction, Scene Planning |
+| Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
 | Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Compilation, Prompt Validation, Prompt Optimization |
 | Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX |
 | Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
@@ -62,6 +62,65 @@ flowchart TD
 4. Evaluation Layer scores the result and decides whether adaptation or retry is needed.
 5. Infrastructure Layer records memory, debug reports, benchmark outputs, and exposes UI/API access.
 
+## Vision Layer v1.1
+
+The Vision Layer no longer treats BLIP as the framework boundary. `VisionAgent` calls `VLMRouter`, and the selected provider returns a shared `vision_result`.
+
+```text
+Image
+  |
+  v
+VisionAgent
+  |
+  v
+VLMRouter
+  |
+  +-- BLIPVLM (default)
+  +-- FlorenceVLM (Florence-2 adapter, BLIP fallback)
+  +-- QwenVLM (Qwen2.5-VL planned, BLIP fallback)
+  |
+  v
+Standard Vision Result
+  |
+  v
+ReferenceImageParser
+```
+
+### Standard Vision Result Schema
+
+Every provider returns these core fields:
+
+```json
+{
+  "caption": "",
+  "detailed_caption": "",
+  "objects": [],
+  "characters": [],
+  "scene": {},
+  "style": {},
+  "colors": {},
+  "composition": {},
+  "provider": "",
+  "used_fallback": false,
+  "latency": 0.0
+}
+```
+
+Backward-compatible aliases such as `detailed_description`, `character_hints`, and `composition_hints` are still preserved for older downstream components.
+
+### Reference Parsing Priority
+
+`ReferenceImageParser` now reads structured fields first:
+
+```text
+characters
+-> objects
+-> style
+-> caption fallback
+```
+
+This keeps caption parsing as a fallback while allowing Florence2 or future VLM providers to supply richer visual understanding.
+
 ## Design Boundaries
 
 - Agents are internal implementation details.
@@ -79,8 +138,9 @@ The project contains many specialized components. Listing every agent makes the 
 
 - Core execution order is preserved.
 - Existing agents and tools are preserved.
-- No new AI model, VLM, LLM, tool, or metric was added.
-- The cleanup is architectural communication and light metadata/log organization.
+- Florence2 is introduced behind the existing VLM adapter boundary.
+- BLIP remains the default and fallback provider.
+- Generation, Evaluation, Adaptive Planning, Memory, FastAPI, Docker, and Benchmark layers are unchanged.
 
 ## Future Work
 

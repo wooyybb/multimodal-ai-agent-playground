@@ -16,9 +16,9 @@ class VLMRouter:
 
         if provider == "blip":
             return BLIPVLM(blip_tool=self.blip_tool)
-        if provider == "florence":
+        if provider in ("florence", "florence2", "florence-2"):
             return FlorenceVLM(blip_tool=self.blip_tool)
-        if provider == "qwen":
+        if provider in ("qwen", "qwen2.5-vl", "qwen-vl"):
             return QwenVLM(blip_tool=self.blip_tool)
 
         print("[VLMRouter] Falling back to BLIP")

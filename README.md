@@ -2,7 +2,7 @@
 
 **Responsibility-based AI Agent Framework for Multimodal Image Generation**
 
-![Status](https://img.shields.io/badge/status-v1.0_RC2-blue)
+![Status](https://img.shields.io/badge/status-v1.1-blue)
 ![Python](https://img.shields.io/badge/Python-3.x-green)
 ![Architecture](https://img.shields.io/badge/Architecture-Responsibility--Layered-purple)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-teal)
@@ -77,6 +77,27 @@ Responsible for understanding user intent and reference image.
 
 Includes vision, goal planning, reference parsing, character extraction, and scene planning.
 
+The Vision Layer is provider-independent:
+
+```text
+Image
+  |
+  v
+Vision Router
+  |
+  +-- BLIP (default)
+  +-- Florence2 (optional, BLIP fallback if unavailable)
+  +-- Qwen2.5-VL (planned)
+  |
+  v
+Standard Vision Result
+  |
+  v
+Reference Image Parser
+```
+
+All vision providers return the same `vision_result` contract: `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, and `latency`.
+
 ### Context Layer
 
 Responsible for making generation-ready context.
@@ -106,6 +127,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Responsibility-based framework architecture
 - DynamicExecutionEngine with layer-readable execution flow
 - ToolRegistry with layer metadata
+- Provider-independent Vision Layer with BLIP default and Florence2 fallback support
 - Context Program and Prompt Compiler
 - Provider routing and provider prompt adaptation
 - FLUX-oriented generation path
@@ -195,11 +217,13 @@ Benchmark results are saved under `benchmark/results/`. Runtime outputs and API 
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `OPENAI_API_KEY` | Optional OpenAI key for LLM reasoning experiments. |
 | `LLM_PROVIDER` | `rule`, `mock`, or `openai`; rule/fallback remains the default behavior. |
-| `VLM_PROVIDER` | `blip`, `florence`, or `qwen`; BLIP is the default. |
+| `VLM_PROVIDER` | `blip`, `florence2`, `florence`, `qwen2.5-vl`, or `qwen`; BLIP is the default. |
 
 ## Current Limitations
 
-- BLIP is the default VLM; Florence/Qwen adapters currently use BLIP fallback.
+- BLIP is the default VLM.
+- Florence2 is available through the Vision Router and falls back to BLIP if the model cannot be loaded.
+- Qwen2.5-VL is planned and currently uses BLIP fallback.
 - FLUX is the current generation provider path.
 - OpenAI reasoning is optional and falls back to rule-based behavior.
 - Some adaptive planning and evaluation logic is intentionally rule-based for stability.

@@ -96,8 +96,10 @@ Retry (Optional)
 ### Vision
 
 - BLIP (default)
-- Florence (planned)
-- Qwen-VL (planned)
+- Florence2 (adapter, BLIP fallback when unavailable)
+- Qwen2.5-VL (planned, BLIP fallback)
+
+All vision providers return a Standard Vision Result with `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, and `latency`.
 
 ### Generation
 

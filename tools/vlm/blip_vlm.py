@@ -1,5 +1,6 @@
 from tools.blip_tool import BlipTool
 from tools.vlm.base_vlm import BaseVLM
+from time import perf_counter
 
 
 class BLIPVLM(BaseVLM):
@@ -44,19 +45,30 @@ class BLIPVLM(BaseVLM):
 
     def analyze(self, image, prompt: str | None = None) -> dict:
         print("[BLIPVLM] Analyzing image...")
+        started = perf_counter()
         caption = self.blip_tool.generate_caption(image)
         text = " ".join([caption or "", prompt or ""]).lower()
+        character_hints = self._character_hints(text)
+        style_hints = self._style_hints(text)
+        composition_hints = self._composition_hints(text)
+        color_hints = self._color_hints(text)
+        objects = self._objects(text)
         return self.standard_result(
             caption=caption,
-            detailed_description=self._build_description(caption, prompt),
-            objects=self._objects(text),
-            character_hints=self._character_hints(text),
-            style_hints=self._style_hints(text),
-            composition_hints=self._composition_hints(text),
-            color_hints=self._color_hints(text),
+            detailed_caption=self._build_description(caption, prompt),
+            objects=objects,
+            character_hints=character_hints,
+            style_hints=style_hints,
+            composition_hints=composition_hints,
+            color_hints=color_hints,
+            scene={"summary": caption, "objects": objects},
+            style={"keywords": style_hints, "rendering": ", ".join(style_hints)},
+            colors=color_hints,
+            composition=composition_hints,
             model=self.model,
             provider=self.provider,
             used_fallback=self.used_fallback,
+            latency=round(perf_counter() - started, 4),
         )
 
     def _build_description(self, caption, prompt):

@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v1.1 Vision Layer Questions
+
+Q. BLIP를 제거하지 않고 Florence2를 추가한 이유는 무엇인가요?
+A. BLIP는 가볍고 fallback으로 안정적입니다. Florence2는 더 풍부한 reference image understanding을 위해 추가했지만, 모델 로딩이나 환경 문제가 생겨도 전체 workflow가 깨지지 않도록 BLIP를 기본 provider와 fallback으로 유지했습니다.
+
+Q. Vision Router가 필요한 이유는 무엇인가요?
+A. VisionAgent가 특정 VLM에 직접 의존하면 Florence2, Qwen2.5-VL 같은 provider를 추가할 때 agent 코드를 계속 바꿔야 합니다. Vision Router는 provider 선택과 fallback을 분리하고, VisionAgent는 표준 `vision_result`만 보게 만듭니다.
+
+Q. Standard Vision Result Schema는 무엇인가요?
+A. 모든 VLM provider가 반환해야 하는 공통 구조입니다. 현재 핵심 필드는 `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, `latency`입니다. 이 schema 덕분에 ReferenceImageParser와 downstream agent가 provider별 코드를 갖지 않아도 됩니다.
+
+Q. ReferenceImageParser는 왜 raw caption보다 structured fields를 먼저 보나요?
+A. caption은 한 문장 요약이라 identity, outfit, object, color, composition 같은 보존 단서를 잃기 쉽습니다. structured fields가 있으면 `characters -> objects -> style -> caption` 순서로 읽어 reference image 정보를 더 안정적으로 Context Program에 전달합니다.
+
+Q. Florence2 모델이 로드되지 않으면 어떻게 동작하나요?
+A. crash하지 않고 BLIP fallback을 사용합니다. 이때 `provider=florence2`, `used_fallback=true`, `model=blip_fallback_for_florence`, `latency`가 debug report에 기록됩니다.
+
 ## v1.0 RC2 Responsibility Questions
 
 Q. 왜 Agent를 많이 만들지 않고 Layer로 설명했나요?

@@ -203,6 +203,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - PromptCritic, PromptOptimizer, LLMContextReasoner, StrategySelector, and HypothesisGenerator can use structured reasoning with automatic fallback.
 - Debug reports can include strategy and hypothesis reasoning metadata.
 
+## Version 1.1
+
+- Upgraded the Vision Layer from BLIP-only captioning to provider-independent VLM routing.
+- Added a Florence2 adapter that attempts HuggingFace Transformers loading and falls back to BLIP when unavailable.
+- Standardized `vision_result` around `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, and `latency`.
+- Updated ReferenceImageParser to prioritize structured fields before caption fallback.
+- Debug reports now preserve provider, latency, and detailed vision fields.
+
 ## Release Candidate 1
 
 - Reorganized project communication around six layers: Planning, Context, Generation, Evaluation, Reasoning, and Memory / Observability.

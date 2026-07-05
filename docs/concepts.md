@@ -183,6 +183,14 @@ VLM Adapter Upgrade는 BLIP의 빠른 기본 실행을 유지하면서 Florence-
 
 Reasoning Layer는 rule 기반 판단과 실제 LLM 기반 판단을 같은 interface 뒤에 둡니다. 기본값은 rule fallback이며, `LLM_PROVIDER=openai`일 때만 OpenAIReasoner가 JSON reasoning을 시도합니다.
 
+## Vision Layer v1.1
+
+Vision Layer v1.1은 BLIP를 기본 provider로 유지하면서 Florence2를 같은 `BaseVLM.analyze()` 인터페이스 뒤에 추가한 구조입니다. 핵심은 모델 교체가 아니라 provider-independent vision architecture입니다.
+
+Standard Vision Result는 다음 필드를 공통 계약으로 사용합니다: `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `used_fallback`, `latency`.
+
+Florence2 모델을 로드할 수 없으면 BLIP fallback을 사용하고 `used_fallback=true`를 기록합니다. ReferenceImageParser는 `characters -> objects -> style -> caption` 순서로 정보를 사용해 raw caption 의존도를 줄입니다.
+
 ## Structured JSON Output
 
 Structured JSON Output은 LLM 응답을 agent state에 안전하게 병합하기 위한 계약입니다. JSON parsing이 실패하면 `JSONParser`가 실패를 표시하고 `ReasonerRouter`는 기존 rule 결과를 fallback으로 유지합니다.

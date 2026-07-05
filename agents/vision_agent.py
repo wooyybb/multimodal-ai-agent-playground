@@ -29,5 +29,8 @@ class VisionAgent:
         vlm = self.vlm_router.select()
         vision_result = vlm.analyze(image)
         caption = vision_result.get("caption", "")
+        print(f"[VisionAgent] Provider: {vision_result.get('provider')}")
+        print(f"[VisionAgent] Fallback: {vision_result.get('used_fallback')}")
+        print(f"[VisionAgent] Latency: {vision_result.get('latency')}s")
         print(f"[VisionAgent] Caption: {caption}")
         return CaptionResult(caption, vision_result)
