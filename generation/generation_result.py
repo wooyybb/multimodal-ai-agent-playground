@@ -18,6 +18,10 @@ class GenerationResult:
     used_conditioning_fallback: bool = False
     conditioning_reason: str = ""
     ip_adapter_status: dict = field(default_factory=dict)
+    style_program: dict = field(default_factory=dict)
+    selected_lora: str = ""
+    lora_status: dict = field(default_factory=dict)
+    controlnet_status: dict = field(default_factory=dict)
 
     def to_dict(self):
         return asdict(self)

@@ -5,6 +5,8 @@ from time import perf_counter
 from PIL import Image, ImageDraw
 
 from generation.generation_result import GenerationResult
+from provider.controlnet_hook import ControlNetHook
+from provider.lora_loader import LoRALoader
 
 
 class SDXLQualityProvider:
@@ -36,11 +38,21 @@ class SDXLQualityProvider:
         started = perf_counter()
         state = state or {}
         config_dict = config.to_dict() if config else {}
+        plan = state.get("generation_plan") or {}
+        style_program = plan.get("style_program") or state.get("style_program") or {}
+        controlnet_status = ControlNetHook().prepare(plan, state)
         conditioning = self._conditioning_package(state)
         ip_adapter_status = self._ip_adapter_status(conditioning)
+        lora_status = {
+            "enabled": False,
+            "selected_lora": style_program.get("lora_name", ""),
+            "lora_scale": style_program.get("lora_scale", 0.0),
+            "used_fallback": False,
+            "reason": "LoRA not attempted",
+        }
         notes = [
             "quality mode provider",
-            "prompt-only generation",
+            "reference-aware style transfer pipeline",
             "IP Adapter hook planned",
             "ControlNet hook planned",
         ]
@@ -57,14 +69,21 @@ class SDXLQualityProvider:
                     config,
                     conditioning,
                     ip_adapter_status,
+                    style_program,
+                    lora_status,
+                    controlnet_status,
                 )
                 backend = "diffusers StableDiffusionXLPipeline"
             else:
                 used_fallback = True
+                lora_status.update(self._lora_mock_status(style_program))
+                controlnet_status = self._controlnet_mock_status(controlnet_status)
                 notes.append("diffusers execution disabled; used mock fallback")
                 output_path = self._create_mock_image(prompt, state, config)
         except Exception as error:
             used_fallback = True
+            lora_status.update(self._lora_mock_status(style_program, reason=str(error)))
+            controlnet_status = self._controlnet_mock_status(controlnet_status)
             notes.append(f"SDXL diffusers unavailable: {error}")
             output_path = self._create_mock_image(prompt, state, config)
 
@@ -73,7 +92,13 @@ class SDXLQualityProvider:
             generation_provider=self.name,
             generation_backend=backend,
             generation_mode="quality",
-            generation_config=self._config_with_conditioning(config_dict, conditioning),
+            generation_config=self._config_with_conditioning(
+                config_dict,
+                conditioning,
+                style_program,
+                lora_status,
+                controlnet_status,
+            ),
             latency=round(perf_counter() - started, 4),
             prompt_length=len(str(prompt or "").split()),
             generation_notes=notes,
@@ -84,24 +109,49 @@ class SDXLQualityProvider:
             used_conditioning_fallback=used_conditioning_fallback,
             conditioning_reason=ip_adapter_status.get("reason", ""),
             ip_adapter_status=ip_adapter_status,
+            style_program=style_program,
+            selected_lora=style_program.get("lora_name", ""),
+            lora_status=lora_status,
+            controlnet_status=controlnet_status,
         )
 
     def _diffusers_enabled(self):
         return str(os.getenv("SDXL_ENABLE_DIFFUSERS") or "").lower() in {"1", "true", "yes"}
 
-    def _generate_with_diffusers(self, prompt, negative_prompt, config, conditioning, ip_adapter_status):
+    def _generate_with_diffusers(
+        self,
+        prompt,
+        negative_prompt,
+        config,
+        conditioning,
+        ip_adapter_status,
+        style_program,
+        lora_status,
+        controlnet_status,
+    ):
         self._load_pipeline()
+        lora_status.update(LoRALoader().load(self.pipeline, style_program))
         self._apply_ip_adapter_hook(conditioning, ip_adapter_status)
         output_dir = Path("outputs")
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "output_sdxl_quality.png"
+        kwargs = {
+            "prompt": self._style_prompt(prompt, style_program),
+            "negative_prompt": negative_prompt or None,
+            "width": config.width,
+            "height": config.height,
+            "num_inference_steps": config.steps,
+            "guidance_scale": config.cfg,
+        }
+        ip_adapter_image = self._ip_adapter_image(conditioning, ip_adapter_status)
+        if ip_adapter_image is not None:
+            kwargs["ip_adapter_image"] = ip_adapter_image
+        if controlnet_status.get("enabled"):
+            controlnet_status["used_fallback"] = True
+            controlnet_status["reason"] = "ControlNet pipeline not connected; prompt-only structure fallback"
+
         image = self.pipeline(
-            prompt=prompt,
-            negative_prompt=negative_prompt or None,
-            width=config.width,
-            height=config.height,
-            num_inference_steps=config.steps,
-            guidance_scale=config.cfg,
+            **kwargs
         ).images[0]
         image.save(output_path)
         return str(output_path)
@@ -125,6 +175,29 @@ class SDXLQualityProvider:
             ip_adapter_status["enabled"] = False
             ip_adapter_status["used_fallback"] = True
             ip_adapter_status["reason"] = f"IP-Adapter fallback: {error}"
+
+    def _ip_adapter_image(self, conditioning, ip_adapter_status):
+        if not ip_adapter_status.get("enabled"):
+            return None
+        image_path = conditioning.get("reference_image_path")
+        if not image_path or not Path(str(image_path)).exists():
+            ip_adapter_status["enabled"] = False
+            ip_adapter_status["used_fallback"] = True
+            ip_adapter_status["reason"] = "reference image for IP-Adapter not available"
+            return None
+        try:
+            return Image.open(str(image_path)).convert("RGB")
+        except Exception as error:
+            ip_adapter_status["enabled"] = False
+            ip_adapter_status["used_fallback"] = True
+            ip_adapter_status["reason"] = f"IP-Adapter image fallback: {error}"
+            return None
+
+    def _style_prompt(self, prompt, style_program):
+        style_prompt = style_program.get("style_prompt") if isinstance(style_program, dict) else ""
+        lighting = style_program.get("lighting") if isinstance(style_program, dict) else ""
+        palette = ", ".join(style_program.get("color_palette") or []) if isinstance(style_program, dict) else ""
+        return ", ".join(item for item in (prompt, style_prompt, lighting, palette) if item)
 
     def _load_pipeline(self):
         if self.pipeline is not None:
@@ -191,7 +264,14 @@ class SDXLQualityProvider:
         status["reason"] = "IP-Adapter hook pending pipeline load"
         return status
 
-    def _config_with_conditioning(self, config_dict, conditioning):
+    def _config_with_conditioning(
+        self,
+        config_dict,
+        conditioning,
+        style_program=None,
+        lora_status=None,
+        controlnet_status=None,
+    ):
         config = dict(config_dict or {})
         config["reference_conditioning"] = {
             "enabled": conditioning.get("enabled", False),
@@ -201,7 +281,26 @@ class SDXLQualityProvider:
             "structure_strength": conditioning.get("structure_strength", 0.40),
             "preserve": conditioning.get("preserve", {}),
         }
+        config["style_program"] = style_program or {}
+        config["lora"] = lora_status or {}
+        config["controlnet"] = controlnet_status or {}
         return config
+
+    def _lora_mock_status(self, style_program, reason="diffusers disabled"):
+        return {
+            "enabled": False,
+            "selected_lora": style_program.get("lora_name", "") if isinstance(style_program, dict) else "",
+            "lora_scale": style_program.get("lora_scale", 0.0) if isinstance(style_program, dict) else 0.0,
+            "used_fallback": True,
+            "reason": f"LoRA hook not applied: {reason}",
+        }
+
+    def _controlnet_mock_status(self, status):
+        status = dict(status or {})
+        if status.get("enabled"):
+            status["used_fallback"] = True
+            status["reason"] = "ControlNet hook planned; diffusers execution disabled"
+        return status
 
     def _create_mock_image(self, prompt, state, config=None):
         output_dir = Path("outputs")

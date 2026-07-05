@@ -91,6 +91,10 @@ class DebugReportManager:
             "resolution": self._safe(state.get("resolution")),
             "future_hooks": self._safe(state.get("future_hooks")),
             "ip_adapter_status": self._safe(state.get("ip_adapter_status")),
+            "style_program": self._safe(state.get("style_program")),
+            "selected_lora": self._safe(state.get("selected_lora")),
+            "lora_status": self._safe(state.get("lora_status")),
+            "controlnet_status": self._safe(state.get("controlnet_status")),
             "reference_conditioning_enabled": self._safe(
                 state.get("reference_conditioning_enabled")
             ),
@@ -293,6 +297,11 @@ class DebugReportManager:
             lines,
             "GENERATION ROUTING",
             self._generation_routing_preview(state),
+        )
+        self._append_block(
+            lines,
+            "STYLE TRANSFER",
+            self._style_transfer_preview(state),
         )
         self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
         self._append_block(
@@ -521,6 +530,15 @@ class DebugReportManager:
             "future_hooks": state.get("future_hooks") or plan.get("future_hooks"),
             "ip_adapter_status": state.get("ip_adapter_status"),
             "notes": state.get("generation_notes", []),
+        }
+
+    def _style_transfer_preview(self, state):
+        return {
+            "style_program": state.get("style_program"),
+            "selected_lora": state.get("selected_lora"),
+            "lora_status": state.get("lora_status"),
+            "ip_adapter": state.get("ip_adapter_status"),
+            "controlnet": state.get("controlnet_status"),
         }
 
     def _dino_metric_preview(self, state):

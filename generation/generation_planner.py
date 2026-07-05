@@ -1,5 +1,7 @@
 import os
 
+from generation.style_program import StyleProgramBuilder
+
 
 class GenerationPlanner:
     FAST_PRESET = {
@@ -31,10 +33,20 @@ class GenerationPlanner:
         print("[GenerationPlanner] Planning generation preset...")
         mode = self._mode(state)
         preset = dict(self.QUALITY_PRESET if mode == "quality" else self.FAST_PRESET)
+        quality_mode = mode == "quality"
+        style_program = state.get("style_program") or StyleProgramBuilder().build(
+            state,
+            quality_mode=quality_mode,
+        )
+        preset["style_program"] = style_program
+        preset["selected_lora"] = style_program.get("lora_name") if quality_mode else None
+        preset["use_ip_adapter"] = quality_mode
+        preset["controlnet"] = self._controlnet_plan(state, quality_mode)
         preset["reason"] = self._reason(state, mode)
         print(f"[GenerationPlanner] Mode: {preset['generation_mode']}")
         print(f"[GenerationPlanner] Provider: {preset['provider']}")
         print(f"[GenerationPlanner] Steps: {preset['steps']}")
+        print(f"[GenerationPlanner] Style Program: {style_program.get('style_name')}")
         return preset
 
     def _mode(self, state):
@@ -65,3 +77,15 @@ class GenerationPlanner:
                 "and visual detail preservation."
             )
         return "Fast mode selected for lightweight FLUX generation."
+
+    def _controlnet_plan(self, state, quality_mode):
+        if not quality_mode:
+            return {"enabled": False, "type": "none", "reason": "fast mode"}
+        text = str(state.get("user_prompt") or "").lower()
+        if "pose" in text or "openpose" in text:
+            return {"enabled": True, "type": "openpose", "reason": "pose preservation requested"}
+        if "depth" in text:
+            return {"enabled": True, "type": "depth", "reason": "depth preservation requested"}
+        if "canny" in text or "line" in text:
+            return {"enabled": True, "type": "canny", "reason": "edge preservation requested"}
+        return {"enabled": False, "type": "none", "reason": "no structural control requested"}
