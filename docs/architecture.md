@@ -295,6 +295,45 @@ Quality Mode applies a preset before generation:
 
 The current SDXL path is a skeleton provider that creates a mock output image and records provider metadata. It does not load a real SDXL model. This keeps FLUX behavior intact while making room for future reference-image preservation tools such as IP Adapter and ControlNet.
 
+## Reference Conditioning Interface v2.1
+
+Prompt-only generation remains the default, but the Context Layer now prepares a provider-facing reference conditioning package:
+
+```json
+{
+  "enabled": false,
+  "reference_image_path": "",
+  "conditioning_type": "none",
+  "identity_strength": 0.0,
+  "style_strength": 0.0,
+  "structure_strength": 0.0,
+  "preserve": {
+    "hair": true,
+    "eye_color": true,
+    "outfit": true,
+    "accessories": true,
+    "silhouette": true
+  },
+  "notes": []
+}
+```
+
+When quality mode or reference preservation is requested, the package is enabled with `conditioning_type="ip_adapter_planned"` and a note that real IP-Adapter integration is not active yet. Provider adapters preserve this package and add a note when the current provider does not support reference conditioning.
+
+Future integration point:
+
+```text
+Prompt Rendering
+  +
+Reference Conditioning Package
+  |
+  v
+Generation Provider
+  +-- IP Adapter
+  +-- ControlNet
+  +-- img2img
+```
+
 ## Design Boundaries
 
 - Agents are internal implementation details.

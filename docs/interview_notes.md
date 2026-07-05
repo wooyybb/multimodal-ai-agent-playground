@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v2.1 Reference Conditioning Interface Questions
+
+Q. 왜 prompt-only generation만으로 reference 보존이 어려운가요?
+A. Prompt는 hair color, eye color, outfit, accessories를 텍스트로 설명할 수는 있지만 reference image의 visual feature를 직접 고정하지는 못합니다. 그래서 identity나 silhouette처럼 시각적 일관성이 중요한 경우에는 IP-Adapter, ControlNet, img2img 같은 reference-conditioned generation 경로가 필요합니다.
+
+Q. Reference Conditioning Package는 무엇인가요?
+A. Reference Conditioning Package는 reference image를 generation provider가 사용할 수 있도록 구조화한 중간 표현입니다. `conditioning_type`, identity/style/structure strength, preserve flags, reference image path, notes를 포함하며 현재는 prompt-only fallback 상태를 명시합니다.
+
+Q. IP-Adapter는 이 구조에서 어디에 붙나요?
+A. Prompt Rendering과 Reference Conditioning Package가 만들어진 뒤 Generation Provider 단계에 붙습니다. 현재는 `ip_adapter_planned`로 기록만 하고, 향후 SDXL Quality Provider 내부에서 실제 IP-Adapter 입력으로 연결할 수 있습니다.
+
 ## v2.0 Generation Quality Upgrade Questions
 
 Q. 왜 Provider Router를 만들었나요?

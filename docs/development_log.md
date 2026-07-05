@@ -106,6 +106,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added `sdxl_quality` as a skeleton Quality Mode provider with CFG, steps, scheduler, and resolution metadata.
 - Debug reports now store generation provider, mode, preset, and future hooks for IP Adapter and ControlNet.
 
+## Version 2.1
+
+- Added Reference Conditioning Package schema.
+- PromptCompiler now creates `reference_conditioning_package` from context, reference image, and character program.
+- ProviderPromptAdapter preserves the package and records prompt-only fallback notes when conditioning is unsupported.
+- Debug reports now show reference conditioning status, strengths, preserve flags, and notes.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.

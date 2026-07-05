@@ -1,3 +1,6 @@
+from generation.reference_conditioning import ReferenceConditioningBuilder
+
+
 class PromptCompiler:
     INTERNAL_TERMS = (
         "context_program",
@@ -57,12 +60,14 @@ class PromptCompiler:
             context_program,
             context_reasoning,
         )
+        reference_conditioning = ReferenceConditioningBuilder().build(state)
         package = {
             "provider": provider,
             "positive_prompt": rendered_prompts["generation_prompt"],
             "negative_prompt": negative,
             "prompt_blocks": prompt_blocks,
             "prompt_rendering": rendered_prompts,
+            "reference_conditioning_package": reference_conditioning,
             "compiler_notes": notes,
             "prompt_budget": {
                 "target_words": target_words,
@@ -75,6 +80,7 @@ class PromptCompiler:
         print(f"[PromptCompiler] Compiler notes: {notes}")
         return {
             "compiled_prompt_package": package,
+            "reference_conditioning_package": reference_conditioning,
             "prompt_rendering": rendered_prompts,
             **rendered_prompts,
         }

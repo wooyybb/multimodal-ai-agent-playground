@@ -20,6 +20,7 @@
 | v1.6 | Evaluation Layer Stabilization | Complete |
 | v1.7 | Context Cache and Incremental Execution | Complete |
 | v2.0 | Generation Quality Upgrade | Complete |
+| v2.1 | Reference Conditioning Interface | Complete |
 
 ## Completed Sprints
 
@@ -92,6 +93,7 @@
 - Version 1.6: Evaluation schema stabilization, metric fallback, and enabled-metric weighted scoring
 - Version 1.7: Context Cache, dirty checks, skipped layer reporting, and incremental execution
 - Version 2.0: Provider-independent Generation Router with FLUX Fast Mode and SDXL Quality Mode skeleton
+- Version 2.1: Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
 
 ## Planned Sprints
 

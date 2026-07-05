@@ -133,6 +133,10 @@ v2.0 adds two generation modes:
 
 Quality Mode currently uses an SDXL provider skeleton and stores quality preset metadata. It does not load a real SDXL model yet. Future hooks are reserved for IP Adapter and ControlNet.
 
+v2.1 adds a Reference Conditioning Interface. Current generation is still prompt-only, but the Prompt Compiler now creates a `reference_conditioning_package` that future providers can use for img2img, IP-Adapter, or ControlNet.
+
+Prompt-only generation has limits for reference preservation: text can describe hair color, eye color, outfit, identity, and accessories, but it cannot directly bind visual features from the reference image. The conditioning package keeps those preservation requirements explicit until real reference-conditioned providers are attached.
+
 ### Evaluation Layer
 
 Responsible for output evaluation and adaptive planning.
@@ -157,6 +161,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
 - Provider routing and provider prompt adaptation
 - Generation Planner and Generation Router with fast/quality modes
+- Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
 - FLUX-oriented generation path
 - Multi-metric evaluation
 - Adaptive planning and retry loop
@@ -342,6 +347,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 | v1.0 | Demo polish, CI, and deployment-ready release |
 | v1.7 | Context Cache and Incremental Execution |
 | v2.0 | Generation Quality Upgrade with provider-independent Generation Router |
+| v2.1 | Reference Conditioning Interface |
 
 ## Portfolio Highlights
 

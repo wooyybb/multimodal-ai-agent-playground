@@ -128,6 +128,12 @@ class DebugReportManager:
             "llm_optimizer_report": self._safe(state.get("llm_optimizer_report")),
             "provider_prompt": self._safe(state.get("provider_prompt")),
             "compiled_prompt_package": self._safe(state.get("compiled_prompt_package")),
+            "reference_conditioning_package": self._safe(
+                state.get("reference_conditioning_package")
+                or (state.get("compiled_prompt_package") or {}).get(
+                    "reference_conditioning_package"
+                )
+            ),
             "prompt_rendering": self._safe(state.get("prompt_rendering")),
             "generation_prompt": self._safe(state.get("generation_prompt")),
             "clip_prompt": self._safe(state.get("clip_prompt")),
@@ -266,6 +272,11 @@ class DebugReportManager:
             "PROMPT RENDERING",
             self._prompt_rendering_preview(state),
         )
+        self._append_block(
+            lines,
+            "REFERENCE CONDITIONING",
+            self._reference_conditioning_preview(state),
+        )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(
             lines,
@@ -341,6 +352,21 @@ class DebugReportManager:
             "metric_prompts": state.get("metric_prompts"),
             "negative_prompt": state.get("negative_prompt")
             or rendering.get("negative_prompt"),
+        }
+
+    def _reference_conditioning_preview(self, state):
+        package = state.get("reference_conditioning_package") or (
+            state.get("compiled_prompt_package") or {}
+        ).get("reference_conditioning_package") or {}
+        return {
+            "enabled": package.get("enabled"),
+            "type": package.get("conditioning_type"),
+            "reference_image_path": package.get("reference_image_path"),
+            "identity_strength": package.get("identity_strength"),
+            "style_strength": package.get("style_strength"),
+            "structure_strength": package.get("structure_strength"),
+            "preserve": package.get("preserve", {}),
+            "notes": package.get("notes", []),
         }
 
     def _adaptive_plan_preview(self, plan):

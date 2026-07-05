@@ -40,8 +40,17 @@ class ProviderPromptAdapter:
                     "provider_negative_prompt",
                     state.get("negative_prompt") or "",
                 ),
+                "reference_conditioning_package": state.get(
+                    "reference_conditioning_package",
+                    result.get("reference_conditioning_package"),
+                ),
                 "adapter_notes": self._with_optimized_note(
-                    result.get("adapter_notes", []),
+                    self._with_conditioning_note(
+                        result.get("adapter_notes", []),
+                        state.get("reference_conditioning_package")
+                        or result.get("reference_conditioning_package"),
+                        result.get("provider", "flux"),
+                    ),
                     state,
                 ),
                 "final_prompt": provider_prompt,
@@ -93,17 +102,30 @@ class ProviderPromptAdapter:
             scene_plan,
             context_program,
         )
+        if fallback_used:
+            result["adapter_notes"].append("unknown provider fallback to flux")
+        return result
 
     def _from_compiled_package(self, state):
         package = state.get("compiled_prompt_package") or {}
         provider_prompt = package.get("positive_prompt") or state.get("final_prompt") or ""
         provider_negative_prompt = package.get("negative_prompt") or state.get("negative_prompt") or ""
+        reference_conditioning = (
+            state.get("reference_conditioning_package")
+            or package.get("reference_conditioning_package")
+        )
         notes = list(package.get("compiler_notes") or [])
         notes.append("used compiled prompt package")
+        notes = self._with_conditioning_note(
+            notes,
+            reference_conditioning,
+            package.get("provider") or state.get("provider") or "flux",
+        )
         return {
             "provider": package.get("provider") or state.get("provider") or "flux",
             "provider_prompt": provider_prompt,
             "provider_negative_prompt": provider_negative_prompt,
+            "reference_conditioning_package": reference_conditioning,
             "adapter_notes": self._with_optimized_note(notes, state),
             "final_prompt": provider_prompt,
         }
@@ -200,6 +222,23 @@ class ProviderPromptAdapter:
         if state.get("optimized_prompt") and "used optimized prompt" not in notes:
             notes.append("used optimized prompt")
         return notes
+
+    def _with_conditioning_note(self, notes, conditioning, provider):
+        notes = list(notes or [])
+        if conditioning and conditioning.get("enabled"):
+            supported = self._supports_conditioning(provider, conditioning)
+            if not supported:
+                notes.append("reference conditioning not supported by current provider")
+            else:
+                notes.append("reference conditioning package preserved for provider")
+        return notes
+
+    def _supports_conditioning(self, provider, conditioning):
+        provider = str(provider or "").lower()
+        conditioning_type = str(conditioning.get("conditioning_type") or "").lower()
+        if provider == "sdxl" and conditioning_type in {"img2img", "ip_adapter", "controlnet"}:
+            return True
+        return False
 
     def _compile_flux_from_context(self, context_program, fallback_prompt):
         scene = context_program.get("scene") or {}
