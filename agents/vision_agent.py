@@ -33,4 +33,6 @@ class VisionAgent:
         print(f"[VisionAgent] Fallback: {vision_result.get('used_fallback')}")
         print(f"[VisionAgent] Latency: {vision_result.get('latency')}s")
         print(f"[VisionAgent] Caption: {caption}")
+        print(f"[VisionAgent] Detailed Caption: {vision_result.get('detailed_caption', '')}")
+        print(f"[VisionAgent] Objects: {len(vision_result.get('objects') or [])}")
         return CaptionResult(caption, vision_result)

@@ -8,6 +8,9 @@ from PIL import Image
 
 class FlorenceVLM(BaseVLM):
     MODEL_ID = "microsoft/Florence-2-base"
+    CAPTION_TASK = "<CAPTION>"
+    DETAILED_CAPTION_TASK = "<DETAILED_CAPTION>"
+    OD_TASK = "<OD>"
 
     def __init__(self, blip_tool=None, model_id: str | None = None):
         self.fallback = BLIPVLM(
@@ -26,24 +29,47 @@ class FlorenceVLM(BaseVLM):
         try:
             self._ensure_model()
             image_obj = self._load_image(image)
-            caption = self._generate(image_obj, "<CAPTION>")
-            detailed_caption = self._generate(image_obj, "<MORE_DETAILED_CAPTION>")
-            text = " ".join([caption, detailed_caption, prompt or ""]).lower()
+            caption = self._text_from_task_result(
+                self._run_task(image_obj, self.CAPTION_TASK)
+            )
+            detailed_caption = self._text_from_task_result(
+                self._run_task(image_obj, self.DETAILED_CAPTION_TASK)
+            )
+            od_result = self._run_task(image_obj, self.OD_TASK)
+            objects = self._objects_from_od(od_result)
+            object_names = [item["name"] for item in objects if item.get("name")]
+            text = " ".join(
+                [caption, detailed_caption, " ".join(object_names), prompt or ""]
+            ).lower()
             fallback_parser = self.fallback
             character_hints = fallback_parser._character_hints(text)
             style_hints = fallback_parser._style_hints(text)
             composition_hints = fallback_parser._composition_hints(text)
             color_hints = fallback_parser._color_hints(text)
-            objects = fallback_parser._objects(text)
+            if not objects:
+                objects = self._objects_from_names(fallback_parser._objects(text))
+            print(f"[FlorenceVLM] Caption task: {bool(caption)}")
+            print(f"[FlorenceVLM] Detailed caption task: {bool(detailed_caption)}")
+            print(f"[FlorenceVLM] Object detection count: {len(objects)}")
             return self.standard_result(
                 caption=caption,
                 detailed_caption=detailed_caption,
                 objects=objects,
+                regions=[],
+                ocr=[],
                 character_hints=character_hints,
                 style_hints=style_hints,
                 composition_hints=composition_hints,
                 color_hints=color_hints,
-                scene={"summary": detailed_caption or caption, "objects": objects},
+                scene={
+                    "summary": detailed_caption or caption,
+                    "objects": objects,
+                    "task_router": [
+                        self.CAPTION_TASK,
+                        self.DETAILED_CAPTION_TASK,
+                        self.OD_TASK,
+                    ],
+                },
                 style={"keywords": style_hints, "rendering": ", ".join(style_hints)},
                 colors=color_hints,
                 composition=composition_hints,
@@ -59,6 +85,9 @@ class FlorenceVLM(BaseVLM):
             result["model"] = "blip_fallback_for_florence"
             result["used_fallback"] = True
             result["latency"] = round(perf_counter() - started, 4)
+            result["objects"] = self._objects_from_names(result.get("objects", []))
+            result.setdefault("regions", [])
+            result.setdefault("ocr", [])
             return result
 
     def _ensure_model(self):
@@ -82,7 +111,7 @@ class FlorenceVLM(BaseVLM):
             return Image.open(str(image)).convert("RGB")
         raise ValueError("Florence-2 requires a valid image path or PIL image.")
 
-    def _generate(self, image, task_prompt):
+    def _run_task(self, image, task_prompt):
         inputs = self.processor(
             text=task_prompt,
             images=image,
@@ -103,7 +132,60 @@ class FlorenceVLM(BaseVLM):
             task=task_prompt,
             image_size=(image.width, image.height),
         )
-        value = parsed.get(task_prompt, parsed)
+        return parsed.get(task_prompt, parsed)
+
+    def _text_from_task_result(self, value):
         if isinstance(value, dict):
-            return " ".join(str(item) for item in value.values())
+            return " ".join(self._text_from_task_result(item) for item in value.values())
+        if isinstance(value, list):
+            return " ".join(self._text_from_task_result(item) for item in value)
         return str(value)
+
+    def _objects_from_od(self, value):
+        data = value.get(self.OD_TASK, value) if isinstance(value, dict) else value
+        if isinstance(data, dict):
+            labels = data.get("labels") or data.get("label") or data.get("objects") or []
+            bboxes = data.get("bboxes") or data.get("boxes") or data.get("bbox") or []
+            if isinstance(labels, str):
+                labels = [labels]
+            objects = []
+            for index, label in enumerate(labels):
+                bbox = bboxes[index] if isinstance(bboxes, list) and index < len(bboxes) else []
+                objects.append(self._object_dict(label, bbox))
+            return [item for item in objects if item["name"]]
+        if isinstance(data, list):
+            objects = []
+            for item in data:
+                if isinstance(item, dict):
+                    name = item.get("name") or item.get("label") or item.get("class") or ""
+                    bbox = item.get("bbox") or item.get("box") or item.get("bboxes") or []
+                    objects.append(self._object_dict(name, bbox))
+                else:
+                    objects.append(self._object_dict(item, []))
+            return [item for item in objects if item["name"]]
+        return []
+
+    def _objects_from_names(self, names):
+        objects = []
+        for item in names or []:
+            if isinstance(item, dict):
+                objects.append(
+                    self._object_dict(
+                        item.get("name") or item.get("label") or "",
+                        item.get("bbox") or item.get("box") or [],
+                    )
+                )
+            else:
+                objects.append(self._object_dict(item, []))
+        return [item for item in objects if item["name"]]
+
+    def _object_dict(self, name, bbox):
+        return {
+            "name": str(name or "").strip(),
+            "bbox": self._bbox_list(bbox),
+        }
+
+    def _bbox_list(self, bbox):
+        if not isinstance(bbox, (list, tuple)):
+            return []
+        return [float(value) if isinstance(value, (int, float)) else value for value in bbox]

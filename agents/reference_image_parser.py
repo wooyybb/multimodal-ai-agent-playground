@@ -82,10 +82,17 @@ class ReferenceImageParser:
 
     def _vision_text(self, vision_result, caption, user_prompt, structured):
         if structured:
+            object_text = " ".join(self._object_names(vision_result.get("objects") or []))
             return " ".join(
                 [
+                    object_text,
+                    str(
+                        vision_result.get("detailed_caption")
+                        or vision_result.get("detailed_description")
+                        or ""
+                    ),
+                    caption,
                     self._stringify(vision_result.get("characters") or []),
-                    self._stringify(vision_result.get("objects") or []),
                     self._stringify(vision_result.get("colors") or {}),
                     self._stringify(vision_result.get("composition") or {}),
                     self._stringify(vision_result.get("style") or {}),
@@ -100,7 +107,7 @@ class ReferenceImageParser:
                     or vision_result.get("detailed_description")
                     or ""
                 ),
-                " ".join(vision_result.get("objects") or []),
+                " ".join(self._object_names(vision_result.get("objects") or [])),
                 " ".join(vision_result.get("style_hints") or []),
                 user_prompt,
             ]
@@ -145,6 +152,7 @@ class ReferenceImageParser:
         first_character = characters[0] if characters and isinstance(characters[0], dict) else {}
         hint_accessories = character_hints.get("accessories") or []
         character_accessories = first_character.get("accessories") or []
+        object_accessories = self._object_names(objects)
         parsed_accessories = [word for word in self.ACCESSORY_WORDS if word in text]
         return {
             "hair": first_character.get("hair") or character_hints.get("hair") or self._hair(text),
@@ -155,7 +163,12 @@ class ReferenceImageParser:
             or character_hints.get("outfit")
             or self._outfit(text),
             "accessories": self._unique(
-                [*hint_accessories, *character_accessories, *objects, *parsed_accessories]
+                [
+                    *hint_accessories,
+                    *character_accessories,
+                    *object_accessories,
+                    *parsed_accessories,
+                ]
             ),
         }
 
@@ -314,6 +327,17 @@ class ReferenceImageParser:
         if isinstance(value, list):
             return " ".join(self._stringify(item) for item in value)
         return str(value or "")
+
+    def _object_names(self, objects):
+        names = []
+        for item in objects or []:
+            if isinstance(item, dict):
+                name = item.get("name") or item.get("label") or item.get("class") or ""
+                if name:
+                    names.append(str(name))
+            elif item:
+                names.append(str(item))
+        return names
 
     def _contains_word(self, text, words):
         normalized = text.replace("-", " ").replace("_", " ")

@@ -78,6 +78,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Reasoner outputs user goal, scene goal, composition goal, interaction goal, style goal, and priority list.
 - Debug reports now include `context_reasoning`.
 
+## Version 1.5
+
+- Upgraded Florence-2 from caption-only use to a Vision Parser path.
+- Florence now runs `<CAPTION>`, `<DETAILED_CAPTION>`, and `<OD>` sequentially.
+- Standard vision results now include structured `objects`, `regions`, and `ocr` skeleton fields.
+- `ReferenceImageParser` prioritizes object detection results before detailed captions and caption fallback.
+
 ## Sprint 43
 
 - Added `LLMPromptCriticAgent`.

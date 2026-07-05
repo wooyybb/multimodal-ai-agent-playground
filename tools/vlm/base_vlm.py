@@ -18,6 +18,8 @@ class BaseVLM(ABC):
         style: dict | None = None,
         colors: dict | None = None,
         composition: dict | None = None,
+        regions: list | None = None,
+        ocr: list | None = None,
         character_hints: dict | None = None,
         style_hints: list | None = None,
         composition_hints: dict | None = None,
@@ -31,6 +33,8 @@ class BaseVLM(ABC):
         composition_hints = composition_hints or {}
         color_hints = color_hints or {}
         objects = objects or []
+        regions = regions or []
+        ocr = ocr or []
         detailed = detailed_caption or detailed_description or caption or ""
         characters = characters or self._characters_from_hints(character_hints)
         colors = colors or {
@@ -54,9 +58,11 @@ class BaseVLM(ABC):
             "caption": caption or "",
             "detailed_caption": detailed,
             "objects": objects,
+            "regions": regions,
             "characters": characters,
             "scene": scene,
             "style": style,
+            "ocr": ocr,
             "colors": colors,
             "composition": composition,
             "provider": provider or "unknown",

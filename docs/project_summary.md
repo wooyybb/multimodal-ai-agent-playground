@@ -30,7 +30,7 @@ This keeps the project understandable even as the number of internal agents grow
 
 The Planning Layer interprets the user request, image reference, goal tree, scene plan, and character identity.
 
-In v1.1, the Planning Layer includes a provider-independent Vision Layer. `VisionAgent` uses `VLMRouter` to select BLIP by default or Florence-2 when requested. All providers return the same structured `vision_result`, so the Reference Image Parser can read `characters`, `objects`, `colors`, and `composition` before falling back to caption parsing.
+In v1.5, the Planning Layer includes a provider-independent Vision Layer. `VisionAgent` uses `VLMRouter` to select BLIP by default or Florence-2 when requested. Florence-2 is handled as a Vision Parser through `<CAPTION>`, `<DETAILED_CAPTION>`, and `<OD>` tasks. All providers return the same structured `vision_result`, so the Reference Image Parser can read object detection results, colors, composition, and detailed captions before falling back to caption parsing.
 
 The Context Layer converts planning output into Context Program and provider-independent prompt structures.
 
@@ -68,7 +68,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 - Transformers
 - Hugging Face
 - BLIP
-- Florence2 adapter with BLIP fallback
+- Florence2 task parser with BLIP fallback
 - FLUX
 - CLIP
 - DINOv2 small through Transformers when available
@@ -83,6 +83,7 @@ The Infrastructure Layer saves run history, debug reports, benchmark results, pr
 
 - BLIP remains the default VLM.
 - Florence-2 can be selected through `VLM_PROVIDER=florence`; if the model cannot load, the system falls back to BLIP and records `used_fallback=true`.
+- Florence object detection results are normalized as `{name, bbox}` and used before caption fallback.
 - FLUX is the current generation provider path.
 - Some reasoning remains rule-based by default.
 - OpenAI API is not required for the v1.1 VLM-only setup.

@@ -97,6 +97,21 @@ Reference Image Parser
 
 All vision providers return the same `vision_result` contract: `caption`, `detailed_caption`, `objects`, `characters`, `scene`, `style`, `colors`, `composition`, `provider`, `model`, `used_fallback`, and `latency`.
 
+Florence-2 is treated as a Vision Parser, not only a caption model:
+
+```text
+Florence Task Router
+  +-- <CAPTION>
+  +-- <DETAILED_CAPTION>
+  +-- <OD>
+  +-- OCR skeleton
+  |
+  v
+Structured Vision Result
+```
+
+`ReferenceImageParser` prioritizes structured object detection results first, then `detailed_caption`, then `caption`, and finally rule-based fallback parsing. Detected objects are normalized as `{name, bbox}` records so accessories such as weapons, hats, and bags can be carried into the reference image context.
+
 ### Context Layer
 
 Responsible for making generation-ready context.
@@ -127,6 +142,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - DynamicExecutionEngine with layer-readable execution flow
 - ToolRegistry with layer metadata
 - Provider-independent Vision Layer with BLIP default and Florence-2 fallback support
+- Florence Task Router for caption, detailed caption, and object detection parsing
 - Rule/mock LLM reasoning fallback for local and free execution
 - Context Program and Prompt Compiler
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts

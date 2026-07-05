@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v1.5 Florence Vision Parser Questions
+
+Q. 왜 Florence를 Caption 모델로만 쓰지 않았나요?
+A. Caption은 이미지 전체를 한 문장으로 요약하기 때문에 object, accessory, bbox, composition 같은 구조 정보를 잃기 쉽습니다. Florence의 `<CAPTION>`, `<DETAILED_CAPTION>`, `<OD>` task를 분리해 실행하면 Reference Image를 prompt 이전의 structured context로 다룰 수 있습니다.
+
+Q. Vision Result를 구조화한 이유는 무엇인가요?
+A. downstream agent가 특정 VLM의 출력 형식에 의존하지 않게 하기 위해서입니다. BLIP이든 Florence든 `caption`, `detailed_caption`, `objects`, `scene`, `style`, `composition`, `provider`, `latency` 같은 공통 schema로 반환하면 ReferenceImageParser와 DebugReport가 동일한 방식으로 동작합니다.
+
+Q. Reference Parser는 왜 Caption보다 Objects를 우선합니까?
+A. object detection 결과는 sword, hat, bag 같은 identity-preserving prop을 caption보다 명확하게 전달합니다. 그래서 parser는 `objects -> detailed_caption -> caption -> fallback` 순서로 읽고, object name을 accessories와 character identity context에 반영합니다.
+
 ## v1.4 DINO Identity Metric Questions
 
 Q. 왜 CLIP 외에 DINO를 추가했나요?

@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the responsibility-based architecture of Multimodal AI Agent Playground, including the v1.1 Vision Layer upgrade.
+This document describes the responsibility-based architecture of Multimodal AI Agent Playground, including the v1.5 Florence Vision Parser upgrade.
 
 ## Target Architecture
 
@@ -62,7 +62,7 @@ flowchart TD
 4. Evaluation Layer scores the result and decides whether adaptation or retry is needed.
 5. Infrastructure Layer records memory, debug reports, benchmark outputs, and exposes UI/API access.
 
-## Vision Layer v1.1
+## Vision Layer v1.5
 
 The Vision Layer no longer treats BLIP as the framework boundary. `VisionAgent` calls `VLMRouter`, and the selected provider returns a shared `vision_result`.
 
@@ -85,6 +85,17 @@ Standard Vision Result
 ReferenceImageParser
 ```
 
+Florence-2 is routed through task prompts sequentially:
+
+```text
+FlorenceVLM
+  |
+  +-- <CAPTION>          -> caption
+  +-- <DETAILED_CAPTION> -> detailed_caption
+  +-- <OD>               -> objects[{name, bbox}]
+  +-- OCR skeleton       -> ocr[]
+```
+
 ### Standard Vision Result Schema
 
 Every provider returns these core fields:
@@ -94,9 +105,11 @@ Every provider returns these core fields:
   "caption": "",
   "detailed_caption": "",
   "objects": [],
+  "regions": [],
   "characters": [],
   "scene": {},
   "style": {},
+  "ocr": [],
   "colors": {},
   "composition": {},
   "provider": "",
@@ -113,14 +126,13 @@ Backward-compatible aliases such as `detailed_description`, `character_hints`, a
 `ReferenceImageParser` now reads structured fields first:
 
 ```text
-characters
--> objects
--> colors
--> composition
--> caption fallback
+objects
+-> detailed_caption
+-> caption
+-> fallback parsing
 ```
 
-This keeps caption parsing as a fallback while allowing Florence-2 to supply richer visual understanding when available.
+This keeps caption parsing as a fallback while allowing Florence-2 object detection and detailed captions to supply richer visual understanding when available. Object records are normalized as `{name, bbox}` so accessories and props can be preserved as structured reference context.
 
 ## Reasoning Boundary
 

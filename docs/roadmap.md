@@ -16,6 +16,7 @@
 | v1.2 | Prompt Rendering Engine | Complete |
 | v1.3 | Evaluation Prompt Routing | Complete |
 | v1.4 | DINO Identity Metric Integration | Complete |
+| v1.5 | Florence Vision Parser Upgrade | Complete |
 
 ## Completed Sprints
 
@@ -84,6 +85,7 @@
 - Version 1.2: Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompt variants
 - Version 1.3: Evaluation Prompt Routing with CLIP prompt isolation and skeleton VLM Judge/DINO metrics
 - Version 1.4: DINO Identity Metric for reference-generated image visual consistency
+- Version 1.5: Florence Vision Parser with caption, detailed caption, object detection, and structured reference parsing
 
 ## Planned Sprints
 
