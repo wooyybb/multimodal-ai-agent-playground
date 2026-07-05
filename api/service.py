@@ -8,6 +8,7 @@ def run_generation(user_prompt: str, provider: str | None = None, image: str | N
     result = orchestrator.run(
         image=image,
         user_prompt=user_prompt,
+        provider=provider,
     )
 
     print("[FastAPI] Generation finished")

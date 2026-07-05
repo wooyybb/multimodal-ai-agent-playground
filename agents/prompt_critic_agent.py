@@ -1,5 +1,3 @@
-from collections import Counter
-
 from llm.openai_reasoner import dumps_payload
 from llm.reasoner_router import ReasonerRouter
 

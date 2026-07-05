@@ -18,6 +18,8 @@ class ProviderRouter:
                 scene_plan=state_or_user_prompt.get("scene_plan"),
                 planner_result=state_or_user_prompt.get("planner_result"),
                 available_providers=available_providers,
+                requested_provider=state_or_user_prompt.get("requested_provider")
+                or state_or_user_prompt.get("provider"),
             )
             return {
                 "provider_routing": result,
@@ -37,6 +39,7 @@ class ProviderRouter:
         scene_plan: dict | None = None,
         planner_result: dict | None = None,
         available_providers: list[str] | None = None,
+        requested_provider: str | None = None,
     ) -> dict:
         print("[ProviderRouter] Running...")
         config = self._load_config()
@@ -56,7 +59,9 @@ class ProviderRouter:
         print(f"[ProviderRouter] Enabled providers: {enabled_providers}")
         print(f"[ProviderRouter] Default provider: {default_provider}")
 
-        requested_provider = self._requested_provider(user_prompt)
+        requested_provider = str(
+            requested_provider or self._requested_provider(user_prompt)
+        ).strip().lower()
         fallback_provider = (
             default_provider if default_provider in enabled_providers else enabled_providers[0]
         )

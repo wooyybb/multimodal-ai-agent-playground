@@ -98,7 +98,7 @@ class OrchestratorAgent:
         self.registry.register("retry", self.retry_agent.should_retry)
         self.registry.register("memory_save", self.memory_manager.save_run)
 
-    def run(self, image, user_prompt):
+    def run(self, image, user_prompt, provider=None):
         print("[OrchestratorAgent] Starting multi-agent workflow...")
         planner_result = self.planner_agent.run(
             user_prompt=user_prompt,
@@ -108,6 +108,8 @@ class OrchestratorAgent:
         state = {
             "image": image,
             "user_prompt": user_prompt,
+            "requested_provider": provider,
+            "provider": provider,
             "planner_result": planner_result,
             "agent_trace": ["PlannerAgent generated execution plan"],
         }

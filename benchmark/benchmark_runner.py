@@ -60,7 +60,11 @@ def _run_single_prompt(orchestrator: OrchestratorAgent, item: dict) -> dict:
 
     print(f"[Benchmark] Running prompt: {prompt_id}")
     try:
-        result = orchestrator.run(image=image, user_prompt=user_prompt)
+        result = orchestrator.run(
+            image=image,
+            user_prompt=user_prompt,
+            provider=requested_provider,
+        )
         debug_paths = _latest_debug_paths()
         final_prompt = result.get("final_prompt") or result.get("provider_prompt") or ""
         best_score = result.get("best_score")
