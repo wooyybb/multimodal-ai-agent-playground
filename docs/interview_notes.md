@@ -1,5 +1,27 @@
 # Interview Notes
 
+## v2.7 Semantic Prompt Engine Questions
+
+Q. 왜 Prompt를 Program으로 관리했나요?
+A. 문자열을 계속 이어붙이면 중복 keyword, 의미 중복, conflict, user intent override 실패가 쉽게 발생합니다. Semantic Prompt Program은 identity, style, layout, scene, lighting, quality, negative, constraints를 분리해서 관리하므로 provider별 prompt를 만들기 전에 의미 단위로 정리할 수 있습니다.
+
+Q. Semantic Merge는 무엇입니까?
+A. 같은 의미를 가진 표현을 하나로 줄이는 단계입니다. 예를 들어 `anime`, `anime style`, `anime illustration`은 `anime illustration`로, `balanced`, `balanced layout`, `balanced composition`은 `balanced composition`으로 정리됩니다.
+
+Q. Conflict Resolver는 어떤 문제를 해결합니까?
+A. reference caption이나 다른 Agent가 추가한 내용이 user intent와 충돌할 때 사용자 의도를 우선합니다. 예를 들어 사용자가 `remove weapon`을 요청하면 `weapon=false` constraint를 만들고 weapon/sword/blade 관련 표현이 generation-facing prompt로 렌더링되지 않게 합니다.
+
+Q. Provider Renderer가 필요한 이유는?
+A. FLUX, SDXL, CLIP은 필요한 prompt 형태가 다릅니다. FLUX는 dense prompt가 필요하고, SDXL Img2Img는 style 중심의 짧은 prompt가 적합하며, CLIP은 평가용 semantic summary가 필요합니다. Provider Renderer는 하나의 Semantic Program에서 각 provider에 맞는 prompt view를 만듭니다.
+
+### Engineering Review
+
+1. 기존 Prompt Pipeline은 문자열을 이어붙였지만, v2.7은 Semantic Program을 source of truth로 둡니다.
+2. Semantic Merge는 중복 keyword와 의미 중복을 줄여 prompt noise를 낮춥니다.
+3. Conflict Resolution은 user intent를 최우선으로 적용해 remove/avoid 요청을 안정적으로 반영합니다.
+4. Provider Renderer는 provider별 prompt 최적화를 한곳에서 관리하게 합니다.
+5. 향후 LLM Prompt Planning은 문자열 생성 대신 Semantic Program의 section을 계획하는 방식으로 확장할 수 있습니다.
+
 ## v2.6 Style Transfer Preset Manager Questions
 
 Q. Style마다 generation parameter를 다르게 둔 이유는?

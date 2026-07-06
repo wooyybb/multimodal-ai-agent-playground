@@ -137,6 +137,22 @@ Prompt Sanitizer / Prompt Validator
 
 The Prompt Sanitizer gives user forbidden intent the highest priority. For example, if the user asks to remove weapons, terms such as `weapon`, `sword`, `blade`, `combat stance`, and `holding a sword` are removed from generation-facing prompts even if the reference caption contains them. The Prompt Validator checks whether forbidden concepts survived, duplicate phrases remain, and SDXL/CLIP prompts stay under the 77-token budget.
 
+v2.7 adds the Semantic Prompt Engine. The prompt is now represented as a sectioned program before rendering:
+
+```text
+Semantic Prompt Program
+  +-- identity
+  +-- style
+  +-- layout
+  +-- scene
+  +-- lighting
+  +-- quality
+  +-- negative
+  +-- constraints
+```
+
+Semantic Merge reduces meaning-level duplication such as `anime`, `anime style`, and `anime illustration` into one canonical phrase. Conflict Resolver applies user intent first, so `remove weapon` becomes a constraint that prevents weapon-related text from being rendered into FLUX, SDXL, or CLIP prompts. Provider Renderer then creates a dense FLUX prompt, a short SDXL style prompt, and a compact CLIP evaluation prompt from the same semantic source.
+
 ### Generation Layer
 
 Responsible for provider-specific generation.
@@ -205,6 +221,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Context Program and Prompt Compiler
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
 - Style Transfer Program, Prompt Sanitizer, and Prompt Validator for long prompt structuring
+- Semantic Prompt Engine with merge, conflict resolution, and provider-specific rendering
 - Provider routing and provider prompt adaptation
 - Generation Planner and Generation Router with fast/quality modes
 - Style Transfer Preset Manager for SDXL strength, IP scale, CFG, steps, and resolution

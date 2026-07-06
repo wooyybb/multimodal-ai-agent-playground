@@ -207,6 +207,44 @@ Supported presets include `subtle_transfer`, `balanced_transfer`, `strong_style_
 
 The preset is still manually overridable through environment variables: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`. Debug reports store `generation_preset`, `preset_reason`, and `environment_overrides`.
 
+## Semantic Prompt Engine v2.7
+
+The Context Layer no longer treats the prompt as only a growing string. It first creates a semantic program:
+
+```text
+Prompt Blocks + Style Transfer Program
+  |
+  v
+Semantic Prompt Program
+  |
+  +-- identity
+  +-- style
+  +-- layout
+  +-- scene
+  +-- lighting
+  +-- quality
+  +-- negative
+  +-- constraints
+```
+
+The engine then runs:
+
+```text
+Semantic Merge
+  |
+  v
+Conflict Resolver
+  |
+  v
+Provider Renderer
+  |
+  +-- FLUX dense prompt
+  +-- SDXL style prompt
+  +-- CLIP evaluation prompt
+```
+
+Semantic Merge reduces meaning-level duplicates such as `anime`, `anime style`, and `anime illustration`. Conflict Resolver gives user intent priority, so a request like `remove weapon` sets `weapon=false` and prevents weapon-related text from being rendered into generation-facing prompts. Provider Renderer keeps provider-specific prompt behavior while sharing the same semantic source of truth.
+
 ## Evaluation Prompt Routing v1.3
 
 The Evaluation Layer consumes prompt variants by metric:

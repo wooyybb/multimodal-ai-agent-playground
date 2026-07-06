@@ -26,6 +26,7 @@
 | v2.4 | Real IP-Adapter Integration for SDXL Img2Img | Complete |
 | v2.5 | Long Prompt Structuring for Reference-aware Style Transfer | Complete |
 | v2.6 | Style Transfer Preset Manager for generation parameter control | Complete |
+| v2.7 | Semantic Prompt Engine | Complete |
 
 ## Completed Sprints
 
@@ -104,6 +105,7 @@
 - Version 2.4: Optional inference-only IP-Adapter integration for SDXL Img2Img with scale, fallback, and debug status
 - Version 2.5: Long user prompts are converted into Style Transfer Program, sanitized, validated, and rendered into FLUX/SDXL/CLIP-specific prompts
 - Version 2.6: Style Transfer Preset Manager selects SDXL strength, IP-Adapter scale, CFG, steps, and resolution from `style_transfer_program` with environment override support
+- Version 2.7: Semantic Prompt Program, Semantic Merge, Conflict Resolver, Provider Renderer, and section-based prompt preview
 
 ## Planned Sprints
 

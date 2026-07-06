@@ -1,6 +1,8 @@
 from generation.reference_conditioning import ReferenceConditioningBuilder
+from context.provider_renderer import ProviderRenderer
 from context.prompt_sanitizer import PromptSanitizer
 from context.prompt_validator import PromptValidator
+from context.semantic_prompt_program import SemanticPromptProgramBuilder
 from context.style_transfer_program import StyleTransferProgramBuilder
 
 
@@ -46,20 +48,27 @@ class PromptCompiler:
             prompt_sections,
         )
         self._apply_style_transfer_program(prompt_blocks, style_transfer_program)
+        semantic_result = SemanticPromptProgramBuilder().build(
+            prompt_blocks,
+            style_transfer_program=style_transfer_program,
+            forbidden_concepts=forbidden_concepts,
+        )
+        semantic_program = semantic_result["semantic_prompt_program"]
+        provider_rendering = ProviderRenderer().render(semantic_program, provider)
         negative = sanitizer.merge_negative_prompt(
             self._negative_prompt(context_program, negative_prompt),
-            style_transfer_program.get("negative_prompt", []),
+            provider_rendering.get("negative_prompt")
+            or style_transfer_program.get("negative_prompt", []),
         )
 
         if provider == "gpt_image":
             generation_prompt, notes, target_words = self._compile_gpt_image(prompt_blocks)
         elif provider in {"sdxl", "sdxl_quality"}:
-            generation_prompt, notes, target_words = self._compile_sdxl(
-                prompt_blocks,
-                style_transfer_program,
-            )
+            generation_prompt = provider_rendering["generation_prompt"]
+            notes, target_words = ["rendered SDXL prompt from semantic program"], 60
         else:
-            generation_prompt, notes, target_words = self._compile_flux(prompt_blocks)
+            generation_prompt = provider_rendering["generation_prompt"]
+            notes, target_words = ["rendered dense FLUX prompt from semantic program"], 100
             provider = "flux"
 
         if context_validation and context_validation.get("valid") is False:
@@ -77,6 +86,7 @@ class PromptCompiler:
             provider,
             sanitizer,
             forbidden_concepts,
+            provider_rendering,
         )
         sanitizer_report = rendered_prompts.pop("prompt_sanitizer_report")
         validation_report = PromptValidator().validate(
@@ -92,6 +102,12 @@ class PromptCompiler:
             "prompt_blocks": prompt_blocks,
             "prompt_rendering": rendered_prompts,
             "style_transfer_program": style_transfer_program,
+            "semantic_prompt_program": semantic_program,
+            "semantic_merge_report": semantic_result["semantic_merge_report"],
+            "conflict_resolution_report": semantic_result[
+                "conflict_resolution_report"
+            ],
+            "provider_render_report": provider_rendering.get("provider_render_report"),
             "prompt_sanitizer_report": sanitizer_report,
             "prompt_validation_report": validation_report,
             "reference_conditioning_package": reference_conditioning,
@@ -110,6 +126,12 @@ class PromptCompiler:
             "reference_conditioning_package": reference_conditioning,
             "style_transfer_program": style_transfer_program,
             "forbidden_concepts": forbidden_concepts,
+            "semantic_prompt_program": semantic_program,
+            "semantic_merge_report": semantic_result["semantic_merge_report"],
+            "conflict_resolution_report": semantic_result[
+                "conflict_resolution_report"
+            ],
+            "provider_render_report": provider_rendering.get("provider_render_report"),
             "prompt_sanitizer_report": sanitizer_report,
             "prompt_validation_report": validation_report,
             "prompt_rendering": rendered_prompts,
@@ -251,10 +273,14 @@ class PromptCompiler:
         provider,
         sanitizer,
         forbidden_concepts,
+        provider_rendering=None,
     ):
-        sdxl_style_prompt = self._render_sdxl_style_prompt(
-            prompt_blocks,
-            style_transfer_program,
+        provider_rendering = provider_rendering or {}
+        sdxl_style_prompt = provider_rendering.get("sdxl_style_prompt") or (
+            self._render_sdxl_style_prompt(
+                prompt_blocks,
+                style_transfer_program,
+            )
         )
         generation_budget = 60 if provider in {"sdxl", "sdxl_quality"} else None
         generation_clean = sanitizer.sanitize(
@@ -270,19 +296,21 @@ class PromptCompiler:
             max_tokens=60,
         )
         clip_clean = sanitizer.sanitize(
-            self._render_clip_prompt(prompt_blocks),
+            provider_rendering.get("clip_prompt") or self._render_clip_prompt(prompt_blocks),
             forbidden_concepts,
             provider="clip",
             max_tokens=40,
         )
         pickscore_clean = sanitizer.sanitize(
-            self._render_pickscore_prompt(prompt_blocks),
+            provider_rendering.get("pickscore_prompt")
+            or self._render_pickscore_prompt(prompt_blocks),
             forbidden_concepts,
             provider="pickscore",
             max_tokens=None,
         )
         vlm_judge_clean = sanitizer.sanitize(
-            self._render_vlm_judge_prompt(
+            provider_rendering.get("vlm_judge_prompt")
+            or self._render_vlm_judge_prompt(
                 prompt_blocks,
                 context_program,
                 context_reasoning,

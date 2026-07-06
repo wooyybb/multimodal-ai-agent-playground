@@ -188,6 +188,12 @@ class DebugReportManager:
                 state.get("style_prompt_token_count")
             ),
             "style_transfer_program": self._safe(state.get("style_transfer_program")),
+            "semantic_prompt_program": self._safe(state.get("semantic_prompt_program")),
+            "semantic_merge_report": self._safe(state.get("semantic_merge_report")),
+            "conflict_resolution_report": self._safe(
+                state.get("conflict_resolution_report")
+            ),
+            "provider_render_report": self._safe(state.get("provider_render_report")),
             "forbidden_concepts": self._safe(state.get("forbidden_concepts")),
             "prompt_sanitizer_report": self._safe(
                 state.get("prompt_sanitizer_report")
@@ -337,6 +343,22 @@ class DebugReportManager:
             "STYLE TRANSFER PROGRAM",
             state.get("style_transfer_program"),
         )
+        self._append_semantic_prompt_sections(lines, state.get("semantic_prompt_program"))
+        self._append_block(
+            lines,
+            "SEMANTIC MERGE",
+            state.get("semantic_merge_report"),
+        )
+        self._append_block(
+            lines,
+            "CONFLICT RESOLUTION",
+            state.get("conflict_resolution_report"),
+        )
+        self._append_block(
+            lines,
+            "PROVIDER RENDERER",
+            state.get("provider_render_report"),
+        )
         self._append_block(lines, "FORBIDDEN CONCEPTS", state.get("forbidden_concepts"))
         self._append_block(
             lines,
@@ -398,6 +420,20 @@ class DebugReportManager:
         lines.append(self._to_text(value))
         lines.append("")
 
+    def _append_semantic_prompt_sections(self, lines, program):
+        program = program or {}
+        for title, key in (
+            ("Identity", "identity"),
+            ("Style", "style"),
+            ("Layout", "layout"),
+            ("Scene", "scene"),
+            ("Lighting", "lighting"),
+            ("Quality", "quality"),
+            ("Negative", "negative"),
+            ("Constraints", "constraints"),
+        ):
+            self._append_block(lines, title, program.get(key))
+
     def _to_text(self, value):
         safe_value = self._safe(value)
         if isinstance(safe_value, (dict, list)):
@@ -451,6 +487,7 @@ class DebugReportManager:
             "metric_prompts": state.get("metric_prompts"),
             "negative_prompt": state.get("negative_prompt")
             or rendering.get("negative_prompt"),
+            "provider_render_report": state.get("provider_render_report"),
         }
 
     def _reference_conditioning_preview(self, state):

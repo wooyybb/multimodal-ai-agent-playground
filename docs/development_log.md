@@ -327,6 +327,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Environment overrides are supported through `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`.
 - Debug reports now include `generation_preset`, `preset_reason`, and `environment_overrides`.
 
+## Version 2.7
+
+- Added Semantic Prompt Program to manage prompt intent as sections instead of one growing string.
+- Added Semantic Merge for meaning-level duplicate reduction.
+- Added Conflict Resolver so user forbidden intent overrides caption or agent-added concepts.
+- Added Provider Renderer for FLUX dense prompt, SDXL style prompt, and CLIP evaluation prompt views.
+- Prompt Preview now includes section-based Identity, Style, Layout, Scene, Lighting, Quality, Negative, and Constraints blocks.
+
 ## Future Work
 
 - Keep this file short.
