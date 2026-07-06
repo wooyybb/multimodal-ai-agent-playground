@@ -10,6 +10,9 @@ class ReferenceConditioningBuilder:
 
         package = default_conditioning_package()
         package["reference_image_path"] = self._reference_image_path(state, reference_image)
+        package.setdefault("conditioned_reference_path", "")
+        package.setdefault("conditioned_reference", "")
+        package.setdefault("conditioning_info", {})
 
         needs_preservation = self._needs_preservation(
             state,

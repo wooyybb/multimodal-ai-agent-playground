@@ -38,6 +38,10 @@ class GenerationResult:
     selected_lora: str = ""
     lora_status: dict = field(default_factory=dict)
     controlnet_status: dict = field(default_factory=dict)
+    reference_analysis: dict = field(default_factory=dict)
+    conditioning_summary: dict = field(default_factory=dict)
+    conditioned_reference_path: str = ""
+    conditioning_package: dict = field(default_factory=dict)
 
     def to_dict(self):
         return asdict(self)

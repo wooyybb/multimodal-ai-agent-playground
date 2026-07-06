@@ -119,6 +119,12 @@ class DebugReportManager:
             "reference_conditioning_enabled": self._safe(
                 state.get("reference_conditioning_enabled")
             ),
+            "reference_analysis": self._safe(state.get("reference_analysis")),
+            "conditioning_summary": self._safe(state.get("conditioning_summary")),
+            "conditioned_reference_path": self._safe(
+                state.get("conditioned_reference_path")
+            ),
+            "conditioning_package": self._safe(state.get("conditioning_package")),
             "conditioning_type": self._safe(state.get("conditioning_type")),
             "used_conditioning_fallback": self._safe(
                 state.get("used_conditioning_fallback")
@@ -377,6 +383,11 @@ class DebugReportManager:
         )
         self._append_block(
             lines,
+            "REFERENCE CONDITIONING PIPELINE",
+            self._reference_conditioning_pipeline_preview(state),
+        )
+        self._append_block(
+            lines,
             "IP-ADAPTER",
             self._ip_adapter_preview(state),
         )
@@ -525,6 +536,14 @@ class DebugReportManager:
             or (state.get("ip_adapter_status") or {}).get("reason"),
             "preserve": package.get("preserve", {}),
             "notes": package.get("notes", []),
+        }
+
+    def _reference_conditioning_pipeline_preview(self, state):
+        return {
+            "reference_analysis": state.get("reference_analysis"),
+            "conditioning_summary": state.get("conditioning_summary"),
+            "conditioned_reference_path": state.get("conditioned_reference_path"),
+            "conditioning_package": state.get("conditioning_package"),
         }
 
     def _ip_adapter_preview(self, state):

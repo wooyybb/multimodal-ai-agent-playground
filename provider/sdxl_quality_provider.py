@@ -6,6 +6,7 @@ from time import perf_counter
 from PIL import Image, ImageDraw
 
 from generation.generation_result import GenerationResult
+from generation.reference_preprocessor import ReferencePreprocessor
 
 
 class SDXLQualityProvider:
@@ -17,6 +18,7 @@ class SDXLQualityProvider:
         self.pipeline = None
         self.device = "cpu"
         self.torch_dtype_name = "float32"
+        self.reference_preprocessor = ReferencePreprocessor()
 
     def generate(
         self,
@@ -51,6 +53,10 @@ class SDXLQualityProvider:
         used_fallback = False
         generation_is_mock = False
         ip_adapter_status = self._ip_adapter_status(state, config)
+        reference_analysis = {}
+        conditioning_summary = {}
+        conditioned_reference_path = ""
+        conditioning_package = {}
         notes = [
             "real SDXL Img2Img backend",
             "StableDiffusionXLImg2ImgPipeline",
@@ -61,6 +67,26 @@ class SDXLQualityProvider:
         try:
             error_stage = "reference_image"
             reference_image = self._load_reference_image(state, config)
+            reference_image, conditioning_result = self._condition_reference_image(
+                reference_image,
+                config,
+            )
+            reference_analysis = conditioning_result.get("reference_analysis", {})
+            conditioning_summary = conditioning_result.get("conditioning_summary", {})
+            conditioned_reference_path = conditioning_result.get(
+                "conditioned_reference_path",
+                "",
+            )
+            conditioning_package = conditioning_result.get("conditioning_package", {})
+            state["reference_analysis"] = reference_analysis
+            state["conditioning_summary"] = conditioning_summary
+            state["conditioned_reference_path"] = conditioned_reference_path
+            state["conditioning_package"] = conditioning_package
+            self._update_reference_conditioning_package(
+                state,
+                conditioned_reference_path,
+                conditioning_summary,
+            )
             error_stage = "pipeline_loading"
             self._load_pipeline()
             ip_adapter_status = self._prepare_ip_adapter(reference_image, state, config)
@@ -118,6 +144,9 @@ class SDXLQualityProvider:
                 "dtype": self.torch_dtype_name,
                 "ip_adapter": ip_adapter_status,
                 "generation_preset": state.get("generation_preset") or {},
+                "reference_analysis": reference_analysis,
+                "conditioning_summary": conditioning_summary,
+                "conditioned_reference_path": conditioned_reference_path,
             },
             latency=latency,
             prompt_length=len(str(prompt or "").split()),
@@ -159,6 +188,10 @@ class SDXLQualityProvider:
                 "enabled": False,
                 "reason": "ControlNet not implemented in this Img2Img sprint",
             },
+            reference_analysis=reference_analysis,
+            conditioning_summary=conditioning_summary,
+            conditioned_reference_path=conditioned_reference_path,
+            conditioning_package=conditioning_package,
         )
 
     def _run_img2img_pipeline(
@@ -329,7 +362,26 @@ class SDXLQualityProvider:
             if not image_path.exists():
                 raise FileNotFoundError(f"reference image not found: {image_path}")
             image = Image.open(image_path).convert("RGB")
-        return image.resize((self._width(config), self._height(config)))
+        return image
+
+    def _condition_reference_image(self, image, config):
+        return self.reference_preprocessor.condition(
+            image,
+            self._width(config),
+            self._height(config),
+        )
+
+    def _update_reference_conditioning_package(
+        self,
+        state,
+        conditioned_reference_path,
+        conditioning_summary,
+    ):
+        package = dict(state.get("reference_conditioning_package") or {})
+        package["conditioned_reference_path"] = conditioned_reference_path
+        package["conditioning_info"] = conditioning_summary
+        package["conditioned_reference"] = conditioned_reference_path
+        state["reference_conditioning_package"] = package
 
     def _reference_image_source(self, state):
         conditioning = state.get("reference_conditioning_package") or {}
