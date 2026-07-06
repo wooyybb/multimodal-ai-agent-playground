@@ -1,28 +1,24 @@
 {
   "goal_planner": {
-    "signature": "b1733ffc799ac865b2c38a2289fe3508ae2d2f2599e0a1bb0070b8b2809c7b08",
+    "signature": "ce266547fa668450cad3f1a0c1c886fbf39ed9b6c137a73f626e3a2558190a1d",
     "artifacts": {
       "goal_tree": {
-        "main_goal": "Generate an image that follows the user request.",
+        "main_goal": "Generate a coherent high-quality image.",
         "sub_goals": [
           "preserve subject identity",
-          "maintain clear composition",
-          "apply requested illustration style",
-          "emphasize lighting and mood"
+          "maintain clear composition"
         ],
         "priorities": {
-          "identity": 1.0,
-          "style": 0.9,
-          "composition": 0.8,
-          "lighting": 0.9,
+          "identity": 0.8,
+          "style": 0.7,
+          "composition": 0.7,
+          "lighting": 0.6,
           "background": 0.5
         },
         "success_criteria": [
           "generated image matches the user request",
           "main subject remains recognizable",
-          "composition is clear and readable",
-          "requested style is visible without overriding identity",
-          "lighting mood is visible and coherent"
+          "composition is clear and readable"
         ]
       }
     }
@@ -220,7 +216,7 @@
     }
   },
   "reference_image_parser": {
-    "signature": "3bef24008676453846909401b7947e5d9d48987d9594df970bc12827e465772b",
+    "signature": "e310ad631b3473ac2f7a4351f922514b89af29502b50395fd648c40017ce585a",
     "artifacts": {
       "reference_image": {
         "identity": {
@@ -241,15 +237,14 @@
             "footwear",
             "human face",
             "miniskirt",
-            "woman",
-            "weapon"
+            "woman"
           ]
         },
         "style": {
-          "anime": 0.92,
-          "realism": 0.11,
-          "lineart": 0.87,
-          "rendering": "anime illustration"
+          "anime": 0.35,
+          "realism": 0.45,
+          "lineart": 0.3,
+          "rendering": ""
         },
         "composition": {
           "camera": "eye_level",
@@ -268,14 +263,13 @@
         "identity_rules": [
           "preserve reference image identity",
           "preserve sword as a key identity accessory",
-          "preserve white visual identity cues",
-          "preserve stylized illustration cues"
+          "preserve white visual identity cues"
         ]
       }
     }
   },
   "character_program_builder": {
-    "signature": "7ecd3bff4c29f905e2e928a9483ad0623c8e342452fd815f8290a6986cc3ad00",
+    "signature": "0e23973791dcee6f655503d3c7ae0c205c013da6254b148a213599b47b8eda08",
     "artifacts": {
       "character_program": {
         "identity": {
@@ -296,15 +290,14 @@
             "footwear",
             "human face",
             "miniskirt",
-            "woman",
-            "weapon"
+            "woman"
           ]
         },
         "style": {
-          "anime": 0.92,
-          "realism": 0.11,
-          "rendering": "anime illustration",
-          "lineart": 0.87
+          "anime": 0.35,
+          "realism": 0.45,
+          "rendering": "",
+          "lineart": 0.3
         },
         "pose": "holding a sword",
         "expression": "natural readable expression",
@@ -319,8 +312,7 @@
           "preserve accessories: sword, fancy dress, footwear",
           "preserve reference image identity",
           "preserve sword as a key identity accessory",
-          "preserve white visual identity cues",
-          "preserve stylized illustration cues"
+          "preserve white visual identity cues"
         ],
         "reference_composition": {
           "camera": "eye_level",
@@ -346,15 +338,14 @@
               "footwear",
               "human face",
               "miniskirt",
-              "woman",
-              "weapon"
+              "woman"
             ]
           },
           "style": {
-            "anime": 0.92,
-            "realism": 0.11,
-            "lineart": 0.87,
-            "rendering": "anime illustration"
+            "anime": 0.35,
+            "realism": 0.45,
+            "lineart": 0.3,
+            "rendering": ""
           },
           "composition": {
             "camera": "eye_level",
@@ -373,20 +364,19 @@
           "identity_rules": [
             "preserve reference image identity",
             "preserve sword as a key identity accessory",
-            "preserve white visual identity cues",
-            "preserve stylized illustration cues"
+            "preserve white visual identity cues"
           ]
         }
       }
     }
   },
   "context_program_builder": {
-    "signature": "e45bed5a12337865d54a03bde0b01d37f83efeccf75f98215808846a5fb74a4d",
+    "signature": "08f2992c6de4ec3c6e8a6d0632b5e159edc399094f7c95fd04e5ad3904b67a88",
     "artifacts": {
       "context_program": {
         "task": {
           "task_type": "image_generation",
-          "intent": "Image and prompt are provided, so full multimodal generation workflow is selected.",
+          "intent": "Image is provided, so vision-based generation workflow is selected.",
           "constraints": {
             "requires_vision": true,
             "requires_generation": true,
@@ -395,12 +385,12 @@
           }
         },
         "user_goal": {
-          "raw_user_prompt": "anime style, cinematic lighting, execpt weapon",
-          "interpreted_goal": "anime style, cinematic lighting, execpt weapon"
+          "raw_user_prompt": "",
+          "interpreted_goal": "image generation"
         },
         "scene": {
           "scene_type": "illustration_scene",
-          "emotion": "dramatic but controlled",
+          "emotion": "natural and readable",
           "relationship": "unspecified",
           "interaction": "clear subject presentation",
           "narrative": "a clear illustration scene with readable character intent",
@@ -421,7 +411,7 @@
               "merge_rule": "do not merge with other characters"
             },
             {
-              "caption_hint": "female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon",
+              "caption_hint": "female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman",
               "character_program": {
                 "identity": {
                   "gender": "female",
@@ -441,15 +431,14 @@
                     "footwear",
                     "human face",
                     "miniskirt",
-                    "woman",
-                    "weapon"
+                    "woman"
                   ]
                 },
                 "style": {
-                  "anime": 0.92,
-                  "realism": 0.11,
-                  "rendering": "anime illustration",
-                  "lineart": 0.87
+                  "anime": 0.35,
+                  "realism": 0.45,
+                  "rendering": "",
+                  "lineart": 0.3
                 },
                 "pose": "holding a sword",
                 "expression": "natural readable expression",
@@ -464,8 +453,7 @@
                   "preserve accessories: sword, fancy dress, footwear",
                   "preserve reference image identity",
                   "preserve sword as a key identity accessory",
-                  "preserve white visual identity cues",
-                  "preserve stylized illustration cues"
+                  "preserve white visual identity cues"
                 ],
                 "reference_composition": {
                   "camera": "eye_level",
@@ -491,15 +479,14 @@
                       "footwear",
                       "human face",
                       "miniskirt",
-                      "woman",
-                      "weapon"
+                      "woman"
                     ]
                   },
                   "style": {
-                    "anime": 0.92,
-                    "realism": 0.11,
-                    "lineart": 0.87,
-                    "rendering": "anime illustration"
+                    "anime": 0.35,
+                    "realism": 0.45,
+                    "lineart": 0.3,
+                    "rendering": ""
                   },
                   "composition": {
                     "camera": "eye_level",
@@ -518,8 +505,7 @@
                   "identity_rules": [
                     "preserve reference image identity",
                     "preserve sword as a key identity accessory",
-                    "preserve white visual identity cues",
-                    "preserve stylized illustration cues"
+                    "preserve white visual identity cues"
                   ]
                 }
               }
@@ -530,7 +516,6 @@
             "Do not merge characters",
             "Preserve recognizable identity",
             "Preserve original outfit, hairstyle, silhouette, proportions, visual vibe, and color balance",
-            "identity is the highest priority",
             "preserve recognizable character identity",
             "keep female identity cues",
             "preserve outfit: blue dress",
@@ -538,21 +523,17 @@
             "preserve reference image identity",
             "preserve sword as a key identity accessory",
             "preserve white visual identity cues",
-            "preserve stylized illustration cues",
             "preserve caption-specific subject details"
           ]
         },
         "style": {
           "style_keywords": [
-            "anime style",
-            "clean line art",
-            "expressive eyes",
-            "anime"
+            "soft Korean webtoon-style illustration",
+            "clean anime-style coloring"
           ],
           "rendering_rules": [
             "lightweight anime lineart",
-            "soft pastel-friendly tones",
-            "preserve requested style without reducing identity clarity"
+            "soft pastel-friendly tones"
           ]
         },
         "layout": {
@@ -565,7 +546,6 @@
             "clear focal point",
             "balanced subject placement",
             "avoid awkward cropping",
-            "composition priority should remain high",
             "use eye-level camera and balanced framing"
           ]
         },
@@ -583,8 +563,8 @@
         },
         "expression": {
           "expression_rules": [
-            "focused expression",
-            "intense gaze"
+            "soft smile",
+            "natural readable emotions"
           ],
           "avoid": [
             "blank faces",
@@ -595,17 +575,13 @@
         "lighting": {
           "lighting_keywords": [
             "cinematic lighting",
-            "balanced contrast",
-            "priority lighting mood"
+            "soft shadow"
           ],
           "mood": null
         },
         "quality": {
           "quality_keywords": [
-            "identity priority 1.0",
-            "style priority 0.9",
-            "composition priority 0.8",
-            "lighting priority 0.9",
+            "identity priority 0.8",
             "selected strategy: Keep current plan with minimal adjustments",
             "adaptive re-planning",
             "identity +2",
@@ -615,9 +591,7 @@
           "success_criteria": [
             "generated image matches the user request",
             "main subject remains recognizable",
-            "composition is clear and readable",
-            "requested style is visible without overriding identity",
-            "lighting mood is visible and coherent"
+            "composition is clear and readable"
           ]
         },
         "negative": {
@@ -630,20 +604,13 @@
           "strict_avoid": []
         },
         "memory": {
-          "memory_hint": "similar previous run found",
-          "similar_run_score": 0.09876543209876543,
-          "best_run_score": 0.7978
+          "memory_hint": "no memory found",
+          "similar_run_score": 0.0,
+          "best_run_score": null
         },
         "retrieval": {
-          "retrieved_style": [
-            "anime style",
-            "clean line art",
-            "expressive eyes"
-          ],
-          "retrieved_lighting": [
-            "cinematic lighting",
-            "balanced contrast"
-          ],
+          "retrieved_style": [],
+          "retrieved_lighting": [],
           "retrieved_quality": [
             "masterpiece",
             "best quality",
@@ -668,26 +635,22 @@
           "save_debug_report": true
         },
         "goal_tree": {
-          "main_goal": "Generate an image that follows the user request.",
+          "main_goal": "Generate a coherent high-quality image.",
           "sub_goals": [
             "preserve subject identity",
-            "maintain clear composition",
-            "apply requested illustration style",
-            "emphasize lighting and mood"
+            "maintain clear composition"
           ],
           "priorities": {
-            "identity": 1.0,
-            "style": 0.9,
-            "composition": 0.8,
-            "lighting": 0.9,
+            "identity": 0.8,
+            "style": 0.7,
+            "composition": 0.7,
+            "lighting": 0.6,
             "background": 0.5
           },
           "success_criteria": [
             "generated image matches the user request",
             "main subject remains recognizable",
-            "composition is clear and readable",
-            "requested style is visible without overriding identity",
-            "lighting mood is visible and coherent"
+            "composition is clear and readable"
           ]
         },
         "character_program": {
@@ -709,15 +672,14 @@
               "footwear",
               "human face",
               "miniskirt",
-              "woman",
-              "weapon"
+              "woman"
             ]
           },
           "style": {
-            "anime": 0.92,
-            "realism": 0.11,
-            "rendering": "anime illustration",
-            "lineart": 0.87
+            "anime": 0.35,
+            "realism": 0.45,
+            "rendering": "",
+            "lineart": 0.3
           },
           "pose": "holding a sword",
           "expression": "natural readable expression",
@@ -732,8 +694,7 @@
             "preserve accessories: sword, fancy dress, footwear",
             "preserve reference image identity",
             "preserve sword as a key identity accessory",
-            "preserve white visual identity cues",
-            "preserve stylized illustration cues"
+            "preserve white visual identity cues"
           ],
           "reference_composition": {
             "camera": "eye_level",
@@ -759,15 +720,14 @@
                 "footwear",
                 "human face",
                 "miniskirt",
-                "woman",
-                "weapon"
+                "woman"
               ]
             },
             "style": {
-              "anime": 0.92,
-              "realism": 0.11,
-              "lineart": 0.87,
-              "rendering": "anime illustration"
+              "anime": 0.35,
+              "realism": 0.45,
+              "lineart": 0.3,
+              "rendering": ""
             },
             "composition": {
               "camera": "eye_level",
@@ -786,8 +746,7 @@
             "identity_rules": [
               "preserve reference image identity",
               "preserve sword as a key identity accessory",
-              "preserve white visual identity cues",
-              "preserve stylized illustration cues"
+              "preserve white visual identity cues"
             ]
           }
         },
@@ -810,15 +769,14 @@
               "footwear",
               "human face",
               "miniskirt",
-              "woman",
-              "weapon"
+              "woman"
             ]
           },
           "style": {
-            "anime": 0.92,
-            "realism": 0.11,
-            "lineart": 0.87,
-            "rendering": "anime illustration"
+            "anime": 0.35,
+            "realism": 0.45,
+            "lineart": 0.3,
+            "rendering": ""
           },
           "composition": {
             "camera": "eye_level",
@@ -837,8 +795,7 @@
           "identity_rules": [
             "preserve reference image identity",
             "preserve sword as a key identity accessory",
-            "preserve white visual identity cues",
-            "preserve stylized illustration cues"
+            "preserve white visual identity cues"
           ]
         },
         "selected_strategy": {
@@ -919,26 +876,344 @@
     }
   },
   "prompt_compiler": {
-    "signature": "9c676f57fea9ba8b4bffaa7495660916073ad6a0c9f039ee30a22d7a2bd428de",
+    "signature": "146c7ab6ec33e189db49835e315d642050bf5939c6bf6c8a7ef0b9aac42eca20",
     "artifacts": {
       "compiled_prompt_package": {
         "provider": "flux",
-        "positive_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain",
-        "negative_prompt": "blurry, low quality, bad anatomy, duplicate, blurry, low quality, bad anatomy, duplicate",
+        "positive_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+        "negative_prompt": "blurry, low quality, bad anatomy, duplicate, duplicate subject",
         "prompt_blocks": {
-          "subject": "2 recognizable subject, A woman in a school uniform holding a sword., female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters",
-          "scene": "a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read",
-          "style": "anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art",
-          "layout": "illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement",
-          "lighting": "cinematic lighting, balanced contrast, priority lighting mood",
-          "quality": "identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze"
+          "subject": "2 recognizable subject, A woman in a school uniform holding a sword., female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, Each uploaded image represents one separate character, Do not merge characters",
+          "scene": "a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read",
+          "style": "soft Korean webtoon-style illustration, clean anime-style coloring, lightweight anime lineart, soft pastel-friendly tones, prioritize high quality, coherent visual style",
+          "layout": "illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, use balanced composition with readable subject placement",
+          "lighting": "cinematic lighting, soft shadow",
+          "quality": "identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions"
         },
         "prompt_rendering": {
-          "generation_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain",
-          "clip_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene",
-          "pickscore_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, cinematic lighting, balanced contrast, priority lighting mood, identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, appealing composition, coherent style, aesthetic visual balance",
-          "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, Style: anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, Layout: illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, Lighting: cinematic lighting, balanced contrast, priority lighting mood, Quality: identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, Reference context: {'identity': {'gender': 'female', 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'accessories': ['sword', 'fancy dress', 'footwear', 'human face', 'miniskirt', 'woman', 'weapon']}, 'style': {'anime': 0.92, 'realism': 0.11, 'lineart': 0.87, 'rendering': 'anime illustration'}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve sword as a key identity accessory', 'preserve white visual identity cues', 'preserve stylized illustration cues']}, Reasoning context: {'user_goal': 'Generate an image matching: anime style, cinematic lighting, execpt weapon', 'scene_goal': 'create a cinematic visual scene', 'composition_goal': 'use balanced composition with readable subject placement', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize anime style with clean line art', 'priority': ['style', 'character', 'emotion', 'layout'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
-          "negative_prompt": "blurry, low quality, bad anatomy, duplicate, blurry, low quality, bad anatomy, duplicate"
+          "generation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+          "sdxl_style_prompt": "soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, cinematic lighting, soft shadow",
+          "clip_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with",
+          "pickscore_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, appealing composition, coherent style, aesthetic visual balance",
+          "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, Style: soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, Layout: illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, Lighting: cinematic lighting, soft shadow, Quality: identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'fancy dress', 'footwear', 'miniskirt', 'realism': 0.45, 'lineart': 0.3, 'rendering': ''}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve white visual identity cues']}, Reasoning context: {'user_goal': 'Generate a clear image from the available context', 'scene_goal': 'create a coherent visual scene', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize high quality, coherent visual style', 'priority': ['character', 'emotion', 'layout', 'style'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0001, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
+          "negative_prompt": "blurry, low quality, bad anatomy, duplicate, duplicate subject"
+        },
+        "style_transfer_program": {
+          "task_type": "reference_aware_style_transfer",
+          "character_count": 1,
+          "character_rules": {
+            "preserve_identity": true,
+            "preserve_outfit": true,
+            "preserve_hairstyle": true,
+            "preserve_silhouette": true,
+            "do_not_merge_characters": true
+          },
+          "style": {
+            "name": "",
+            "rendering": "",
+            "mood": "",
+            "color_palette": [],
+            "texture": ""
+          },
+          "layout": {
+            "format": "",
+            "structure": "",
+            "background": "",
+            "decorations": []
+          },
+          "pose_expression": {
+            "allowed": [],
+            "forbidden": []
+          },
+          "forbidden_concepts": [],
+          "negative_prompt": [
+            "low quality",
+            "blurry",
+            "bad anatomy",
+            "duplicate subject"
+          ],
+          "text_rules": {
+            "allow_small_text": true,
+            "avoid_large_typography": true,
+            "language_constraints": []
+          },
+          "source_summary": {
+            "user_prompt": "",
+            "caption": "A woman in a school uniform holding a sword.",
+            "presets": []
+          }
+        },
+        "prompt_sanitizer_report": {
+          "generation": {
+            "provider": "flux",
+            "removed_forbidden": [],
+            "deduplicated_phrases": [
+              "female character",
+              "female character",
+              "female character",
+              "anime illustration",
+              "balanced composition",
+              "balanced composition"
+            ],
+            "semantic_merges": [
+              {
+                "from": "A woman in a school uniform holding a sword",
+                "to": "female character"
+              },
+              {
+                "from": "female",
+                "to": "female character"
+              },
+              {
+                "from": "sword",
+                "to": "holding a sword"
+              },
+              {
+                "from": "human face",
+                "to": "female character"
+              },
+              {
+                "from": "woman",
+                "to": "female character"
+              },
+              {
+                "from": "clean anime-style coloring",
+                "to": "anime illustration"
+              },
+              {
+                "from": "lightweight anime lineart",
+                "to": "anime illustration"
+              },
+              {
+                "from": "balanced",
+                "to": "balanced composition"
+              },
+              {
+                "from": "balanced subject placement",
+                "to": "balanced composition"
+              },
+              {
+                "from": "use balanced composition with readable subject placement",
+                "to": "balanced composition"
+              }
+            ],
+            "token_budget": null,
+            "token_count": 122,
+            "trimmed": false
+          },
+          "sdxl": {
+            "provider": "sdxl",
+            "removed_forbidden": [],
+            "deduplicated_phrases": [
+              "anime illustration"
+            ],
+            "semantic_merges": [
+              {
+                "from": "clean anime-style coloring",
+                "to": "anime illustration"
+              },
+              {
+                "from": "lightweight anime lineart",
+                "to": "anime illustration"
+              }
+            ],
+            "token_budget": 60,
+            "token_count": 29,
+            "trimmed": false
+          },
+          "clip": {
+            "provider": "clip",
+            "removed_forbidden": [],
+            "deduplicated_phrases": [
+              "female character",
+              "female character",
+              "female character"
+            ],
+            "semantic_merges": [
+              {
+                "from": "A woman in a school uniform holding a sword",
+                "to": "female character"
+              },
+              {
+                "from": "female",
+                "to": "female character"
+              },
+              {
+                "from": "sword",
+                "to": "holding a sword"
+              },
+              {
+                "from": "human face",
+                "to": "female character"
+              },
+              {
+                "from": "woman",
+                "to": "female character"
+              }
+            ],
+            "token_budget": 40,
+            "token_count": 41,
+            "trimmed": true
+          },
+          "pickscore": {
+            "provider": "pickscore",
+            "removed_forbidden": [],
+            "deduplicated_phrases": [
+              "female character",
+              "female character",
+              "female character",
+              "anime illustration",
+              "balanced composition",
+              "balanced composition"
+            ],
+            "semantic_merges": [
+              {
+                "from": "A woman in a school uniform holding a sword",
+                "to": "female character"
+              },
+              {
+                "from": "female",
+                "to": "female character"
+              },
+              {
+                "from": "sword",
+                "to": "holding a sword"
+              },
+              {
+                "from": "human face",
+                "to": "female character"
+              },
+              {
+                "from": "woman",
+                "to": "female character"
+              },
+              {
+                "from": "clean anime-style coloring",
+                "to": "anime illustration"
+              },
+              {
+                "from": "lightweight anime lineart",
+                "to": "anime illustration"
+              },
+              {
+                "from": "balanced",
+                "to": "balanced composition"
+              },
+              {
+                "from": "balanced subject placement",
+                "to": "balanced composition"
+              },
+              {
+                "from": "use balanced composition with readable subject placement",
+                "to": "balanced composition"
+              }
+            ],
+            "token_budget": null,
+            "token_count": 116,
+            "trimmed": false
+          },
+          "vlm_judge": {
+            "provider": "vlm_judge",
+            "removed_forbidden": [],
+            "deduplicated_phrases": [
+              "female character",
+              "female character",
+              "female character",
+              "anime illustration",
+              "balanced composition",
+              "balanced composition",
+              "female character",
+              "holding a sword",
+              "female character",
+              "female character",
+              "anime illustration",
+              "holding a sword",
+              "balanced composition"
+            ],
+            "semantic_merges": [
+              {
+                "from": "A woman in a school uniform holding a sword",
+                "to": "female character"
+              },
+              {
+                "from": "female",
+                "to": "female character"
+              },
+              {
+                "from": "sword",
+                "to": "holding a sword"
+              },
+              {
+                "from": "human face",
+                "to": "female character"
+              },
+              {
+                "from": "woman",
+                "to": "female character"
+              },
+              {
+                "from": "clean anime-style coloring",
+                "to": "anime illustration"
+              },
+              {
+                "from": "lightweight anime lineart",
+                "to": "anime illustration"
+              },
+              {
+                "from": "balanced",
+                "to": "balanced composition"
+              },
+              {
+                "from": "balanced subject placement",
+                "to": "balanced composition"
+              },
+              {
+                "from": "use balanced composition with readable subject placement",
+                "to": "balanced composition"
+              },
+              {
+                "from": "Reference context: {'identity': {'gender': 'female'",
+                "to": "female character"
+              },
+              {
+                "from": "'accessories': ['sword'",
+                "to": "holding a sword"
+              },
+              {
+                "from": "'human face'",
+                "to": "female character"
+              },
+              {
+                "from": "'woman']}",
+                "to": "female character"
+              },
+              {
+                "from": "'style': {'anime': 0.35",
+                "to": "anime illustration"
+              },
+              {
+                "from": "'preserve sword as a key identity accessory'",
+                "to": "holding a sword"
+              },
+              {
+                "from": "'composition_goal': 'use balanced composition with readable subject placement'",
+                "to": "balanced composition"
+              }
+            ],
+            "token_budget": null,
+            "token_count": 520,
+            "trimmed": false
+          }
+        },
+        "prompt_validation_report": {
+          "valid": true,
+          "forbidden_survived": [],
+          "duplicate_count": 0,
+          "sdxl_token_count": 29,
+          "clip_token_count": 41,
+          "required_style_preserved": true,
+          "required_layout_preserved": true,
+          "warnings": []
         },
         "reference_conditioning_package": {
           "enabled": true,
@@ -964,43 +1239,44 @@
         ],
         "prompt_budget": {
           "target_words": 100,
-          "actual_words": 110
+          "actual_words": 88
         }
       },
       "prompt_rendering": {
-        "generation_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain",
-        "clip_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene",
-        "pickscore_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, cinematic lighting, balanced contrast, priority lighting mood, identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, appealing composition, coherent style, aesthetic visual balance",
-        "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, Style: anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, Layout: illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, Lighting: cinematic lighting, balanced contrast, priority lighting mood, Quality: identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, Reference context: {'identity': {'gender': 'female', 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'accessories': ['sword', 'fancy dress', 'footwear', 'human face', 'miniskirt', 'woman', 'weapon']}, 'style': {'anime': 0.92, 'realism': 0.11, 'lineart': 0.87, 'rendering': 'anime illustration'}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve sword as a key identity accessory', 'preserve white visual identity cues', 'preserve stylized illustration cues']}, Reasoning context: {'user_goal': 'Generate an image matching: anime style, cinematic lighting, execpt weapon', 'scene_goal': 'create a cinematic visual scene', 'composition_goal': 'use balanced composition with readable subject placement', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize anime style with clean line art', 'priority': ['style', 'character', 'emotion', 'layout'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
-        "negative_prompt": "blurry, low quality, bad anatomy, duplicate, blurry, low quality, bad anatomy, duplicate"
+        "generation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+        "sdxl_style_prompt": "soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, cinematic lighting, soft shadow",
+        "clip_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with",
+        "pickscore_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, appealing composition, coherent style, aesthetic visual balance",
+        "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, Style: soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, Layout: illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, Lighting: cinematic lighting, soft shadow, Quality: identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'fancy dress', 'footwear', 'miniskirt', 'realism': 0.45, 'lineart': 0.3, 'rendering': ''}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve white visual identity cues']}, Reasoning context: {'user_goal': 'Generate a clear image from the available context', 'scene_goal': 'create a coherent visual scene', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize high quality, coherent visual style', 'priority': ['character', 'emotion', 'layout', 'style'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0001, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
+        "negative_prompt": "blurry, low quality, bad anatomy, duplicate, duplicate subject"
       },
-      "generation_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain",
-      "clip_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene",
-      "pickscore_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, cinematic lighting, balanced contrast, priority lighting mood, identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, appealing composition, coherent style, aesthetic visual balance",
-      "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, Style: anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, Layout: illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, Lighting: cinematic lighting, balanced contrast, priority lighting mood, Quality: identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, Reference context: {'identity': {'gender': 'female', 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'accessories': ['sword', 'fancy dress', 'footwear', 'human face', 'miniskirt', 'woman', 'weapon']}, 'style': {'anime': 0.92, 'realism': 0.11, 'lineart': 0.87, 'rendering': 'anime illustration'}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve sword as a key identity accessory', 'preserve white visual identity cues', 'preserve stylized illustration cues']}, Reasoning context: {'user_goal': 'Generate an image matching: anime style, cinematic lighting, execpt weapon', 'scene_goal': 'create a cinematic visual scene', 'composition_goal': 'use balanced composition with readable subject placement', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize anime style with clean line art', 'priority': ['style', 'character', 'emotion', 'layout'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
-      "negative_prompt": "blurry, low quality, bad anatomy, duplicate, blurry, low quality, bad anatomy, duplicate",
+      "generation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+      "clip_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with",
+      "pickscore_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, appealing composition, coherent style, aesthetic visual balance",
+      "vlm_judge_prompt": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, Style: soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, Layout: illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, Lighting: cinematic lighting, soft shadow, Quality: identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'fancy dress', 'footwear', 'miniskirt', 'realism': 0.45, 'lineart': 0.3, 'rendering': ''}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve white visual identity cues']}, Reasoning context: {'user_goal': 'Generate a clear image from the available context', 'scene_goal': 'create a coherent visual scene', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize high quality, coherent visual style', 'priority': ['character', 'emotion', 'layout', 'style'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0001, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}",
+      "negative_prompt": "blurry, low quality, bad anatomy, duplicate, duplicate subject",
       "metric_prompts": {
-        "clip": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene",
-        "pickscore": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, cinematic lighting, balanced contrast, priority lighting mood, identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, appealing composition, coherent style, aesthetic visual balance",
-        "vlm_judge": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, Style: anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, Layout: illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain high, use balanced composition with readable subject placement, Lighting: cinematic lighting, balanced contrast, priority lighting mood, Quality: identity priority 1.0, style priority 0.9, composition priority 0.8, lighting priority 0.9, relaxed posture, natural hand gestures, focused expression, intense gaze, Reference context: {'identity': {'gender': 'female', 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'accessories': ['sword', 'fancy dress', 'footwear', 'human face', 'miniskirt', 'woman', 'weapon']}, 'style': {'anime': 0.92, 'realism': 0.11, 'lineart': 0.87, 'rendering': 'anime illustration'}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve sword as a key identity accessory', 'preserve white visual identity cues', 'preserve stylized illustration cues']}, Reasoning context: {'user_goal': 'Generate an image matching: anime style, cinematic lighting, execpt weapon', 'scene_goal': 'create a cinematic visual scene', 'composition_goal': 'use balanced composition with readable subject placement', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize anime style with clean line art', 'priority': ['style', 'character', 'emotion', 'layout'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}"
+        "clip": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with",
+        "pickscore": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, appealing composition, coherent style, aesthetic visual balance",
+        "vlm_judge": "Compare the reference image and generated image. Evaluate identity, style, lighting, camera, composition, background, and prompt alignment. Return an evidence-based visual judgment, Subject: 2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, Scene: a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, Style: soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, Layout: illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, Lighting: cinematic lighting, soft shadow, Quality: identity priority 0.8, relaxed posture, natural hand gestures, soft smile, natural readable emotions, 'estimated_age': 'adult', 'species': 'human', 'role': 'warrior'}, 'appearance': {'hair': '', 'hair_color': '', 'eye_color': '', 'skin': '', 'outfit': 'blue dress', 'fancy dress', 'footwear', 'miniskirt', 'realism': 0.45, 'lineart': 0.3, 'rendering': ''}, 'composition': {'camera': 'eye_level', 'framing': 'single subject', 'viewpoint': 'front'}, 'colors': {'dominant': ['white', 'blue'], 'accent': ['blue']}, 'identity_rules': ['preserve reference image identity', 'preserve white visual identity cues']}, Reasoning context: {'user_goal': 'Generate a clear image from the available context', 'scene_goal': 'create a coherent visual scene', 'interaction_goal': 'keep the main subject expression and pose easy to read', 'style_goal': 'prioritize high quality, coherent visual style', 'priority': ['character', 'emotion', 'layout', 'style'], 'mode': 'mock_llm_rule_based', 'reasoning_provider': 'rule', 'reasoning_schema': 'context_reasoning', 'reasoning_used_fallback': True, 'reasoning_latency': 0.0001, 'llm_provider': 'rule', 'llm_used_fallback': True, 'llm_json_parse_success': False, 'reasoning_fallback_reason': 'rule fallback'}"
       },
-      "evaluation_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene"
+      "evaluation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with"
     }
   },
   "generation": {
-    "signature": "eebca2ecb7c7ab72722e7c52b111ef28c8a39bc821c6d4d09ca026ae84f19793",
+    "signature": "4f84bb22b7dd1fd929a1db97fc4f7f0c6f61d5e9c8f24436019a666684e27188",
     "artifacts": {
-      "output_image_path": "outputs\\output_sdxl_img2img.png",
-      "generation_provider": "sdxl_quality",
-      "generation_mode": "quality",
+      "output_image_path": "outputs\\flux_output_20260706_112601_307664.png",
+      "generation_provider": "flux_fast",
+      "generation_mode": "fast",
       "generation_plan": {
-        "generation_mode": "quality",
-        "provider": "sdxl_quality",
-        "cfg": 7.5,
+        "generation_mode": "fast",
+        "provider": "flux_fast",
+        "cfg": null,
         "strength": 0.55,
-        "steps": 30,
+        "steps": 4,
         "resolution": "1024x1024",
-        "scheduler": "DPM++ 2M Karras",
+        "scheduler": "schnell",
         "future_hooks": {
           "ip_adapter": "planned",
           "controlnet": "planned"
@@ -1023,68 +1299,45 @@
           "mood": "bright expressive mood",
           "camera": "balanced medium camera",
           "rendering": "polished anime rendering",
-          "quality_mode": true
+          "quality_mode": false
         },
-        "selected_lora": "anime",
-        "use_ip_adapter": true,
+        "selected_lora": null,
+        "use_ip_adapter": false,
         "controlnet": {
           "enabled": false,
           "type": "none",
-          "reason": "no structural control requested"
+          "reason": "fast mode"
         },
-        "reason": "Quality mode selected for stronger identity, outfit, accessory, and visual detail preservation."
+        "reason": "Fast mode selected for lightweight FLUX generation."
       },
       "provider_prompt_rendering": {
-        "provider_prompt": "clean anime illustration, expressive character design, clean cel-shaded lighting, high quality, crisp line art, bright expressive mood, balanced medium camera, polished anime rendering, pastel, clear base color, accent color",
-        "style_prompt": "clean anime illustration, expressive character design, clean cel-shaded lighting, high quality, crisp line art, bright expressive mood, balanced medium camera, polished anime rendering, pastel, clear base color, accent color",
-        "prompt_type": "Style",
-        "word_count": 29,
-        "token_count": 41,
+        "provider_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+        "prompt_type": "Dense",
+        "word_count": 88,
+        "token_count": 122,
         "notes": [
-          "SDXL Img2Img uses reference image for identity",
-          "SDXL prompt rendered from Style Program only",
-          "identity, hair, outfit, eye color, and accessories removed from prompt"
+          "FLUX uses the existing dense visual prompt"
         ]
       },
-      "provider_prompt_type": "Style",
-      "dense_generation_prompt": "2 recognizable subject, A woman in a school uniform holding a sword, female, warrior, blue dress, sword, fancy dress, footwear, human face, miniskirt, woman, weapon, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a cinematic visual scene, keep the main subject expression and pose easy to read, anime style, clean line art, expressive eyes, anime, lightweight anime lineart, soft pastel-friendly tones, preserve requested style without reducing identity clarity, prioritize anime style with clean line art, illustration, flexible, single clear frame, eye_level, balanced, clear focal point, balanced subject placement, avoid awkward cropping, composition priority should remain",
-      "generation_prompt": "clean anime illustration, expressive character design, clean cel-shaded lighting, high quality, crisp line art, bright expressive mood, balanced medium camera, polished anime rendering, pastel, clear base color, accent color",
-      "style_prompt": "clean anime illustration, expressive character design, clean cel-shaded lighting, high quality, crisp line art, bright expressive mood, balanced medium camera, polished anime rendering, pastel, clear base color, accent color",
-      "style_prompt_word_count": 29,
-      "style_prompt_token_count": 41,
-      "model_id": "stabilityai/stable-diffusion-xl-base-1.0",
-      "device": "cuda",
-      "dtype": "float16",
-      "cfg": 7.5,
+      "provider_prompt_type": "Dense",
+      "dense_generation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+      "generation_prompt": "2 recognizable subject, female character, warrior, blue dress, holding a sword, fancy dress, footwear, miniskirt, Each uploaded image represents one separate character, Do not merge characters, a clear illustration scene with readable character intent, clear subject presentation, create a coherent visual scene, keep the main subject expression and pose easy to read, soft Korean webtoon-style illustration, anime illustration, soft pastel-friendly tones, prioritize high quality, coherent visual style, illustration, flexible, single clear frame, eye_level, balanced composition, clear focal point, avoid awkward cropping, cinematic lighting, soft shadow, identity priority 0.8",
+      "style_prompt_word_count": 88,
+      "style_prompt_token_count": 122,
       "strength": 0.55,
-      "steps": 30,
-      "scheduler": "DPM++ 2M Karras",
+      "steps": 4,
+      "scheduler": "schnell",
       "resolution": "1024x1024",
       "future_hooks": {
         "ip_adapter": "planned",
         "controlnet": "planned"
       },
-      "ip_adapter_status": {
-        "enabled": true,
-        "loaded": true,
-        "requested": true,
-        "repo_id": "h94/IP-Adapter",
-        "subfolder": "sdxl_models",
-        "weight_name": "ip-adapter_sdxl.bin",
-        "scale": 0.75,
-        "used_fallback": false,
-        "fallback_reason": "",
-        "reason": "IP-Adapter loaded"
-      },
-      "ip_adapter_enabled": true,
-      "ip_adapter_loaded": true,
-      "ip_adapter_repo_id": "h94/IP-Adapter",
-      "ip_adapter_subfolder": "sdxl_models",
-      "ip_adapter_weight_name": "ip-adapter_sdxl.bin",
+      "ip_adapter_enabled": false,
+      "ip_adapter_loaded": false,
       "ip_adapter_scale": 0.75,
       "used_conditioning_fallback": false,
       "generation_is_mock": false
     }
   },
-  "updated_at": "2026-07-05T23:26:21"
+  "updated_at": "2026-07-06T11:26:27"
 }

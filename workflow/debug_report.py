@@ -84,6 +84,9 @@ class DebugReportManager:
             "generation_mode": self._safe(state.get("generation_mode")),
             "generation_plan": self._safe(state.get("generation_plan")),
             "generation_config": self._safe(state.get("generation_config")),
+            "generation_preset": self._safe(state.get("generation_preset")),
+            "preset_reason": self._safe(state.get("preset_reason")),
+            "environment_overrides": self._safe(state.get("environment_overrides")),
             "generation_prompt_length": self._safe(state.get("prompt_length")),
             "generation_is_mock": self._safe(state.get("generation_is_mock")),
             "fallback_reason": self._safe(state.get("fallback_reason")),
@@ -360,6 +363,11 @@ class DebugReportManager:
             lines,
             "GENERATION ROUTING",
             self._generation_routing_preview(state),
+        )
+        self._append_block(
+            lines,
+            "GENERATION PRESET",
+            self._generation_preset_preview(state),
         )
         self._append_block(
             lines,
@@ -661,6 +669,32 @@ class DebugReportManager:
             "generation_error_traceback": state.get("generation_error_traceback"),
             "notes": state.get("generation_notes", []),
         }
+
+    def _generation_preset_preview(self, state):
+        preset = state.get("generation_preset") or (
+            state.get("generation_config") or {}
+        ).get("generation_preset") or {}
+        return {
+            "preset": preset.get("preset_name"),
+            "strength": preset.get("sdxl_strength"),
+            "ip_adapter_scale": preset.get("ip_adapter_scale"),
+            "cfg": preset.get("cfg"),
+            "steps": preset.get("steps"),
+            "resolution": preset.get("resolution")
+            or self._resolution_from_preset(preset),
+            "reason": state.get("preset_reason") or preset.get("reason"),
+            "environment_overrides": state.get("environment_overrides")
+            or preset.get("environment_overrides", {}),
+        }
+
+    def _resolution_from_preset(self, preset):
+        if not preset:
+            return None
+        width = preset.get("width")
+        height = preset.get("height")
+        if width and height:
+            return f"{width}x{height}"
+        return None
 
     def _style_transfer_preview(self, state):
         return {

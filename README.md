@@ -170,6 +170,18 @@ v2.3 adds provider-specific prompt rendering. FLUX keeps the dense generation pr
 
 v2.4 connects optional IP-Adapter conditioning inside the SDXL Img2Img provider. SDXL Img2Img preserves reference structure, IP-Adapter strengthens identity/reference feature preservation, and the Style Prompt controls style direction. The adapter is inference-only; no training is performed. The default adapter config uses `IP_ADAPTER_REPO_ID=h94/IP-Adapter`, `IP_ADAPTER_SUBFOLDER=sdxl_models`, and `IP_ADAPTER_WEIGHT_NAME=ip-adapter_sdxl.bin`. If adapter loading fails, the provider falls back to SDXL Img2Img without crashing and records the fallback reason in the debug report.
 
+v2.6 adds a Style Transfer Preset Manager. SDXL Img2Img no longer uses one fixed `strength`, IP-Adapter scale, CFG, and step count for every style. The framework selects a `generation_preset` from the `style_transfer_program`, such as `photobooth_soft`, `ugly_cute_drawing`, `anime_webtoon`, or `realistic_preserve`.
+
+The trade-off is explicit:
+
+- Lower Img2Img `strength` keeps the original reference stronger.
+- Higher Img2Img `strength` allows stronger style change but can distort identity.
+- Higher IP-Adapter scale preserves reference identity/features more strongly.
+- Lower IP-Adapter scale gives the style prompt more freedom.
+- CFG and steps control prompt guidance strength and generation refinement.
+
+Environment variables can override the preset when manual tuning is needed: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`.
+
 ### Evaluation Layer
 
 Responsible for output evaluation and adaptive planning.
@@ -195,6 +207,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Style Transfer Program, Prompt Sanitizer, and Prompt Validator for long prompt structuring
 - Provider routing and provider prompt adaptation
 - Generation Planner and Generation Router with fast/quality modes
+- Style Transfer Preset Manager for SDXL strength, IP scale, CFG, steps, and resolution
 - Reference Conditioning Package for future IP-Adapter, ControlNet, and img2img
 - FLUX-oriented generation path
 - Multi-metric evaluation

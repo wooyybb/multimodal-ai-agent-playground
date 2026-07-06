@@ -50,7 +50,7 @@ class SDXLQualityProvider:
         output_path = ""
         used_fallback = False
         generation_is_mock = False
-        ip_adapter_status = self._ip_adapter_status()
+        ip_adapter_status = self._ip_adapter_status(state, config)
         notes = [
             "real SDXL Img2Img backend",
             "StableDiffusionXLImg2ImgPipeline",
@@ -63,7 +63,7 @@ class SDXLQualityProvider:
             reference_image = self._load_reference_image(state, config)
             error_stage = "pipeline_loading"
             self._load_pipeline()
-            ip_adapter_status = self._prepare_ip_adapter(reference_image)
+            ip_adapter_status = self._prepare_ip_adapter(reference_image, state, config)
             if ip_adapter_status.get("fallback_reason"):
                 notes.append(ip_adapter_status["fallback_reason"])
                 fallback_reason = ip_adapter_status["fallback_reason"]
@@ -117,6 +117,7 @@ class SDXLQualityProvider:
                 "device": self.device,
                 "dtype": self.torch_dtype_name,
                 "ip_adapter": ip_adapter_status,
+                "generation_preset": state.get("generation_preset") or {},
             },
             latency=latency,
             prompt_length=len(str(prompt or "").split()),
@@ -208,13 +209,13 @@ class SDXLQualityProvider:
         )
         self.pipeline = self.pipeline.to(self.device)
 
-    def _ip_adapter_status(self):
+    def _ip_adapter_status(self, state=None, config=None):
         enabled = str(os.getenv("USE_IP_ADAPTER") or "false").lower() in {
             "1",
             "true",
             "yes",
         }
-        scale = self._ip_adapter_scale()
+        scale = self._ip_adapter_scale(state, config)
         status = {
             "enabled": enabled,
             "loaded": False,
@@ -230,8 +231,8 @@ class SDXLQualityProvider:
         self._log_ip_adapter_status(status)
         return status
 
-    def _prepare_ip_adapter(self, reference_image):
-        status = self._ip_adapter_status()
+    def _prepare_ip_adapter(self, reference_image, state=None, config=None):
+        status = self._ip_adapter_status(state, config)
         if not status["enabled"]:
             return status
         if reference_image is None:
@@ -275,9 +276,11 @@ class SDXLQualityProvider:
         print(f"[IPAdapter] Fallback: {status.get('used_fallback')}")
         print(f"[IPAdapter] Reason: {status.get('fallback_reason') or status.get('reason', '')}")
 
-    def _ip_adapter_scale(self):
+    def _ip_adapter_scale(self, state=None, config=None):
+        preset = (state or {}).get("generation_preset") or {}
+        preset_value = preset.get("ip_adapter_scale")
         try:
-            return float(os.getenv("IP_ADAPTER_SCALE") or 0.75)
+            return float(os.getenv("IP_ADAPTER_SCALE") or preset_value or 0.75)
         except (TypeError, ValueError):
             return 0.75
 
@@ -354,6 +357,7 @@ class SDXLQualityProvider:
         data = config.to_dict()
         data["strength"] = self._strength(config)
         data["resolution"] = f"{self._width(config)}x{self._height(config)}"
+        data["generation_preset"] = getattr(config, "generation_preset", None) or {}
         return data
 
     def _width(self, config):

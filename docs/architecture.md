@@ -183,6 +183,30 @@ The `style_transfer_program` stores style, layout, pose/expression rules, text r
 
 User forbidden intent has the highest priority. If the user asks to remove weapons, weapon-related concepts are removed from final generation-facing prompts even when the reference caption contains a sword. The validator records `prompt_validation_report` with forbidden concept survival, duplicate count, SDXL token count, CLIP token count, and required style/layout preservation.
 
+## Style Transfer Preset Manager v2.6
+
+The Generation Layer reads the `style_transfer_program` and selects a generation preset before SDXL Img2Img runs:
+
+```text
+style_transfer_program
+  |
+  v
+StylePresetManager
+  |
+  v
+generation_preset
+  |
+  +-- sdxl_strength
+  +-- ip_adapter_scale
+  +-- cfg
+  +-- steps
+  +-- resolution
+```
+
+Supported presets include `subtle_transfer`, `balanced_transfer`, `strong_style_transfer`, `photobooth_soft`, `ugly_cute_drawing`, `anime_webtoon`, and `realistic_preserve`.
+
+The preset is still manually overridable through environment variables: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`. Debug reports store `generation_preset`, `preset_reason`, and `environment_overrides`.
+
 ## Evaluation Prompt Routing v1.3
 
 The Evaluation Layer consumes prompt variants by metric:

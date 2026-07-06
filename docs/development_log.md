@@ -319,6 +319,14 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added Prompt Validator to check forbidden concept survival, duplicate count, SDXL/CLIP token limits, and style/layout preservation.
 - Debug reports now include `style_transfer_program`, `forbidden_concepts`, `prompt_sanitizer_report`, `prompt_validation_report`, and `sdxl_style_prompt`.
 
+## Version 2.6
+
+- Added `StylePresetManager` and `GenerationPreset`.
+- SDXL quality generation now selects `subtle_transfer`, `balanced_transfer`, `strong_style_transfer`, `photobooth_soft`, `ugly_cute_drawing`, `anime_webtoon`, or `realistic_preserve` from `style_transfer_program`.
+- Generation preset values drive SDXL `strength`, IP-Adapter scale, CFG, steps, and resolution.
+- Environment overrides are supported through `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`.
+- Debug reports now include `generation_preset`, `preset_reason`, and `environment_overrides`.
+
 ## Future Work
 
 - Keep this file short.

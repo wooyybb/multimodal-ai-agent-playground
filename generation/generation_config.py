@@ -12,6 +12,9 @@ class GenerationConfig:
     strength: float = 0.55
     scheduler: str = "schnell"
     resolution: str = "1024x1024"
+    generation_preset: dict | None = None
+    preset_reason: str = ""
+    environment_overrides: dict | None = None
 
     @classmethod
     def from_plan(cls, plan: dict | None) -> "GenerationConfig":
@@ -27,6 +30,9 @@ class GenerationConfig:
             strength=float(plan.get("strength") or 0.55),
             scheduler=plan.get("scheduler") or "schnell",
             resolution=f"{width}x{height}",
+            generation_preset=plan.get("generation_preset") or {},
+            preset_reason=plan.get("preset_reason") or "",
+            environment_overrides=plan.get("environment_overrides") or {},
         )
 
     def to_dict(self):

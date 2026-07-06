@@ -4,6 +4,7 @@ from generation.generation_config import GenerationConfig
 from generation.generation_planner import GenerationPlanner
 from generation.prompt_renderer import ProviderPromptRenderer
 from generation.generation_result import GenerationResult
+from generation.style_preset_manager import StylePresetManager
 from provider.flux_fast_provider import FluxFastProvider
 from provider.sdxl_quality_provider import SDXLQualityProvider
 
@@ -12,6 +13,7 @@ class GenerationRouter:
     def __init__(self, planner=None, providers=None):
         self.planner = planner or GenerationPlanner()
         self.prompt_renderer = ProviderPromptRenderer()
+        self.style_preset_manager = StylePresetManager()
         self.providers = providers or {
             "flux_fast": FluxFastProvider(),
             "sdxl_quality": SDXLQualityProvider(),
@@ -29,6 +31,17 @@ class GenerationRouter:
             plan["provider"] = provider_name
             plan["generation_mode"] = "fast"
             plan["reason"] = "unknown provider fallback to flux_fast"
+        if provider_name == "sdxl_quality":
+            generation_preset = self.style_preset_manager.select(state)
+            plan = self._apply_generation_preset(plan, generation_preset)
+            state["generation_preset"] = generation_preset
+            state["preset_reason"] = generation_preset.get("reason", "")
+            state["environment_overrides"] = generation_preset.get(
+                "environment_overrides",
+                {},
+            )
+        else:
+            generation_preset = {}
 
         dense_prompt = state.get("generation_prompt") or state.get("final_prompt") or ""
         state["generation_plan"] = plan
@@ -66,6 +79,13 @@ class GenerationRouter:
             **config.to_dict(),
             **provider_generation_config,
         }
+        if generation_preset:
+            result["generation_preset"] = generation_preset
+            result["preset_reason"] = generation_preset.get("reason", "")
+            result["environment_overrides"] = generation_preset.get(
+                "environment_overrides",
+                {},
+            )
         result["generation_mode"] = plan.get("generation_mode")
         result["generation_provider"] = provider_name
         result["dense_generation_prompt"] = dense_prompt
@@ -133,3 +153,16 @@ class GenerationRouter:
         print(f"[GenerationRouter] Mock generation: {result.get('generation_is_mock')}")
         print(f"[GenerationRouter] Output: {result.get('output_image_path')}")
         return result
+
+    def _apply_generation_preset(self, plan, preset):
+        plan = dict(plan or {})
+        if not preset:
+            return plan
+        plan["strength"] = preset.get("sdxl_strength")
+        plan["cfg"] = preset.get("cfg")
+        plan["steps"] = preset.get("steps")
+        plan["resolution"] = preset.get("resolution")
+        plan["generation_preset"] = preset
+        plan["preset_reason"] = preset.get("reason", "")
+        plan["environment_overrides"] = preset.get("environment_overrides", {})
+        return plan

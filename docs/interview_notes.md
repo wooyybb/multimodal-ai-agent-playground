@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v2.6 Style Transfer Preset Manager Questions
+
+Q. Style마다 generation parameter를 다르게 둔 이유는?
+A. SDXL Img2Img에서는 style마다 적절한 원본 보존 강도와 스타일 변화 강도가 다릅니다. photobooth는 자연스럽고 부드럽게 유지해야 하고, ugly-cute drawing은 강한 스타일 변화가 필요합니다. 그래서 `style_transfer_program`을 읽어 `strength`, IP-Adapter scale, CFG, steps를 preset으로 자동 선택하게 했습니다.
+
+Q. Img2Img strength와 IP-Adapter scale의 차이는?
+A. Img2Img `strength`는 reference image를 얼마나 강하게 변형할지 조절합니다. 낮으면 원본이 강하게 보존되고 높으면 스타일 변화가 커집니다. IP-Adapter scale은 reference image feature를 얼마나 강하게 주입할지 조절합니다. 높으면 identity/hair/outfit 같은 reference feature가 더 잘 보존됩니다.
+
+Q. 원본이 너무 강하거나 이미지가 뭉개질 때 어떻게 조정하나요?
+A. 원본이 너무 강하면 `SDXL_STRENGTH`를 올리거나 `IP_ADAPTER_SCALE`을 낮춥니다. 이미지가 뭉개지거나 identity가 무너지면 `SDXL_STRENGTH`를 낮추고 `IP_ADAPTER_SCALE`을 올립니다. 필요하면 `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, `SDXL_HEIGHT`로 수동 override할 수 있습니다.
+
 ## v2.5 Long Prompt Structuring Questions
 
 Q. 왜 긴 사용자 프롬프트를 그대로 사용하지 않았나요?
