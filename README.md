@@ -279,15 +279,19 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 
 ## Repository Structure
 
-The folders remain implementation-oriented, but README explains them by responsibility:
+The v3.2 physical refactor separates top-level agent entry points from lower-level implementation modules:
 
 | Responsibility | Main Folders |
 | --- | --- |
-| Planning | `agents/`, `tools/vlm/` |
-| Context | `agents/`, `knowledge/`, `llm/` |
-| Generation | `agents/`, `tools/`, `config/` |
-| Evaluation | `agents/`, `evaluation/`, `tools/` |
+| Agent entry points and compatibility wrappers | `agents/` |
+| Understanding modules | `modules/understanding/`, `tools/vlm/` |
+| Planning modules | `modules/planning/`, `modules/prompt/`, `context/`, `llm/`, `knowledge/` |
+| Generation modules | `modules/generation/`, `generation/`, `provider/`, `config/` |
+| Evaluation modules | `modules/evaluation/`, `evaluation/`, `tools/` |
+| Reflection modules | `modules/reflection/` |
 | Infrastructure | `workflow/`, `memory/`, `api/`, `ui/`, `benchmark/`, `docs/` |
+
+`agents/` keeps compatibility wrappers such as `agents/style_agent.py` so older imports continue to work. The actual implementation now lives under `modules/`.
 
 ## Quick Start
 

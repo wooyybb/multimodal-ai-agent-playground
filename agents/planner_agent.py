@@ -1,5 +1,5 @@
-from agents.goal_planner import GoalPlanner
-from agents.llm_context_reasoner import LLMContextReasoner
+from modules.planning.goal_planner import GoalPlanner
+from modules.planning.llm_context_reasoner import LLMContextReasoner
 
 
 class PlannerAgent:

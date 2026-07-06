@@ -55,6 +55,44 @@ For example, `ReferenceImageParser` is important, but it is a module inside the 
 | Evaluation Agent | Score output quality from multiple perspectives. | CLIPMetric, DINOIdentityMetric, PromptMetric, AestheticMetric, EvaluationAggregator |
 | Reflection Agent | Analyze failure, choose strategy, adapt plan, and retry. | ReflectionAgent, SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent, MemorySave, DebugReport |
 
+## Physical File Structure v3.2
+
+v3.2 moves lower-level implementation files into `modules/` while keeping `agents/` as the compatibility and top-level entry folder.
+
+```text
+agents/
+  understanding_agent.py
+  planning_agent.py
+  generation_agent.py
+  evaluation_agent.py
+  reflection_agent.py
+  orchestrator_agent.py
+  *_agent.py compatibility wrappers
+
+modules/
+  understanding/
+  planning/
+  generation/
+  evaluation/
+  reflection/
+  prompt/
+  memory/
+```
+
+The wrapper policy keeps old imports stable:
+
+```python
+from modules.planning.style_agent import StyleAgent
+```
+
+is re-exported by:
+
+```python
+from agents.style_agent import StyleAgent
+```
+
+This lets the framework adopt the v3 structure without breaking `ToolRegistry`, `OrchestratorAgent`, API, UI, or benchmark entry points.
+
 ## 1-Minute Interview Explanation
 
 This project is a reference-aware multimodal AI Agent framework for style transfer. It is not just a prompt-to-image script. The Understanding Agent extracts visual context from the reference image. The Planning Agent turns the user's natural language request into a structured Style Transfer Program and Semantic Prompt Program. The Generation Agent renders provider-specific prompts and runs FLUX or SDXL Img2Img with optional IP-Adapter and ControlNet hooks. The Evaluation Agent scores the result with CLIP, DINO, prompt, and aesthetic metrics. The Reflection Agent analyzes failures and updates the plan for retry.

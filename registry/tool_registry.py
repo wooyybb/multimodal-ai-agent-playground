@@ -122,25 +122,25 @@ class ToolRegistry:
 
     def _register_default_tools(self):
         try:
-            from agents.llm_context_reasoner import LLMContextReasoner
+            from modules.planning.llm_context_reasoner import LLMContextReasoner
 
             self.register("llm_context_reasoner", LLMContextReasoner())
-            from agents.adaptive_planner import AdaptivePlanner
+            from modules.reflection.adaptive_planner import AdaptivePlanner
 
             self.register("adaptive_planner", AdaptivePlanner())
-            from agents.character_program_builder import CharacterProgramBuilder
+            from modules.understanding.character_program_builder import CharacterProgramBuilder
 
             self.register("character_program_builder", CharacterProgramBuilder())
-            from agents.reference_image_parser import ReferenceImageParser
+            from modules.understanding.reference_image_parser import ReferenceImageParser
 
             self.register("reference_image_parser", ReferenceImageParser())
-            from agents.goal_planner import GoalPlanner
+            from modules.planning.goal_planner import GoalPlanner
 
             self.register("goal_planner", GoalPlanner())
-            from agents.strategy_selector import StrategySelector
+            from modules.reflection.strategy_selector import StrategySelector
 
             self.register("strategy_selector", StrategySelector())
-            from agents.self_verification_agent import SelfVerificationAgent
+            from modules.reflection.self_verification_agent import SelfVerificationAgent
 
             self.register("self_verification", SelfVerificationAgent())
         except Exception as error:

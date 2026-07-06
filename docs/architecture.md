@@ -62,6 +62,23 @@ flowchart TD
 4. Evaluation Agent scores the output with metric-specific prompts and image similarity metrics.
 5. Reflection Agent analyzes failure modes, updates planning strategy, decides retry, and records memory/debug output.
 
+## Physical Module Layout v3.2
+
+The codebase mirrors the 5-Agent explanation with a `modules/` package:
+
+| Area | Folder |
+| --- | --- |
+| Top-level entry points and compatibility wrappers | `agents/` |
+| Understanding implementations | `modules/understanding/` |
+| Planning implementations | `modules/planning/` |
+| Prompt planning/rendering helpers | `modules/prompt/` |
+| Generation implementations | `modules/generation/` |
+| Evaluation implementations | `modules/evaluation/` |
+| Reflection implementations | `modules/reflection/` |
+| Knowledge helper modules | `modules/memory/` |
+
+Compatibility wrappers remain in `agents/` during the first physical refactor, so older imports such as `from agents.style_agent import StyleAgent` still work while the implementation lives in `modules/planning/style_agent.py`.
+
 ## Vision Layer v1.5
 
 The Vision Layer no longer treats BLIP as the framework boundary. `VisionAgent` calls `VLMRouter`, and the selected provider returns a shared `vision_result`.

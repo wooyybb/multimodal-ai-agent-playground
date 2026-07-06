@@ -8,6 +8,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added ToolRegistry agent-group metadata and ExecutionEngine component trace fields.
 - Updated README, architecture, project summary, interview notes, and release notes around Agent vs Module terminology.
 
+## Version 3.2
+
+- Added the `modules/` package and grouped lower-level implementations by Understanding, Planning, Generation, Evaluation, Reflection, Prompt, and Memory responsibilities.
+- Kept `agents/` compatibility wrappers so existing imports and execution plans continue to work.
+- Updated Registry and Orchestrator imports to use implementation modules directly where practical.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

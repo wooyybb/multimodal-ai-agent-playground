@@ -1,11 +1,4 @@
-class RetryAgent:
-    def __init__(self, threshold=0.75):
-        self.threshold = threshold
+from modules.reflection.retry_agent import RetryAgent
 
-    def should_retry(self, score: float) -> bool:
-        if score < self.threshold:
-            print("[RetryAgent] Score below threshold. Retry needed.")
-            return True
+__all__ = ["RetryAgent"]
 
-        print("[RetryAgent] Score meets threshold. No retry.")
-        return False
