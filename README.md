@@ -1,42 +1,42 @@
 # Multimodal AI Agent Playground
 
-**Responsibility-based AI Agent Framework for Multimodal Image Generation**
+**Reference-aware Multimodal AI Agent Framework for Style Transfer**
 
-![Status](https://img.shields.io/badge/status-v1.1-blue)
+![Status](https://img.shields.io/badge/status-v3.1-blue)
 ![Python](https://img.shields.io/badge/Python-3.x-green)
-![Architecture](https://img.shields.io/badge/Architecture-Responsibility--Layered-purple)
+![Architecture](https://img.shields.io/badge/Architecture-5--Agent-purple)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-teal)
 ![Gradio](https://img.shields.io/badge/UI-Gradio-orange)
 
 ## Project Overview
 
-This project is not about having many agents. It is a multimodal image generation framework organized by responsibility.
+This project is not a prompt-to-image demo. It is a reference-aware multimodal AI Agent framework that understands a reference image, converts a natural-language style request into a structured Style Transfer Program, renders provider-specific prompts, generates with SDXL Img2Img/IP-Adapter/ControlNet hooks, evaluates the result, and adaptively replans.
 
-The framework is explained through five layers:
+The framework is explained through five top-level agents:
 
-1. Planning Layer
-2. Context Layer
-3. Generation Layer
-4. Evaluation Layer
-5. Infrastructure Layer
+1. Understanding Agent
+2. Planning Agent
+3. Generation Agent
+4. Evaluation Agent
+5. Reflection Agent
 
-Each internal agent is treated as an implementation detail inside one of these layers.
+Existing smaller agents and utilities are treated as internal modules/components inside these five agents.
 
 ## Why This Project?
 
 Most image generation demos are direct prompt-to-image scripts. They are hard to inspect when the result is poor.
 
-This project separates the workflow into responsibilities:
+This project separates the workflow into agent responsibilities:
 
 ```text
-Understand intent and reference image
--> Build generation-ready context
--> Generate with provider-specific adaptation
--> Evaluate and adapt the plan
--> Save memory, debug reports, and benchmark results
+Reference Understanding
+-> Style Transfer Planning
+-> Reference-aware Generation
+-> Multi-Metric Evaluation
+-> Reflection and Adaptive Replanning
 ```
 
-The goal is to make the system understandable in five minutes: what each layer owns, how data moves, and where future improvements belong.
+The goal is to make the system understandable in five minutes: what each top-level agent owns, how data moves, and where future improvements belong.
 
 The current framework can be summarized as:
 
@@ -64,40 +64,50 @@ Adaptive Planning
 
 The LLM does not write the final prompt directly. It plans a JSON-based Style Transfer Program, and the Semantic Prompt Engine renders provider-specific prompts from that program.
 
-## Layer-based Architecture
+## 5-Agent Architecture
 
 ```text
 User
   |
   v
-Planning Layer
+Understanding Agent
   |
   v
-Context Layer
+Planning Agent
   |
   v
-Generation Layer
+Generation Agent
   |
   v
-Evaluation Layer
+Evaluation Agent
   |
   v
-Infrastructure Layer
+Reflection Agent
 ```
 
 ## End-to-End Workflow
 
-| Step | Layer | Responsibility |
+| Step | Agent | Responsibility |
 | --- | --- | --- |
-| 1 | Planning | Understand user intent, reference image, goal, character, and scene. |
-| 2 | Context | Build Context Program, validate it, optimize prompt, and compile provider prompt package. |
-| 3 | Generation | Route provider, adapt prompt, and generate image. |
-| 4 | Evaluation | Evaluate output, reflect, select strategy, adapt plan, and decide retry. |
-| 5 | Infrastructure | Save memory, debug report, benchmark output, API/UI access, and run history. |
+| 1 | Understanding | Parse reference image, character identity, style hints, objects, colors, and composition. |
+| 2 | Planning | Convert user intent into Style Transfer Program, semantic prompt program, constraints, and provider-ready planning signals. |
+| 3 | Generation | Render provider-specific prompts, route provider, apply SDXL Img2Img/IP-Adapter/ControlNet hooks, and generate image. |
+| 4 | Evaluation | Run multi-metric evaluation for semantic alignment, identity consistency, prompt consistency, and aesthetic quality. |
+| 5 | Reflection | Reflect on failures, select strategy, adapt planning parameters, decide retry, and save debug/memory outputs. |
 
-## Core Layers
+## Agent Responsibilities
 
-### Planning Layer
+| Agent | Main Inputs | Main Outputs | Internal Components |
+| --- | --- | --- | --- |
+| Understanding Agent | Reference image, VLM output, user prompt | `vision_result`, `reference_image`, `character_program` | VisionAgent, ReferenceImageParser, CharacterProgramBuilder |
+| Planning Agent | User prompt, reference context, character program | `style_transfer_program`, `semantic_prompt_program`, constraints, validation reports | LLMStyleTransferPlanner, GoalPlanner, ScenePlanningAgent, Style/Layout/Pose/Expression/Lighting modules, SemanticPromptEngine, ConflictResolver, PromptSanitizer, PromptValidator |
+| Generation Agent | Style Transfer Program, semantic prompt, provider config, reference conditioning package | Provider prompt, generation config, generated image path | PromptCompiler, ProviderRouter, ProviderPromptAdapter, GenerationPlanner, GenerationRouter, SDXL/FLUX providers, ReferenceConditioningPipeline, StylePresetManager |
+| Evaluation Agent | Generated image, reference image, metric-specific prompts | `evaluation_result`, weighted score, metric summary | CLIPMetric, DINOIdentityMetric, PromptMetric, AestheticMetric, EvaluationAggregator |
+| Reflection Agent | Evaluation result, strategy candidates, current state | `adaptive_plan`, retry decision, memory/debug trace | ReflectionAgent, SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent, MemorySave, DebugReport |
+
+## Component Details
+
+### Understanding Agent
 
 Responsible for understanding user intent and reference image.
 
@@ -138,11 +148,11 @@ Structured Vision Result
 
 `ReferenceImageParser` prioritizes structured object detection results first, then `detailed_caption`, then `caption`, and finally rule-based fallback parsing. Detected objects are normalized as `{name, bbox}` records so accessories such as weapons, hats, and bags can be carried into the reference image context.
 
-### Context Layer
+### Planning Agent
 
 Responsible for making generation-ready context.
 
-Externally, this layer can be understood as the Prompt Compiler layer. Internally, it includes Context Program, prompt validation, negative prompt, prompt optimization, and prompt compression.
+Externally, this agent can be understood as the style transfer planner. Internally, it includes Context Program, prompt validation, negative prompt, prompt optimization, and prompt compression.
 
 v2.5 adds Long Prompt Structuring for reference-aware style transfer. Long user prompts are no longer copied directly into the final prompt. They are first converted into a `style_transfer_program`, then rendered into provider-specific prompts.
 
@@ -181,7 +191,7 @@ Semantic Merge reduces meaning-level duplication such as `anime`, `anime style`,
 
 v3.0 adds the LLM Style Transfer Planner. When `LLM_PROVIDER=openai` and an API key is available, the LLM attempts to convert the natural-language user request into a structured Style Transfer Program. If the LLM is unavailable, invalid, or disabled, the rule-based planner is used. The final prompt is still created by the Semantic Prompt Engine, not by the LLM.
 
-### Generation Layer
+### Generation Agent
 
 Responsible for provider-specific generation.
 
@@ -232,13 +242,13 @@ The trade-off is explicit:
 
 Environment variables can override the preset when manual tuning is needed: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`.
 
-### Evaluation Layer
+### Evaluation Agent
 
 Responsible for output evaluation and adaptive planning.
 
 It includes evaluation aggregation, reflection, hypothesis/strategy logic, adaptive planning, and retry decision. Hypothesis, Strategy, and Retry are treated as internal steps of adaptive evaluation.
 
-### Infrastructure Layer
+### Reflection and Infrastructure
 
 Responsible for system support.
 
@@ -484,6 +494,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Agent Architecture v3](docs/agent_architecture_v3.md)
 - [Layer Map](docs/layer_map.md)
 - [Project Summary](docs/project_summary.md)
 - [Design Specification v1.0](docs/design_spec_v1.md)
@@ -491,6 +502,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 - [Interview Notes](docs/interview_notes.md)
 - [Roadmap](docs/roadmap.md)
 - [v1.0 RC2 Release Notes](docs/release_notes_v1_rc2.md)
+- [v3 Agent Refactor Release Notes](docs/release_notes_v3_agent_refactor.md)
 
 ## License
 

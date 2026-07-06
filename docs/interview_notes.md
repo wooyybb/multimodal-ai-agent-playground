@@ -1,5 +1,25 @@
 # Interview Notes
 
+## v3 Agent Architecture Refactoring Questions
+
+Q. 왜 Agent 수를 줄였나요?
+A. 실제 코드의 작은 agent/module 수가 많아지면서 처음 보는 사람이 전체 구조를 이해하기 어려워졌습니다. 그래서 외부 설명은 Understanding, Planning, Generation, Evaluation, Reflection의 5개 상위 Agent로 정리하고, 기존 작은 agent들은 내부 module로 설명했습니다. 기능은 유지하면서 책임 경계를 더 선명하게 만든 refactoring입니다.
+
+Q. Agent와 Module의 차이를 어떻게 정의했나요?
+A. Agent는 목표, 의사결정, tool-use, feedback loop를 책임지는 상위 단위입니다. Module은 그 Agent 안에서 특정 기능 하나를 수행하는 하위 컴포넌트입니다. 예를 들어 ReferenceImageParser는 Understanding Agent의 module이고, PromptCompiler는 Generation Agent의 module입니다.
+
+Q. 이 프로젝트가 AI Agent라고 볼 수 있는 이유는?
+A. 단순히 prompt를 이미지 모델에 넣는 구조가 아니라 reference image를 이해하고, style transfer goal을 계획하고, provider별 prompt를 렌더링하고, 생성 결과를 평가한 뒤 reflection/adaptive planning으로 다음 전략을 조정합니다. 입력 이해, 계획, 도구 호출, 평가, 피드백 루프가 있기 때문에 AI Agent framework로 볼 수 있습니다.
+
+Q. Reflection Agent는 어떤 역할을 하나요?
+A. Reflection Agent는 Evaluation 결과를 읽고 실패 원인을 분석합니다. 이후 SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent를 통해 다음 generation strategy를 조정하고, debug report와 memory에 실행 흔적을 남깁니다.
+
+Q. Planning Agent가 단순 Prompt Builder와 무엇이 다른가요?
+A. Planning Agent는 final prompt를 바로 만드는 것이 아니라 Style Transfer Program과 Semantic Prompt Program을 만듭니다. 여기에는 identity policy, style goal, layout, generation strategy, forbidden concepts, negative prompt, validation 결과가 포함됩니다. 최종 prompt는 Generation Agent의 renderer가 provider별로 생성합니다.
+
+Q. 왜 LLM을 final prompt generator로 쓰지 않았나요?
+A. LLM이 final prompt를 직접 쓰면 provider token budget, forbidden concepts, reference conditioning, evaluation prompt routing을 일관되게 관리하기 어렵습니다. 이 프로젝트에서는 LLM이 구조화된 intent를 계획하고, framework가 검증 가능한 program을 provider별 prompt로 렌더링합니다.
+
 ## v3.0 LLM Style Transfer Planner Questions
 
 Q. 이 프로젝트에서 LLM은 어떤 역할을 하나요?

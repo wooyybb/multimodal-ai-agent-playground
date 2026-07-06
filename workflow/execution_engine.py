@@ -8,15 +8,15 @@ from memory.context_cache import ContextCacheManager
 
 class DynamicExecutionEngine:
     DEFAULT_PLAN = [
-        # ===== Planning Layer =====
+        # ===== Planning Agent =====
         "goal_planner",
-        # ===== Infrastructure Layer =====
+        # ===== Infrastructure =====
         "memory_load",
-        # ===== Planning Layer =====
+        # ===== Understanding Agent =====
         "vision",
         "reference_image_parser",
         "character_program_builder",
-        # ===== Context Layer =====
+        # ===== Planning Agent =====
         "memory_retrieval",
         "retrieval",
         "prompt_compressor",
@@ -35,21 +35,48 @@ class DynamicExecutionEngine:
         "llm_prompt_critic",
         "prompt_optimizer",
         "llm_prompt_optimizer",
+        # ===== Generation Agent =====
         "prompt_compiler",
-        # ===== Generation Layer =====
         "provider_router",
         "provider_prompt_adapter",
         "generation",
-        # ===== Evaluation Layer =====
+        # ===== Evaluation Agent =====
         "evaluation",
+        # ===== Reflection Agent =====
         "reflection",
         "self_verification",
         "strategy_selector",
         "adaptive_planner",
         "retry",
-        # ===== Infrastructure Layer =====
+        # ===== Infrastructure =====
         "memory_save",
     ]
+
+    AGENT_STEP_MESSAGES = {
+        "vision": "Running vision...",
+        "reference_image_parser": "Parsing reference image...",
+        "character_program_builder": "Building character program...",
+        "goal_planner": "Building goal tree...",
+        "llm_context_reasoner": "Interpreting user intent...",
+        "scene_planning": "Planning scene...",
+        "style": "Planning style...",
+        "layout": "Planning layout...",
+        "pose": "Planning pose...",
+        "expression": "Planning expression...",
+        "lighting": "Planning lighting...",
+        "negative_prompt": "Planning negative constraints...",
+        "prompt_compiler": "Building style transfer program...",
+        "provider_router": "Selecting generation provider...",
+        "provider_prompt_adapter": "Rendering provider prompt...",
+        "generation": "Running generation...",
+        "evaluation": "Running metrics...",
+        "reflection": "Reflecting on result...",
+        "self_verification": "Verifying result...",
+        "strategy_selector": "Selecting strategy...",
+        "adaptive_planner": "Creating adaptive plan...",
+        "retry": "Deciding retry...",
+        "memory_save": "Saving memory and debug report...",
+    }
 
     CACHE_RULES = {
         "goal_planner": {
@@ -152,6 +179,9 @@ class DynamicExecutionEngine:
         state.setdefault("executed_layers", [])
         state.setdefault("skipped_layers", [])
         state.setdefault("dirty_reasons", [])
+        state["agent_architecture_version"] = "v3"
+        state.setdefault("executed_agent_groups", [])
+        state.setdefault("component_trace", [])
         planner_goal_tree = (state.get("planner_result") or {}).get("goal_tree")
         if planner_goal_tree and not state.get("goal_tree"):
             state["goal_tree"] = planner_goal_tree
@@ -180,7 +210,10 @@ class DynamicExecutionEngine:
                     continue
 
                 print(f"[ExecutionEngine] Run {self._cache_step_label(step)}")
+                state["_active_component_step"] = step
+                self._record_agent_group_step(registry, state, step)
                 handler(registry, state)
+                state.pop("_active_component_step", None)
                 self._record_cache_step(step, state)
                 self._record_executed_step(registry, step, state)
                 state["agent_trace"].append(f"ExecutionEngine completed {step}")
@@ -197,6 +230,7 @@ class DynamicExecutionEngine:
         final_dict = final_state.to_dict()
         final_dict.pop("_context_cache", None)
         final_dict.pop("_context_cache_updates", None)
+        final_dict.pop("_active_component_step", None)
         return final_dict
 
     def _run_memory_load(self, registry, state):
@@ -1373,11 +1407,41 @@ class DynamicExecutionEngine:
         return bool(output_path and Path(str(output_path)).exists())
 
     def _run_state_step(self, registry, state, step):
+        if state.get("_active_component_step") != step:
+            self._record_agent_group_step(registry, state, step)
         print(f"[{self._layer_label(registry, step)}] Running state-based step: {step}")
         result = registry.run_with_state(step, state)
         state.update(result)
         print(f"[{self._layer_label(registry, step)}] State updated by: {step}")
         return result
+
+    def _record_agent_group_step(self, registry, state, step):
+        group = self._agent_group(registry, step)
+        label = self._agent_group_label(registry, step)
+        message = self.AGENT_STEP_MESSAGES.get(step, f"Running {step}...")
+        print(f"[{label}] {message}")
+
+        executed_groups = state.setdefault("executed_agent_groups", [])
+        if group not in executed_groups:
+            executed_groups.append(group)
+        state.setdefault("component_trace", []).append(
+            {
+                "agent_group": group,
+                "agent_label": label,
+                "component": step,
+                "message": message,
+            }
+        )
+
+    def _agent_group(self, registry, step):
+        if hasattr(registry, "agent_group_for"):
+            return registry.agent_group_for(step)
+        return "unmapped"
+
+    def _agent_group_label(self, registry, step):
+        if hasattr(registry, "agent_group_label_for"):
+            return registry.agent_group_label_for(step)
+        return "Unmapped Agent"
 
     def _layer_label(self, registry, step):
         if hasattr(registry, "layer_label_for"):

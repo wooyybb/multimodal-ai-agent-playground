@@ -1,66 +1,66 @@
 # Architecture
 
-This document describes the responsibility-based architecture of Multimodal AI Agent Playground, including the v1.5 Florence Vision Parser upgrade.
+This document describes the v3 5-Agent Architecture of Multimodal AI Agent Playground.
 
-## Target Architecture
+The project is a reference-aware multimodal AI Agent framework for style transfer. Existing small agents are treated as internal modules inside five top-level agents.
+
+## Target Architecture v3
 
 ```text
 User
   |
   v
-Planning Layer
+Understanding Agent
   |
   v
-Context Layer
+Planning Agent
   |
   v
-Generation Layer
+Generation Agent
   |
   v
-Evaluation Layer
+Evaluation Agent
   |
   v
-Infrastructure Layer
+Reflection Agent
 ```
 
-## Layer Responsibilities
+## Agent Responsibilities
 
-| Layer | Responsibility | Internal Examples |
+| Agent | Responsibility | Internal Examples |
 | --- | --- | --- |
-| Planning Layer | Understand user intent and reference image. | Vision Router, BLIP, Florence-2, Reference Parsing, Goal Planning, Character Extraction, Scene Planning |
-| Context Layer | Build generation-ready context. | Character Program, Context Program, Prompt Rendering Engine, Prompt Validation, Prompt Optimization |
-| Generation Layer | Generate with provider-specific adaptation. | Provider Router, Provider Adapter, Generation Agent, FLUX, SDXL Img2Img |
-| Evaluation Layer | Evaluate result and adapt next plan. | Evaluation Aggregator, Reflection, Hypothesis, Strategy, Adaptive Planning, Retry |
-| Infrastructure Layer | Support runtime, observability, and access. | Memory, History, Debug Report, Benchmark, FastAPI, Gradio |
+| Understanding Agent | Understand the reference image and extract structured visual context. | VisionAgent, VLMRouter, BLIP, Florence-2, ReferenceImageParser, CharacterProgramBuilder |
+| Planning Agent | Convert user intent into Style Transfer Program, Semantic Prompt Program, constraints, and validation results. | LLMStyleTransferPlanner, GoalPlanner, ScenePlanningAgent, SemanticPromptEngine, ConflictResolver, PromptSanitizer, PromptValidator |
+| Generation Agent | Render provider-specific prompts and run reference-aware generation. | PromptCompiler, ProviderRouter, ProviderPromptAdapter, GenerationRouter, FLUX, SDXL Img2Img, IP-Adapter hook, ControlNet hook |
+| Evaluation Agent | Evaluate output with multiple metrics. | EvaluationAggregator, CLIPMetric, DINOIdentityMetric, PromptMetric, AestheticMetric |
+| Reflection Agent | Analyze results, select strategy, adapt plan, retry, and record observability data. | ReflectionAgent, SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent, MemorySave, DebugReport |
 
 ## Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    U[User] --> P[Planning Layer]
-    P --> C[Context Layer]
-    C --> G[Generation Layer]
-    G --> E[Evaluation Layer]
-    E --> C
-    E --> I[Infrastructure Layer]
-    P --> I
-    C --> I
-    G --> I
+    U[User + Reference Image] --> A1[Understanding Agent]
+    A1 --> A2[Planning Agent]
+    A2 --> A3[Generation Agent]
+    A3 --> A4[Evaluation Agent]
+    A4 --> A5[Reflection Agent]
+    A5 --> A2
+    A5 --> O[Memory / Debug Report / Benchmark]
 
-    P -.internal.-> P1[Vision / Goal / Reference / Scene]
-    C -.internal.-> C1[Context Program / Prompt Compiler]
-    G -.internal.-> G1[Provider Router / Generation]
-    E -.internal.-> E1[Evaluation / Adaptive Planning / Retry]
-    I -.internal.-> I1[Memory / Debug / Benchmark / API / UI]
+    A1 -.modules.-> M1[Vision / Reference Parser / Character Program]
+    A2 -.modules.-> M2[Style Transfer Program / Semantic Prompt Engine / Validation]
+    A3 -.modules.-> M3[Prompt Compiler / Provider Router / SDXL or FLUX]
+    A4 -.modules.-> M4[CLIP / DINO / Prompt / Aesthetic Metrics]
+    A5 -.modules.-> M5[Reflection / Strategy / Adaptive Planner / Retry]
 ```
 
 ## Runtime Flow
 
-1. Planning Layer reads user input and image reference.
-2. Context Layer turns planning output into provider-ready context and prompt package.
-3. Generation Layer chooses provider and generates the image.
-4. Evaluation Layer scores the result and decides whether adaptation or retry is needed.
-5. Infrastructure Layer records memory, debug reports, benchmark outputs, and exposes UI/API access.
+1. Understanding Agent reads the image reference and produces structured visual context.
+2. Planning Agent turns user intent and reference context into Style Transfer Program and Semantic Prompt Program.
+3. Generation Agent renders provider prompts and generates with FLUX or SDXL Img2Img plus optional conditioning hooks.
+4. Evaluation Agent scores the output with metric-specific prompts and image similarity metrics.
+5. Reflection Agent analyzes failure modes, updates planning strategy, decides retry, and records memory/debug output.
 
 ## Vision Layer v1.5
 

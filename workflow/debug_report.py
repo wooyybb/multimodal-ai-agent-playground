@@ -68,6 +68,13 @@ class DebugReportManager:
         return {
             "run_id": self.run_id,
             "timestamp": self.timestamp,
+            "agent_architecture_version": self._safe(
+                state.get("agent_architecture_version", "v3")
+            ),
+            "executed_agent_groups": self._safe(
+                state.get("executed_agent_groups", [])
+            ),
+            "component_trace": self._safe(state.get("component_trace", [])),
             "user_prompt": self._safe(state.get("user_prompt")),
             "vision_result": self._safe(self._vision_result(state)),
             "vlm_provider": self._safe(
@@ -289,6 +296,15 @@ class DebugReportManager:
     def _build_prompt_preview(self, state):
         lines = []
         self._append_block(lines, "USER REQUEST", state.get("user_prompt"))
+        self._append_block(
+            lines,
+            "AGENT ARCHITECTURE",
+            {
+                "version": state.get("agent_architecture_version", "v3"),
+                "executed_agent_groups": state.get("executed_agent_groups", []),
+                "component_trace": state.get("component_trace", []),
+            },
+        )
         self._append_block(
             lines,
             "INCREMENTAL EXECUTION",

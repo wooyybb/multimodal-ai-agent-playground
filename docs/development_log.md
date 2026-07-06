@@ -2,6 +2,12 @@
 
 This log keeps a short summary of each sprint. Detailed notes live in `docs/sprint_book/`.
 
+## Version 3.1
+
+- Refactored architecture explanation into five top-level agents: Understanding, Planning, Generation, Evaluation, and Reflection.
+- Added ToolRegistry agent-group metadata and ExecutionEngine component trace fields.
+- Updated README, architecture, project summary, interview notes, and release notes around Agent vs Module terminology.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

@@ -2,6 +2,64 @@ from workflow.agent_state import AgentState
 
 
 class ToolRegistry:
+    AGENT_GROUP_METADATA = {
+        "understanding": [
+            "vision",
+            "reference_image_parser",
+            "character_program_builder",
+        ],
+        "planning": [
+            "llm_context_reasoner",
+            "goal_planner",
+            "scene_planning",
+            "character",
+            "style",
+            "layout",
+            "pose",
+            "expression",
+            "lighting",
+            "negative_prompt",
+            "context_program_builder",
+            "context_program_validator",
+            "prompt_assembler",
+            "prompt_critic",
+            "llm_prompt_critic",
+            "prompt_optimizer",
+            "llm_prompt_optimizer",
+            "retrieval",
+            "memory_retrieval",
+            "prompt_compressor",
+        ],
+        "generation": [
+            "prompt_compiler",
+            "provider_router",
+            "provider_prompt_adapter",
+            "generation",
+        ],
+        "evaluation": [
+            "evaluation",
+        ],
+        "reflection": [
+            "reflection",
+            "self_verification",
+            "strategy_selector",
+            "adaptive_planner",
+            "retry",
+        ],
+        "infrastructure": [
+            "memory_load",
+            "memory_save",
+        ],
+    }
+    AGENT_GROUP_LABELS = {
+        "understanding": "Understanding Agent",
+        "planning": "Planning Agent",
+        "generation": "Generation Agent",
+        "evaluation": "Evaluation Agent",
+        "reflection": "Reflection Agent",
+        "infrastructure": "Infrastructure",
+        "unmapped": "Unmapped Agent",
+    }
     LAYER_METADATA = {
         "planning": [
             "goal_planner",
@@ -149,3 +207,23 @@ class ToolRegistry:
 
     def layer_label_for(self, tool_name: str) -> str:
         return self.LAYER_LABELS.get(self.layer_for(tool_name), "Unmapped Layer")
+
+    def agent_group_for(self, tool_name: str) -> str:
+        for group, tools in self.AGENT_GROUP_METADATA.items():
+            if tool_name in tools:
+                return group
+        return "unmapped"
+
+    def agent_group_label_for(self, tool_name: str) -> str:
+        return self.AGENT_GROUP_LABELS.get(
+            self.agent_group_for(tool_name), "Unmapped Agent"
+        )
+
+    def metadata_for(self, tool_name: str) -> dict:
+        return {
+            "name": tool_name,
+            "layer": self.layer_for(tool_name),
+            "layer_label": self.layer_label_for(tool_name),
+            "agent_group": self.agent_group_for(tool_name),
+            "agent_group_label": self.agent_group_label_for(tool_name),
+        }

@@ -30,6 +30,7 @@
 | v2.8 | Reference Conditioning Pipeline | Complete |
 | v2.9 | ControlNet Hook for SDXL Img2Img | Complete |
 | v3.0 | LLM Style Transfer Planner | Complete |
+| v3.1 | 5-Agent Architecture refactoring and documentation alignment | Complete |
 
 ## Completed Sprints
 
