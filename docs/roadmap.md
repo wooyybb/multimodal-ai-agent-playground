@@ -27,6 +27,7 @@
 | v2.5 | Long Prompt Structuring for Reference-aware Style Transfer | Complete |
 | v2.6 | Style Transfer Preset Manager for generation parameter control | Complete |
 | v2.7 | Semantic Prompt Engine | Complete |
+| v2.8 | Reference Conditioning Pipeline | Complete |
 
 ## Completed Sprints
 
@@ -106,6 +107,7 @@
 - Version 2.5: Long user prompts are converted into Style Transfer Program, sanitized, validated, and rendered into FLUX/SDXL/CLIP-specific prompts
 - Version 2.6: Style Transfer Preset Manager selects SDXL strength, IP-Adapter scale, CFG, steps, and resolution from `style_transfer_program` with environment override support
 - Version 2.7: Semantic Prompt Program, Semantic Merge, Conflict Resolver, Provider Renderer, and section-based prompt preview
+- Version 2.8: Reference Analyzer, Reference Preprocessor, conditioned reference image, and conditioning debug report for SDXL Img2Img/IP-Adapter stability
 
 ## Planned Sprints
 

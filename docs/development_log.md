@@ -335,6 +335,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Added Provider Renderer for FLUX dense prompt, SDXL style prompt, and CLIP evaluation prompt views.
 - Prompt Preview now includes section-based Identity, Style, Layout, Scene, Lighting, Quality, Negative, and Constraints blocks.
 
+## Version 2.8
+
+- Added Reference Analyzer for width, height, aspect ratio, character ratio, background ratio, face ratio, focus, and quality estimation.
+- Added Reference Preprocessor with aspect-ratio-preserving resize, auto center crop, auto padding, and longest-edge resize behavior.
+- SDXL Img2Img and IP-Adapter now receive the conditioned reference image instead of relying on raw reference dimensions.
+- Debug reports now include `reference_analysis`, `conditioning_summary`, and `conditioned_reference_path`.
+
 ## Future Work
 
 - Keep this file short.

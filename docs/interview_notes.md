@@ -1,5 +1,23 @@
 # Interview Notes
 
+## v2.8 Reference Conditioning Pipeline Questions
+
+Q. 왜 Reference Conditioning이 필요합니까?
+A. reference image의 해상도, 비율, 배경 비중, 피사체 위치가 불안정하면 SDXL Img2Img와 IP-Adapter가 같은 prompt에서도 크게 흔들릴 수 있습니다. 그래서 generation 전에 reference를 분석하고, 모델 입력에 적합한 크기와 비율로 정리해 더 안정적인 conditioning input을 만듭니다.
+
+Q. IP-Adapter 전에 전처리하는 이유는?
+A. IP-Adapter는 reference image feature를 읽어 identity/style 정보를 주입합니다. 원본이 너무 작거나 배경이 많거나 비율이 맞지 않으면 feature 자체가 약해질 수 있습니다. 전처리를 먼저 하면 IP-Adapter가 더 일관된 reference feature를 받을 수 있습니다.
+
+Q. Reference 품질이 생성 품질에 어떤 영향을 주나요?
+A. 피사체가 작거나 배경이 많으면 identity preservation이 약해지고, 과도한 crop이나 낮은 해상도는 디테일 손실을 만듭니다. `reference_analysis`와 `conditioning_summary`를 debug report에 남기면 결과가 흔들린 원인을 추적할 수 있습니다.
+
+### Engineering Review
+
+1. Reference Analyzer는 입력 이미지의 크기, 비율, foreground/background 추정, 품질을 기록합니다.
+2. Preprocessor는 target resolution에 맞춰 resize, center crop, padding을 선택합니다.
+3. Conditioning Package는 원본 reference와 conditioned reference, conditioning info를 Generation Provider까지 전달합니다.
+4. 향후 Face Detection을 연결하면 face ratio와 focus 추정을 실제 얼굴 기반 분석으로 교체할 수 있습니다.
+
 ## v2.7 Semantic Prompt Engine Questions
 
 Q. 왜 Prompt를 Program으로 관리했나요?

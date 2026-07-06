@@ -207,6 +207,28 @@ Supported presets include `subtle_transfer`, `balanced_transfer`, `strong_style_
 
 The preset is still manually overridable through environment variables: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`. Debug reports store `generation_preset`, `preset_reason`, and `environment_overrides`.
 
+## Reference Conditioning Pipeline v2.8
+
+Before SDXL Img2Img or IP-Adapter receives the reference image, the Generation Layer analyzes and preprocesses it:
+
+```text
+Reference Image
+  |
+  v
+Reference Analyzer
+  |
+  v
+Reference Preprocessor
+  |
+  v
+Conditioning Package
+  |
+  +-- SDXL Img2Img image
+  +-- IP-Adapter image
+```
+
+The analyzer records image width, height, aspect ratio, estimated character ratio, background ratio, face ratio, focus, and quality. The preprocessor supports aspect-ratio-preserving resize, automatic center crop, automatic padding, and longest-edge resize. Debug reports store `reference_analysis`, `conditioning_summary`, and `conditioned_reference_path`.
+
 ## Semantic Prompt Engine v2.7
 
 The Context Layer no longer treats the prompt as only a growing string. It first creates a semantic program:

@@ -2,6 +2,8 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageOps, ImageStat
 
+LANCZOS = getattr(getattr(Image, "Resampling", Image), "LANCZOS")
+
 
 class ReferenceAnalyzer:
     def analyze(self, image: Image.Image) -> dict:
@@ -123,7 +125,7 @@ class ReferencePreprocessor:
             conditioned = ImageOps.pad(
                 conditioned,
                 (target_width, target_height),
-                method=Image.Resampling.LANCZOS,
+                method=LANCZOS,
                 color=self._padding_color(conditioned),
                 centering=(0.5, 0.5),
             )
@@ -135,7 +137,7 @@ class ReferencePreprocessor:
             conditioned = ImageOps.fit(
                 image,
                 (target_width, target_height),
-                method=Image.Resampling.LANCZOS,
+                method=LANCZOS,
                 centering=(0.5, 0.5),
             )
             steps["crop_applied"] = True
@@ -146,12 +148,12 @@ class ReferencePreprocessor:
         conditioned = ImageOps.contain(
             image,
             (target_width, target_height),
-            method=Image.Resampling.LANCZOS,
+            method=LANCZOS,
         )
         conditioned = ImageOps.pad(
             conditioned,
             (target_width, target_height),
-            method=Image.Resampling.LANCZOS,
+            method=LANCZOS,
             color=self._padding_color(conditioned),
             centering=(0.5, 0.5),
         )
