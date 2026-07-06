@@ -229,6 +229,22 @@ Conditioning Package
 
 The analyzer records image width, height, aspect ratio, estimated character ratio, background ratio, face ratio, focus, and quality. The preprocessor supports aspect-ratio-preserving resize, automatic center crop, automatic padding, and longest-edge resize. Debug reports store `reference_analysis`, `conditioning_summary`, and `conditioned_reference_path`.
 
+## ControlNet Hook v2.9
+
+The Generation Layer includes an optional ControlNet hook for SDXL Img2Img:
+
+```text
+Conditioned Reference
+  |
+  v
+Canny Control Image
+  |
+  v
+SDXL Img2Img + optional IP-Adapter + optional ControlNet
+```
+
+IP-Adapter is used for identity/reference feature preservation. ControlNet is used for pose, silhouette, composition, and structural preservation. v2.9 implements Canny control image generation first. Depth and OpenPose remain skeleton hooks. If ControlNet cannot be loaded, the provider records fallback status and continues through the existing SDXL Img2Img + IP-Adapter path.
+
 ## Semantic Prompt Engine v2.7
 
 The Context Layer no longer treats the prompt as only a growing string. It first creates a semantic program:

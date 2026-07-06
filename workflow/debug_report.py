@@ -116,6 +116,32 @@ class DebugReportManager:
             "selected_lora": self._safe(state.get("selected_lora")),
             "lora_status": self._safe(state.get("lora_status")),
             "controlnet_status": self._safe(state.get("controlnet_status")),
+            "controlnet_enabled": self._safe(
+                state.get("controlnet_enabled")
+                if state.get("controlnet_enabled") is not None
+                else (state.get("controlnet_status") or {}).get("enabled")
+            ),
+            "controlnet_loaded": self._safe(
+                state.get("controlnet_loaded")
+                if state.get("controlnet_loaded") is not None
+                else (state.get("controlnet_status") or {}).get("loaded")
+            ),
+            "controlnet_type": self._safe(
+                state.get("controlnet_type")
+                or (state.get("controlnet_status") or {}).get("type")
+            ),
+            "controlnet_scale": self._safe(
+                state.get("controlnet_scale")
+                or (state.get("controlnet_status") or {}).get("scale")
+            ),
+            "control_image_path": self._safe(
+                state.get("control_image_path")
+                or (state.get("controlnet_status") or {}).get("control_image_path")
+            ),
+            "controlnet_fallback_reason": self._safe(
+                state.get("controlnet_fallback_reason")
+                or (state.get("controlnet_status") or {}).get("fallback_reason")
+            ),
             "reference_conditioning_enabled": self._safe(
                 state.get("reference_conditioning_enabled")
             ),
@@ -391,6 +417,11 @@ class DebugReportManager:
             "IP-ADAPTER",
             self._ip_adapter_preview(state),
         )
+        self._append_block(
+            lines,
+            "CONTROLNET",
+            self._controlnet_preview(state),
+        )
         self._append_block(lines, "PROVIDER PROMPT", state.get("provider_prompt"))
         self._append_block(
             lines,
@@ -565,6 +596,23 @@ class DebugReportManager:
             "reason": state.get("conditioning_fallback_reason")
             or status.get("fallback_reason")
             or status.get("reason"),
+        }
+
+    def _controlnet_preview(self, state):
+        status = state.get("controlnet_status") or {}
+        return {
+            "enabled": state.get("controlnet_enabled", status.get("enabled")),
+            "loaded": state.get("controlnet_loaded", status.get("loaded")),
+            "type": state.get("controlnet_type", status.get("type")),
+            "scale": state.get("controlnet_scale", status.get("scale")),
+            "control_image_path": state.get(
+                "control_image_path",
+                status.get("control_image_path"),
+            ),
+            "fallback_reason": state.get(
+                "controlnet_fallback_reason",
+                status.get("fallback_reason"),
+            ),
         }
 
     def _adaptive_plan_preview(self, plan):
@@ -759,6 +807,21 @@ class DebugReportManager:
             "lora_status": state.get("lora_status"),
             "ip_adapter": state.get("ip_adapter_status"),
             "controlnet": state.get("controlnet_status"),
+            "controlnet_enabled": (
+                state.get("controlnet_status") or {}
+            ).get("enabled"),
+            "controlnet_loaded": (
+                state.get("controlnet_status") or {}
+            ).get("loaded"),
+            "controlnet_type": (
+                state.get("controlnet_status") or {}
+            ).get("type"),
+            "control_image_path": (
+                state.get("controlnet_status") or {}
+            ).get("control_image_path"),
+            "controlnet_fallback_reason": (
+                state.get("controlnet_status") or {}
+            ).get("fallback_reason"),
         }
 
     def _dino_metric_preview(self, state):

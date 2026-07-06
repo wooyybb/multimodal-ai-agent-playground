@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 
 from generation.generation_result import GenerationResult
 from generation.reference_preprocessor import ReferencePreprocessor
+from provider.controlnet_hook import ControlNetHook
 
 
 class SDXLQualityProvider:
@@ -19,6 +20,7 @@ class SDXLQualityProvider:
         self.device = "cpu"
         self.torch_dtype_name = "float32"
         self.reference_preprocessor = ReferencePreprocessor()
+        self.controlnet_hook = ControlNetHook()
 
     def generate(
         self,
@@ -57,11 +59,12 @@ class SDXLQualityProvider:
         conditioning_summary = {}
         conditioned_reference_path = ""
         conditioning_package = {}
+        controlnet_status = self.controlnet_hook.prepare(None)
         notes = [
             "real SDXL Img2Img backend",
             "StableDiffusionXLImg2ImgPipeline",
             "IP-Adapter is optional and inference-only",
-            "ControlNet and LoRA are not active in this sprint",
+            "ControlNet is optional; LoRA is not active in this sprint",
         ]
 
         try:
@@ -87,8 +90,20 @@ class SDXLQualityProvider:
                 conditioned_reference_path,
                 conditioning_summary,
             )
+            controlnet_status = self.controlnet_hook.prepare(reference_image)
+            state["controlnet_status"] = controlnet_status
+            state["controlnet_enabled"] = bool(controlnet_status.get("enabled"))
+            state["controlnet_loaded"] = bool(controlnet_status.get("loaded"))
+            state["controlnet_type"] = controlnet_status.get("type")
+            state["controlnet_scale"] = controlnet_status.get("scale")
+            state["control_image_path"] = controlnet_status.get("control_image_path")
+            state["controlnet_fallback_reason"] = controlnet_status.get(
+                "fallback_reason",
+                "",
+            )
             error_stage = "pipeline_loading"
-            self._load_pipeline()
+            controlnet_status = self._load_pipeline(controlnet_status)
+            state["controlnet_status"] = controlnet_status
             ip_adapter_status = self._prepare_ip_adapter(reference_image, state, config)
             if ip_adapter_status.get("fallback_reason"):
                 notes.append(ip_adapter_status["fallback_reason"])
@@ -100,6 +115,7 @@ class SDXLQualityProvider:
                 reference_image=reference_image,
                 config=config,
                 ip_adapter_status=ip_adapter_status,
+                controlnet_status=controlnet_status,
             )
             print("[SDXL] Generation Finished")
         except Exception as error:
@@ -143,6 +159,7 @@ class SDXLQualityProvider:
                 "device": self.device,
                 "dtype": self.torch_dtype_name,
                 "ip_adapter": ip_adapter_status,
+                "controlnet": controlnet_status,
                 "generation_preset": state.get("generation_preset") or {},
                 "reference_analysis": reference_analysis,
                 "conditioning_summary": conditioning_summary,
@@ -185,8 +202,7 @@ class SDXLQualityProvider:
                 "reason": "LoRA not implemented in this Img2Img sprint",
             },
             controlnet_status={
-                "enabled": False,
-                "reason": "ControlNet not implemented in this Img2Img sprint",
+                **controlnet_status,
             },
             reference_analysis=reference_analysis,
             conditioning_summary=conditioning_summary,
@@ -201,6 +217,7 @@ class SDXLQualityProvider:
         reference_image,
         config,
         ip_adapter_status=None,
+        controlnet_status=None,
     ):
         output_dir = Path("outputs")
         output_dir.mkdir(exist_ok=True)
@@ -216,18 +233,29 @@ class SDXLQualityProvider:
         }
         if (ip_adapter_status or {}).get("loaded"):
             kwargs["ip_adapter_image"] = reference_image
+        if (controlnet_status or {}).get("loaded"):
+            kwargs["control_image"] = self._load_control_image(controlnet_status)
+            kwargs["controlnet_conditioning_scale"] = float(
+                controlnet_status.get("scale") or 0.6
+            )
         result = self.pipeline(**kwargs)
         result.images[0].save(output_path)
         return str(output_path)
 
-    def _load_pipeline(self):
+    def _load_pipeline(self, controlnet_status=None):
         if self.pipeline is not None:
             print(f"[SDXL] Device: {self.device.upper()}")
             print(f"[SDXL] Dtype: {self.torch_dtype_name}")
-            return
+            if (controlnet_status or {}).get("enabled") and not (
+                controlnet_status or {}
+            ).get("loaded"):
+                return self.controlnet_hook.mark_fallback(
+                    controlnet_status,
+                    "ControlNet fallback: base SDXL pipeline is already loaded",
+                )
+            return controlnet_status or {}
         print("[SDXL] Loading Model...")
         import torch
-        from diffusers import StableDiffusionXLImg2ImgPipeline
 
         cuda_available = torch.cuda.is_available()
         self.device = "cuda" if cuda_available else "cpu"
@@ -235,12 +263,46 @@ class SDXLQualityProvider:
         self.torch_dtype_name = "float16" if cuda_available else "float32"
         print(f"[SDXL] Device: {self.device.upper()}")
         print(f"[SDXL] Dtype: {self.torch_dtype_name}")
+        controlnet_status = controlnet_status or {}
+        if controlnet_status.get("enabled") and controlnet_status.get("control_image_path"):
+            try:
+                from diffusers import (
+                    ControlNetModel,
+                    StableDiffusionXLControlNetImg2ImgPipeline,
+                )
+
+                model_id = controlnet_status.get("model_id")
+                if not model_id:
+                    raise ValueError("CONTROLNET_MODEL_ID is not set")
+                controlnet = ControlNetModel.from_pretrained(
+                    model_id,
+                    torch_dtype=dtype,
+                    use_safetensors=True,
+                )
+                self.pipeline = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(
+                    self.model_id,
+                    controlnet=controlnet,
+                    torch_dtype=dtype,
+                    use_safetensors=True,
+                )
+                self.pipeline = self.pipeline.to(self.device)
+                return self.controlnet_hook.mark_loaded(controlnet_status)
+            except Exception as error:
+                reason = f"ControlNet pipeline fallback: {error or repr(error)}"
+                controlnet_status = self.controlnet_hook.mark_fallback(
+                    controlnet_status,
+                    reason,
+                )
+
+        from diffusers import StableDiffusionXLImg2ImgPipeline
+
         self.pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(
             self.model_id,
             torch_dtype=dtype,
             use_safetensors=True,
         )
         self.pipeline = self.pipeline.to(self.device)
+        return controlnet_status
 
     def _ip_adapter_status(self, state=None, config=None):
         enabled = str(os.getenv("USE_IP_ADAPTER") or "false").lower() in {
@@ -363,6 +425,12 @@ class SDXLQualityProvider:
                 raise FileNotFoundError(f"reference image not found: {image_path}")
             image = Image.open(image_path).convert("RGB")
         return image
+
+    def _load_control_image(self, controlnet_status):
+        path = controlnet_status.get("control_image_path")
+        if not path:
+            raise ValueError("control image path is unavailable")
+        return Image.open(path).convert("RGB")
 
     def _condition_reference_image(self, image, config):
         return self.reference_preprocessor.condition(

@@ -188,6 +188,8 @@ v2.4 connects optional IP-Adapter conditioning inside the SDXL Img2Img provider.
 
 v2.8 adds a Reference Conditioning Pipeline before SDXL Img2Img and IP-Adapter. The reference image is analyzed and converted into a conditioned reference image before generation. The analyzer records width, height, aspect ratio, estimated character/background/face ratios, focus, and quality. The preprocessor applies aspect-ratio-preserving resize, center crop, or padding so SDXL and IP-Adapter receive a more stable reference input.
 
+v2.9 adds an optional ControlNet hook for SDXL Img2Img. IP-Adapter focuses on identity and reference visual features, while ControlNet focuses on pose, silhouette, composition, and structure. The first implemented control type is Canny: the conditioned reference image is converted to grayscale, edges are extracted, and the resulting control image is saved for debugging. Depth and OpenPose remain planned hooks. If ControlNet loading fails or `CONTROLNET_MODEL_ID` is not configured, the workflow falls back to the existing SDXL Img2Img + IP-Adapter path.
+
 v2.6 adds a Style Transfer Preset Manager. SDXL Img2Img no longer uses one fixed `strength`, IP-Adapter scale, CFG, and step count for every style. The framework selects a `generation_preset` from the `style_transfer_program`, such as `photobooth_soft`, `ugly_cute_drawing`, `anime_webtoon`, or `realistic_preserve`.
 
 The trade-off is explicit:
@@ -198,6 +200,7 @@ The trade-off is explicit:
 - Lower IP-Adapter scale gives the style prompt more freedom.
 - CFG and steps control prompt guidance strength and generation refinement.
 - Reference preprocessing reduces instability caused by very small, off-ratio, or background-heavy reference images.
+- ControlNet Canny can preserve edge structure, silhouette, and composition when enabled with `USE_CONTROLNET=true`.
 
 Environment variables can override the preset when manual tuning is needed: `SDXL_STRENGTH`, `IP_ADAPTER_SCALE`, `SDXL_CFG`, `SDXL_STEPS`, `SDXL_WIDTH`, and `SDXL_HEIGHT`.
 

@@ -5,3 +5,4 @@ huggingface_hub
 python-dotenv
 diffusers
 accelerate
+opencv-python

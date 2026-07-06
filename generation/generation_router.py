@@ -118,6 +118,16 @@ class GenerationRouter:
         result.setdefault("selected_lora", plan.get("selected_lora") or "")
         result.setdefault("lora_status", {})
         result.setdefault("controlnet_status", {})
+        controlnet_status = result.get("controlnet_status") or {}
+        result.setdefault("controlnet_enabled", bool(controlnet_status.get("enabled")))
+        result.setdefault("controlnet_loaded", bool(controlnet_status.get("loaded")))
+        result.setdefault("controlnet_type", controlnet_status.get("type", ""))
+        result.setdefault("controlnet_scale", controlnet_status.get("scale"))
+        result.setdefault("control_image_path", controlnet_status.get("control_image_path", ""))
+        result.setdefault(
+            "controlnet_fallback_reason",
+            controlnet_status.get("fallback_reason", ""),
+        )
         result.setdefault("generation_is_mock", False)
         result.setdefault("fallback_reason", "")
         result.setdefault("reference_analysis", {})

@@ -342,6 +342,15 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - SDXL Img2Img and IP-Adapter now receive the conditioned reference image instead of relying on raw reference dimensions.
 - Debug reports now include `reference_analysis`, `conditioning_summary`, and `conditioned_reference_path`.
 
+## Version 2.9
+
+- Added optional ControlNet hook for SDXL Img2Img.
+- Implemented Canny control image generation from the conditioned reference image.
+- Depth and OpenPose remain planned hook types.
+- SDXL provider attempts ControlNet pipeline loading only when `USE_CONTROLNET=true`.
+- If ControlNet loading fails, the workflow falls back to existing SDXL Img2Img + IP-Adapter.
+- Debug reports now include ControlNet enabled/loaded/type/scale/control image/fallback fields.
+
 ## Future Work
 
 - Keep this file short.

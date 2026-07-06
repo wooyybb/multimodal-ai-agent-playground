@@ -1,5 +1,16 @@
 # Interview Notes
 
+## v2.9 ControlNet Hook Questions
+
+Q. IP-Adapter와 ControlNet의 역할 차이는?
+A. IP-Adapter는 reference image의 identity, hair, outfit, visual feature를 보존하는 쪽에 가깝습니다. ControlNet은 pose, silhouette, edge, composition, structure 같은 공간 구조를 유지하는 역할입니다. 둘은 대체 관계가 아니라 reference-aware generation에서 서로 보완하는 관계입니다.
+
+Q. 왜 ControlNet을 Img2Img 이후에 추가했나요?
+A. 먼저 SDXL Img2Img로 reference image를 실제 generation input에 연결하고, 그 다음 IP-Adapter로 identity feature preservation을 강화했습니다. 그 기반이 안정화된 뒤 구조 보존을 위한 ControlNet hook을 추가하는 순서가 책임 분리가 명확합니다.
+
+Q. Canny ControlNet은 무엇을 유지하나요?
+A. Canny는 reference image의 edge map을 사용하므로 silhouette, pose outline, object boundary, composition 같은 구조적 단서를 유지하는 데 유용합니다. v2.9에서는 Canny를 먼저 구현하고 depth/openpose는 hook만 유지했습니다.
+
 ## v2.8 Reference Conditioning Pipeline Questions
 
 Q. 왜 Reference Conditioning이 필요합니까?
