@@ -1,5 +1,31 @@
 # Interview Notes
 
+## v3.0 LLM Style Transfer Planner Questions
+
+Q. 이 프로젝트에서 LLM은 어떤 역할을 하나요?
+A. LLM은 final prompt를 직접 쓰는 Prompt Generator가 아니라 Planner입니다. 사용자의 자연어 요청을 `Style Transfer Program`이라는 JSON 구조로 바꾸고, 이후 Semantic Prompt Engine이 provider별 prompt를 렌더링합니다.
+
+Q. 왜 LLM이 final prompt를 직접 만들지 않나요?
+A. final prompt를 LLM이 바로 만들면 provider별 token budget, forbidden concept, reference conditioning, evaluation prompt routing을 일관되게 관리하기 어렵습니다. LLM은 의도를 구조화하고, 시스템이 검증 가능한 Program을 렌더링하는 편이 Agent Framework답고 디버깅하기 쉽습니다.
+
+Q. Style Transfer Program은 무엇인가요?
+A. Style Transfer Program은 style goal, identity policy, style, layout, generation strategy, forbidden concepts, negative prompt를 담은 중간 표현입니다. prompt 문자열이 아니라 generation과 evaluation을 위한 계획 데이터입니다.
+
+Q. AI Agent 구조는 어디에서 드러나나요?
+A. Vision/Reference Parsing이 입력을 이해하고, LLM Style Transfer Planner가 의도를 구조화하며, Semantic Prompt Engine이 provider별 prompt를 만들고, SDXL/IP-Adapter/ControlNet이 생성하며, Evaluation과 Adaptive Planning이 결과를 다시 분석합니다. 이 loop가 Agent 구조입니다.
+
+Q. 연구 경험과 이 프로젝트는 어떻게 연결되나요?
+A. 연구에서 얻은 multimodal generation과 evaluation 관점을 단순 데모가 아니라 실제 시스템 구조로 확장했습니다. reference image 이해, style transfer planning, conditioning, metric evaluation, adaptive planning까지 연결해 연구 아이디어를 실행 가능한 AI Agent Framework로 만든 것이 핵심입니다.
+
+### Engineering Review
+
+1. LLM을 Prompt Generator가 아니라 Planner로 사용해 prompt 문자열 대신 구조화된 의도를 생성했습니다.
+2. Style Transfer Program은 prompt, generation parameter, forbidden concept, reference preservation 정책을 한곳에서 관리하게 합니다.
+3. Rule fallback이 있어 OpenAI API가 없거나 실패해도 workflow가 중단되지 않습니다.
+4. SDXL/IP-Adapter/ControlNet은 `generation_strategy`와 Semantic Prompt Engine 결과를 통해 연결됩니다.
+5. 경험기술서의 “연구를 실제 AI 시스템으로 확장”이라는 스토리와 프로젝트 목적이 일치합니다.
+6. 다음 개선 방향은 LLM planner output schema validation 강화와 evaluation 결과 기반 strategy field 자동 조정입니다.
+
 ## v2.9 ControlNet Hook Questions
 
 Q. IP-Adapter와 ControlNet의 역할 차이는?

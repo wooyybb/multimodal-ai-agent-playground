@@ -351,6 +351,15 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - If ControlNet loading fails, the workflow falls back to existing SDXL Img2Img + IP-Adapter.
 - Debug reports now include ControlNet enabled/loaded/type/scale/control image/fallback fields.
 
+## Version 3.0
+
+- Added `LLMStyleTransferPlanner`.
+- LLM reasoning now creates a JSON Style Transfer Program instead of directly writing final prompts.
+- `LLM_PROVIDER=rule` keeps the existing rule-based fallback behavior.
+- `LLM_PROVIDER=openai` attempts structured planning and falls back without crashing when API key/client/JSON parsing fails.
+- PromptCompiler now sends the final Style Transfer Program into the Semantic Prompt Engine for provider-specific rendering.
+- Debug reports include LLM planner output, fallback status, reasoning summary, final Style Transfer Program, and generation strategy.
+
 ## Future Work
 
 - Keep this file short.

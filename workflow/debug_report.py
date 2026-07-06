@@ -220,6 +220,17 @@ class DebugReportManager:
                 state.get("style_prompt_token_count")
             ),
             "style_transfer_program": self._safe(state.get("style_transfer_program")),
+            "llm_style_transfer_program": self._safe(
+                state.get("llm_style_transfer_program")
+            ),
+            "llm_style_transfer_metadata": self._safe(
+                state.get("llm_style_transfer_metadata")
+            ),
+            "llm_reasoning_summary": self._safe(state.get("llm_reasoning_summary")),
+            "final_style_transfer_program": self._safe(
+                state.get("final_style_transfer_program")
+            ),
+            "generation_strategy": self._safe(state.get("generation_strategy")),
             "semantic_prompt_program": self._safe(state.get("semantic_prompt_program")),
             "semantic_merge_report": self._safe(state.get("semantic_merge_report")),
             "conflict_resolution_report": self._safe(
@@ -375,6 +386,11 @@ class DebugReportManager:
             "STYLE TRANSFER PROGRAM",
             state.get("style_transfer_program"),
         )
+        self._append_block(
+            lines,
+            "LLM STYLE TRANSFER PLANNER",
+            self._llm_style_transfer_preview(state),
+        )
         self._append_semantic_prompt_sections(lines, state.get("semantic_prompt_program"))
         self._append_block(
             lines,
@@ -495,6 +511,23 @@ class DebugReportManager:
             "provider suitability": report.get("provider_suitability_issues", []),
             "suggestions": report.get("suggestions", []),
             "summary": report.get("reasoning_summary"),
+        }
+
+    def _llm_style_transfer_preview(self, state):
+        program = state.get("llm_style_transfer_program") or {}
+        return {
+            "task_type": program.get("task_type"),
+            "style_goal": program.get("style_goal"),
+            "identity_policy": program.get("identity_policy", {}),
+            "style": program.get("style", {}),
+            "layout": program.get("layout", {}),
+            "generation_strategy": program.get("generation_strategy", {}),
+            "forbidden_concepts": program.get("forbidden_concepts", []),
+            "reasoning_summary": state.get("llm_reasoning_summary")
+            or program.get("reasoning_summary"),
+            "used_fallback": state.get("llm_used_fallback"),
+            "metadata": state.get("llm_style_transfer_metadata", {}),
+            "final_style_transfer_program": state.get("final_style_transfer_program"),
         }
 
     def _compiled_prompt_package_preview(self, package):

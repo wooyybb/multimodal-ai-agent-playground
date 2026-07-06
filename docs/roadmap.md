@@ -29,6 +29,7 @@
 | v2.7 | Semantic Prompt Engine | Complete |
 | v2.8 | Reference Conditioning Pipeline | Complete |
 | v2.9 | ControlNet Hook for SDXL Img2Img | Complete |
+| v3.0 | LLM Style Transfer Planner | Complete |
 
 ## Completed Sprints
 
@@ -110,6 +111,7 @@
 - Version 2.7: Semantic Prompt Program, Semantic Merge, Conflict Resolver, Provider Renderer, and section-based prompt preview
 - Version 2.8: Reference Analyzer, Reference Preprocessor, conditioned reference image, and conditioning debug report for SDXL Img2Img/IP-Adapter stability
 - Version 2.9: Optional ControlNet hook with Canny control image generation, fallback status, and debug report fields
+- Version 3.0: LLM plans JSON Style Transfer Program, rule fallback remains, Semantic Prompt Engine still renders final prompts
 
 ## Planned Sprints
 

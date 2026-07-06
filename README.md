@@ -38,6 +38,32 @@ Understand intent and reference image
 
 The goal is to make the system understandable in five minutes: what each layer owns, how data moves, and where future improvements belong.
 
+The current framework can be summarized as:
+
+```text
+User Prompt
+  |
+  v
+LLM Style Transfer Planner
+  |
+  v
+Style Transfer Program
+  |
+  v
+Semantic Prompt Engine
+  |
+  v
+SDXL Img2Img + IP-Adapter + ControlNet
+  |
+  v
+Evaluation
+  |
+  v
+Adaptive Planning
+```
+
+The LLM does not write the final prompt directly. It plans a JSON-based Style Transfer Program, and the Semantic Prompt Engine renders provider-specific prompts from that program.
+
 ## Layer-based Architecture
 
 ```text
@@ -153,6 +179,8 @@ Semantic Prompt Program
 
 Semantic Merge reduces meaning-level duplication such as `anime`, `anime style`, and `anime illustration` into one canonical phrase. Conflict Resolver applies user intent first, so `remove weapon` becomes a constraint that prevents weapon-related text from being rendered into FLUX, SDXL, or CLIP prompts. Provider Renderer then creates a dense FLUX prompt, a short SDXL style prompt, and a compact CLIP evaluation prompt from the same semantic source.
 
+v3.0 adds the LLM Style Transfer Planner. When `LLM_PROVIDER=openai` and an API key is available, the LLM attempts to convert the natural-language user request into a structured Style Transfer Program. If the LLM is unavailable, invalid, or disabled, the rule-based planner is used. The final prompt is still created by the Semantic Prompt Engine, not by the LLM.
+
 ### Generation Layer
 
 Responsible for provider-specific generation.
@@ -228,6 +256,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 - Prompt Rendering Engine for generation, CLIP, PickScore, and VLM Judge prompts
 - Style Transfer Program, Prompt Sanitizer, and Prompt Validator for long prompt structuring
 - Semantic Prompt Engine with merge, conflict resolution, and provider-specific rendering
+- LLM Style Transfer Planner that creates JSON Style Transfer Programs instead of final prompts
 - Provider routing and provider prompt adaptation
 - Generation Planner and Generation Router with fast/quality modes
 - Style Transfer Preset Manager for SDXL strength, IP scale, CFG, steps, and resolution

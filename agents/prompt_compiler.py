@@ -1,4 +1,5 @@
 from generation.reference_conditioning import ReferenceConditioningBuilder
+from agents.llm_style_transfer_planner import LLMStyleTransferPlanner
 from context.provider_renderer import ProviderRenderer
 from context.prompt_sanitizer import PromptSanitizer
 from context.prompt_validator import PromptValidator
@@ -36,7 +37,14 @@ class PromptCompiler:
         context_validation = state.get("context_validation") or {}
         prompt_sections = state.get("prompt_sections") or {}
         negative_prompt = state.get("negative_prompt") or ""
-        style_transfer_program = StyleTransferProgramBuilder().build(state)
+        rule_style_transfer_program = StyleTransferProgramBuilder().build(state)
+        planner_state = dict(state)
+        planner_state["style_transfer_program"] = rule_style_transfer_program
+        llm_style_result = LLMStyleTransferPlanner().run(planner_state)
+        style_transfer_program = llm_style_result.get(
+            "final_style_transfer_program",
+            rule_style_transfer_program,
+        )
         forbidden_concepts = style_transfer_program.get("forbidden_concepts", [])
         sanitizer = PromptSanitizer()
 
@@ -102,6 +110,13 @@ class PromptCompiler:
             "prompt_blocks": prompt_blocks,
             "prompt_rendering": rendered_prompts,
             "style_transfer_program": style_transfer_program,
+            "llm_style_transfer_program": llm_style_result.get(
+                "llm_style_transfer_program"
+            ),
+            "llm_used_fallback": llm_style_result.get("llm_used_fallback"),
+            "llm_reasoning_summary": llm_style_result.get("llm_reasoning_summary"),
+            "final_style_transfer_program": style_transfer_program,
+            "generation_strategy": llm_style_result.get("generation_strategy", {}),
             "semantic_prompt_program": semantic_program,
             "semantic_merge_report": semantic_result["semantic_merge_report"],
             "conflict_resolution_report": semantic_result[
@@ -125,6 +140,17 @@ class PromptCompiler:
             "compiled_prompt_package": package,
             "reference_conditioning_package": reference_conditioning,
             "style_transfer_program": style_transfer_program,
+            "llm_style_transfer_program": llm_style_result.get(
+                "llm_style_transfer_program"
+            ),
+            "llm_style_transfer_metadata": llm_style_result.get(
+                "llm_style_transfer_metadata",
+                {},
+            ),
+            "llm_used_fallback": llm_style_result.get("llm_used_fallback"),
+            "llm_reasoning_summary": llm_style_result.get("llm_reasoning_summary"),
+            "final_style_transfer_program": style_transfer_program,
+            "generation_strategy": llm_style_result.get("generation_strategy", {}),
             "forbidden_concepts": forbidden_concepts,
             "semantic_prompt_program": semantic_program,
             "semantic_merge_report": semantic_result["semantic_merge_report"],

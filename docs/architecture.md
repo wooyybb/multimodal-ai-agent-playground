@@ -283,6 +283,28 @@ Provider Renderer
 
 Semantic Merge reduces meaning-level duplicates such as `anime`, `anime style`, and `anime illustration`. Conflict Resolver gives user intent priority, so a request like `remove weapon` sets `weapon=false` and prevents weapon-related text from being rendered into generation-facing prompts. Provider Renderer keeps provider-specific prompt behavior while sharing the same semantic source of truth.
 
+## LLM Style Transfer Planner v3.0
+
+The LLM is used as an AI Agent planner, not as a final prompt writer:
+
+```text
+User Request
+  |
+  v
+LLM Style Transfer Planner
+  |
+  v
+Style Transfer Program JSON
+  |
+  v
+Semantic Prompt Engine
+  |
+  v
+Provider-specific Rendering
+```
+
+The planner outputs structured fields such as `style_goal`, `identity_policy`, `style`, `layout`, `generation_strategy`, `forbidden_concepts`, and `negative_prompt`. If `LLM_PROVIDER=rule` or OpenAI is unavailable, the workflow uses the existing rule-based Style Transfer Program fallback. Final generation prompts are always rendered by the Semantic Prompt Engine.
+
 ## Evaluation Prompt Routing v1.3
 
 The Evaluation Layer consumes prompt variants by metric:
