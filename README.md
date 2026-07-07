@@ -279,19 +279,20 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 
 ## Repository Structure
 
-The v3.2 physical refactor separates top-level agent entry points from lower-level implementation modules:
+The v3.3 compression refactor keeps `agents/` focused on the five top-level agents and moves lower-level implementation modules behind `modules/` and `core/`:
 
 | Responsibility | Main Folders |
 | --- | --- |
-| Agent entry points and compatibility wrappers | `agents/` |
+| Top-level agent entry points | `agents/` |
 | Understanding modules | `modules/understanding/`, `tools/vlm/` |
 | Planning modules | `modules/planning/`, `modules/prompt/`, `context/`, `llm/`, `knowledge/` |
 | Generation modules | `modules/generation/`, `generation/`, `provider/`, `config/` |
 | Evaluation modules | `modules/evaluation/`, `evaluation/`, `tools/` |
 | Reflection modules | `modules/reflection/` |
+| Compressed core APIs | `core/` |
 | Infrastructure | `workflow/`, `memory/`, `api/`, `ui/`, `benchmark/`, `docs/` |
 
-`agents/` keeps compatibility wrappers such as `agents/style_agent.py` so older imports continue to work. The actual implementation now lives under `modules/`.
+`agents/` now contains only `orchestrator_agent.py`, `understanding_agent.py`, `planning_agent.py`, `generation_agent.py`, `evaluation_agent.py`, and `reflection_agent.py`. Small former agent files now live under `modules/`, while prompt, style transfer, generation routing, evaluation, reference conditioning, and debug APIs are collected under `core/`.
 
 ## Quick Start
 

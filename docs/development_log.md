@@ -14,6 +14,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Kept `agents/` compatibility wrappers so existing imports and execution plans continue to work.
 - Updated Registry and Orchestrator imports to use implementation modules directly where practical.
 
+## Version 3.3
+
+- Compressed `agents/` to the five high-level agent files plus `orchestrator_agent.py`.
+- Removed small compatibility wrappers after moving runtime imports to `modules.*`.
+- Added `core/` façades for style transfer program, semantic prompt engine, reference conditioning, generation routing, evaluation runner, and debug report.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

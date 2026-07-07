@@ -1,10 +1,12 @@
-from generation.reference_conditioning import ReferenceConditioningBuilder
+from core.reference_conditioning import ReferenceConditioningBuilder
+from core.semantic_prompt_engine import (
+    PromptSanitizer,
+    PromptValidator,
+    ProviderRenderer,
+    SemanticPromptProgramBuilder,
+)
+from core.style_transfer_program import StyleTransferProgramBuilder
 from modules.planning.llm_style_transfer_planner import LLMStyleTransferPlanner
-from context.provider_renderer import ProviderRenderer
-from context.prompt_sanitizer import PromptSanitizer
-from context.prompt_validator import PromptValidator
-from context.semantic_prompt_program import SemanticPromptProgramBuilder
-from context.style_transfer_program import StyleTransferProgramBuilder
 
 
 class PromptCompiler:

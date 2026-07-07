@@ -6,7 +6,7 @@ from modules.generation.generation_agent import GenerationAgent
 from modules.planning.layout_agent import LayoutAgent
 from modules.planning.lighting_agent import LightingAgent
 from modules.planning.negative_prompt_agent import NegativePromptAgent
-from agents.planner_agent import PlannerAgent
+from agents.planning_agent import PlannerAgent
 from modules.planning.pose_agent import PoseAgent
 from modules.planning.expression_agent import ExpressionAgent
 from modules.prompt.prompt_assembler import PromptAssembler

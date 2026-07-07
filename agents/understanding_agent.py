@@ -1,6 +1,6 @@
-from agents.character_program_builder import CharacterProgramBuilder
-from agents.reference_image_parser import ReferenceImageParser
-from agents.vision_agent import VisionAgent
+from modules.understanding.character_program_builder import CharacterProgramBuilder
+from modules.understanding.reference_image_parser import ReferenceImageParser
+from modules.understanding.vision_agent import VisionAgent
 
 
 class UnderstandingAgent:

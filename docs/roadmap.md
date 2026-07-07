@@ -32,6 +32,7 @@
 | v3.0 | LLM Style Transfer Planner | Complete |
 | v3.1 | 5-Agent Architecture refactoring and documentation alignment | Complete |
 | v3.2 | Physical file refactoring into agents and modules packages | Complete |
+| v3.3 | Codebase compression into high-level agents and core façades | Complete |
 
 ## Completed Sprints
 

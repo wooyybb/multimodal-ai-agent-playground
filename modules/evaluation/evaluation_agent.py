@@ -1,4 +1,4 @@
-from evaluation.evaluation_aggregator import EvaluationAggregator
+from core.evaluation_runner import EvaluationAggregator
 from tools.clip_tool import ClipTool
 
 

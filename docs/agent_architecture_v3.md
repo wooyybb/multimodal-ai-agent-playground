@@ -55,9 +55,9 @@ For example, `ReferenceImageParser` is important, but it is a module inside the 
 | Evaluation Agent | Score output quality from multiple perspectives. | CLIPMetric, DINOIdentityMetric, PromptMetric, AestheticMetric, EvaluationAggregator |
 | Reflection Agent | Analyze failure, choose strategy, adapt plan, and retry. | ReflectionAgent, SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent, MemorySave, DebugReport |
 
-## Physical File Structure v3.2
+## Physical File Structure v3.3
 
-v3.2 moves lower-level implementation files into `modules/` while keeping `agents/` as the compatibility and top-level entry folder.
+v3.3 compresses the codebase further. `agents/` now keeps only top-level agent entry files and the orchestrator. Lower-level implementation files live in `modules/`, and commonly used cross-cutting APIs are exposed through `core/`.
 
 ```text
 agents/
@@ -67,7 +67,6 @@ agents/
   evaluation_agent.py
   reflection_agent.py
   orchestrator_agent.py
-  *_agent.py compatibility wrappers
 
 modules/
   understanding/
@@ -77,21 +76,17 @@ modules/
   reflection/
   prompt/
   memory/
+
+core/
+  style_transfer_program.py
+  semantic_prompt_engine.py
+  reference_conditioning.py
+  generation_router.py
+  evaluation_runner.py
+  debug_report.py
 ```
 
-The wrapper policy keeps old imports stable:
-
-```python
-from modules.planning.style_agent import StyleAgent
-```
-
-is re-exported by:
-
-```python
-from agents.style_agent import StyleAgent
-```
-
-This lets the framework adopt the v3 structure without breaking `ToolRegistry`, `OrchestratorAgent`, API, UI, or benchmark entry points.
+The old small `agents/*` compatibility wrappers were removed after Registry and Orchestrator imports were moved to `modules.*`. API, UI, benchmark, and workflow entry points still import only `OrchestratorAgent`, so the runtime contract remains stable.
 
 ## 1-Minute Interview Explanation
 
@@ -101,6 +96,6 @@ The important design choice is that LLMs do not directly write the final prompt.
 
 ## Future Work
 
-- Move module ownership metadata closer to each component registration.
+- Move more prompt helper internals behind `core.semantic_prompt_engine`.
 - Add a visual dashboard grouped by the five agents.
 - Expand `component_trace` into a richer execution graph.

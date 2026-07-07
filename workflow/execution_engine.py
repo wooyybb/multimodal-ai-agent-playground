@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from generation.generation_router import GenerationRouter
+from core.generation_router import GenerationRouter
 from workflow.agent_state import AgentState
 from workflow.debug_report import DebugReportManager
 from memory.context_cache import ContextCacheManager

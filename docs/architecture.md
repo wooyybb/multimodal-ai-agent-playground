@@ -62,13 +62,13 @@ flowchart TD
 4. Evaluation Agent scores the output with metric-specific prompts and image similarity metrics.
 5. Reflection Agent analyzes failure modes, updates planning strategy, decides retry, and records memory/debug output.
 
-## Physical Module Layout v3.2
+## Physical Module Layout v3.3
 
-The codebase mirrors the 5-Agent explanation with a `modules/` package:
+The codebase mirrors the 5-Agent explanation with compressed `agents/`, `modules/`, and `core/` packages:
 
 | Area | Folder |
 | --- | --- |
-| Top-level entry points and compatibility wrappers | `agents/` |
+| Top-level agent entry points | `agents/` |
 | Understanding implementations | `modules/understanding/` |
 | Planning implementations | `modules/planning/` |
 | Prompt planning/rendering helpers | `modules/prompt/` |
@@ -76,8 +76,9 @@ The codebase mirrors the 5-Agent explanation with a `modules/` package:
 | Evaluation implementations | `modules/evaluation/` |
 | Reflection implementations | `modules/reflection/` |
 | Knowledge helper modules | `modules/memory/` |
+| Cross-cutting core APIs | `core/` |
 
-Compatibility wrappers remain in `agents/` during the first physical refactor, so older imports such as `from agents.style_agent import StyleAgent` still work while the implementation lives in `modules/planning/style_agent.py`.
+Small `agents/*` wrappers were removed in v3.3. Runtime entry points continue to use `agents.orchestrator_agent.OrchestratorAgent`, while implementation dependencies are imported from `modules.*` and compressed core façades such as `core.semantic_prompt_engine`.
 
 ## Vision Layer v1.5
 
