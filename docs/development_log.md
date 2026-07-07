@@ -26,6 +26,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Split prompt policy into FLUX dense, SDXL Img2Img style, CLIP evaluation, and negative prompt outputs.
 - Added token budget optimization and debug reporting for removed weak/internal prompt phrases.
 
+## Version 4.0
+
+- Added `LLM Requirement Parser` to convert long user requirements into structured Style Transfer Program JSON.
+- Kept `LLM_PROVIDER=rule` as the default and added OpenAI JSON parsing with rule fallback.
+- Added debug report fields for parser provider, parser fallback, requirement program, and reasoning summary.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

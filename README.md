@@ -41,10 +41,10 @@ The goal is to make the system understandable in five minutes: what each top-lev
 The current framework can be summarized as:
 
 ```text
-User Prompt
+User Requirement
   |
   v
-LLM Style Transfer Planner
+LLM Requirement Parser
   |
   v
 Style Transfer Program
@@ -62,7 +62,7 @@ Evaluation
 Adaptive Planning
 ```
 
-The LLM does not write the final prompt directly. It plans a JSON-based Style Transfer Program, and the Semantic Prompt Engine renders provider-specific prompts from that program.
+The LLM does not write the final prompt directly. It parses a long natural-language requirement into a JSON-based Style Transfer Program, and the Semantic Prompt Engine renders provider-specific prompts from that program.
 
 ## 5-Agent Architecture
 
@@ -189,7 +189,7 @@ Semantic Prompt Program
 
 Semantic Merge reduces meaning-level duplication such as `anime`, `anime style`, and `anime illustration` into one canonical phrase. Conflict Resolver applies user intent first, so `remove weapon` becomes a constraint that prevents weapon-related text from being rendered into FLUX, SDXL, or CLIP prompts. Provider Renderer then creates a dense FLUX prompt, a short SDXL style prompt, and a compact CLIP evaluation prompt from the same semantic source.
 
-v3.0 adds the LLM Style Transfer Planner. When `LLM_PROVIDER=openai` and an API key is available, the LLM attempts to convert the natural-language user request into a structured Style Transfer Program. If the LLM is unavailable, invalid, or disabled, the rule-based planner is used. The final prompt is still created by the Semantic Prompt Engine, not by the LLM.
+v4.0 reframes the LLM layer as a Requirement Parser. When `LLM_PROVIDER=openai` and an API key is available, the LLM attempts to convert the natural-language user requirement into structured Style Transfer Program JSON. If the LLM is unavailable, invalid, or disabled, the rule-based parser is used. The final prompt is still created by the Semantic Prompt Engine, not by the LLM.
 
 ### Generation Agent
 
@@ -391,6 +391,8 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
 | `LLM_PROVIDER` | Use `rule` or `mock` for the current free/local setup. |
+| `OPENAI_API_KEY` | Optional key for OpenAI requirement parsing. Never commit real keys. |
+| `OPENAI_MODEL` | Optional OpenAI model name for requirement parsing. Default is `gpt-5-mini`. |
 | `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
 | `GENERATION_PROVIDER` | `flux_fast` or `sdxl_quality`; default is `flux_fast`. |
 | `SDXL_MODEL_ID` | Optional Diffusers model id for SDXL Img2Img. Default is `stabilityai/stable-diffusion-xl-base-1.0`. |
@@ -460,6 +462,30 @@ Provider Prompt Compiler V2
 ```
 
 For SDXL Img2Img, the reference image, Img2Img path, and optional IP-Adapter carry identity. The SDXL prompt therefore stays short and style-focused: renderer, color palette, lighting, mood, composition, and quality. Internal planning values such as identity priority, style priority, and strategy scores are removed before the model prompt is produced.
+
+## LLM Requirement Parser
+
+v4.0 treats the LLM as a Requirement Parser, not a Prompt Generator.
+
+```text
+Long User Requirement
+  |
+  v
+LLM Requirement Parser
+  |
+  v
+Structured Style Transfer Program JSON
+  |
+  v
+Semantic Prompt Compiler
+  |
+  v
+Provider Prompt Compiler
+```
+
+Default execution uses `LLM_PROVIDER=rule`, so no paid API is required. When `LLM_PROVIDER=openai` and `OPENAI_API_KEY` are available, the parser asks the model to return JSON only. If JSON parsing fails or the API is unavailable, the workflow falls back to the rule parser without crashing.
+
+The parser output stores task, identity preservation policy, style, layout, scene, pose, text rules, negative requirements, and generation strategy as structured data. Final model prompts are still produced by the Semantic Prompt Engine and Provider Prompt Compiler.
 
 ## Evaluation Prompt Routing
 

@@ -227,6 +227,14 @@ class DebugReportManager:
                 state.get("style_prompt_token_count")
             ),
             "style_transfer_program": self._safe(state.get("style_transfer_program")),
+            "requirement_parser": self._safe(state.get("requirement_parser")),
+            "parser_provider": self._safe(state.get("parser_provider")),
+            "parser_fallback": self._safe(state.get("parser_fallback")),
+            "requirement_program": self._safe(state.get("requirement_program")),
+            "reasoning_summary": self._safe(
+                state.get("reasoning_summary")
+                or state.get("llm_reasoning_summary")
+            ),
             "llm_style_transfer_program": self._safe(
                 state.get("llm_style_transfer_program")
             ),
@@ -411,6 +419,11 @@ class DebugReportManager:
         )
         self._append_block(
             lines,
+            "LLM REQUIREMENT PARSER",
+            self._requirement_parser_preview(state),
+        )
+        self._append_block(
+            lines,
             "LLM STYLE TRANSFER PLANNER",
             self._llm_style_transfer_preview(state),
         )
@@ -552,6 +565,17 @@ class DebugReportManager:
             "Removed Internal Control Tokens": report.get(
                 "removed_internal_control_tokens", []
             ),
+        }
+
+    def _requirement_parser_preview(self, state):
+        return {
+            "requirement_parser": state.get("requirement_parser"),
+            "parser_provider": state.get("parser_provider"),
+            "parser_fallback": state.get("parser_fallback"),
+            "requirement_program": state.get("requirement_program"),
+            "style_transfer_program": state.get("style_transfer_program"),
+            "reasoning_summary": state.get("reasoning_summary")
+            or state.get("llm_reasoning_summary"),
         }
 
     def _to_text(self, value):

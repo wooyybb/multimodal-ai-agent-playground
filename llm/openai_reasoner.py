@@ -9,7 +9,7 @@ from llm.json_parser import JSONParser
 class OpenAIReasoner(BaseReasoner):
     def __init__(self):
         self.api_key = os.getenv("OPENAI_API_KEY")
-        self.model = os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+        self.model = os.getenv("OPENAI_MODEL") or "gpt-5-mini"
         self.parser = JSONParser()
         self.client = self._build_client()
 

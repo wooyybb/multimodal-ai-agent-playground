@@ -62,6 +62,31 @@ flowchart TD
 4. Evaluation Agent scores the output with metric-specific prompts and image similarity metrics.
 5. Reflection Agent analyzes failure modes, updates planning strategy, decides retry, and records memory/debug output.
 
+## LLM Requirement Parser v4.0
+
+The LLM layer is used as a Requirement Parser, not as a final prompt generator.
+
+```text
+User Requirement
+  |
+  v
+LLM Requirement Parser
+  |
+  v
+Structured Style Transfer Program JSON
+  |
+  v
+Semantic Prompt Compiler
+  |
+  v
+Provider Prompt Compiler
+  |
+  v
+Generation
+```
+
+Default mode is `LLM_PROVIDER=rule`. When `LLM_PROVIDER=openai` and `OPENAI_API_KEY` are available, the parser requests JSON-only output from OpenAI. JSON parse failure, missing keys, or missing credentials fall back to the rule parser without crashing the workflow.
+
 ## Physical Module Layout v3.3
 
 The codebase mirrors the 5-Agent explanation with compressed `agents/`, `modules/`, and `core/` packages:

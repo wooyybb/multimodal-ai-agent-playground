@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v4.0 LLM Requirement Parser Questions
+
+Q. 왜 LLM에게 Prompt를 쓰게 하지 않았나요?
+A. Prompt를 LLM이 직접 쓰면 provider별 token budget, forbidden concepts, reference conditioning, evaluation prompt routing을 일관되게 관리하기 어렵습니다. 이 프로젝트에서는 LLM이 긴 요구사항을 JSON Style Transfer Program으로 파싱하고, prompt는 Semantic Prompt Compiler와 Provider Prompt Compiler가 생성합니다.
+
+Q. Requirement Parser의 역할은?
+A. Requirement Parser는 사용자의 긴 자연어 요구사항, vision result, reference image parser 결과, character program을 읽고 task, identity policy, style, layout, scene, pose, text, negative, generation strategy를 구조화합니다. 즉 prompt 문장이 아니라 실행 가능한 요구사항 program을 만듭니다.
+
+Q. Rule Parser와 LLM Parser는 어떻게 공존합니까?
+A. 기본값은 `LLM_PROVIDER=rule`입니다. OpenAI를 사용할 수 없거나 JSON parse에 실패하면 Rule Parser 결과로 fallback합니다. 따라서 API key가 없어도 workflow는 중단되지 않습니다.
+
+Q. Long Prompt를 어떻게 처리합니까?
+A. Long Prompt를 그대로 generation prompt에 넣지 않습니다. 먼저 requirement로 해석해 JSON field로 나누고, 이후 Semantic Prompt Engine이 provider별로 필요한 정보만 선택합니다.
+
+Q. 왜 JSON 기반 Program을 생성합니까?
+A. JSON Program은 검증, fallback, provider-independent rendering, debug report 저장이 쉽습니다. 또한 Video/3D 같은 미래 provider로 확장할 때 prompt 문자열보다 구조화된 요구사항이 재사용하기 좋습니다.
+
 ## v3.4 Provider Prompt Compiler V2 Questions
 
 Q. 왜 provider별 prompt를 다르게 만들었나요?
