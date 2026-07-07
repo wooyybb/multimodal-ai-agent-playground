@@ -50,7 +50,7 @@ For example, `ReferenceImageParser` is important, but it is a module inside the 
 | Top-level Agent | Responsibility | Internal Modules |
 | --- | --- | --- |
 | Understanding Agent | Understand reference image and visual identity. | VisionAgent, ReferenceImageParser, CharacterProgramBuilder |
-| Planning Agent | Convert user intent into structured style transfer planning. | LLMStyleTransferPlanner, GoalPlanner, ScenePlanningAgent, StyleAgent, LayoutAgent, PoseAgent, ExpressionAgent, LightingAgent, NegativePromptAgent, SemanticPromptEngine, ConflictResolver, PromptSanitizer, PromptValidator |
+| Planning Agent | Convert user intent into structured style transfer planning. | Requirement Parser slot, LLMStyleTransferPlanner, GoalPlanner, ScenePlanningAgent, StyleAgent, LayoutAgent, PoseAgent, ExpressionAgent, LightingAgent, NegativePromptAgent, SemanticPromptEngine, ConflictResolver, PromptSanitizer, PromptValidator |
 | Generation Agent | Render provider-specific prompts and run generation. | PromptCompiler, ProviderRouter, ProviderPromptAdapter, GenerationPlanner, GenerationRouter, SDXL Provider, FLUX Provider, ReferenceConditioningPipeline, StylePresetManager |
 | Evaluation Agent | Score output quality from multiple perspectives. | CLIPMetric, DINOIdentityMetric, PromptMetric, AestheticMetric, EvaluationAggregator |
 | Reflection Agent | Analyze failure, choose strategy, adapt plan, and retry. | ReflectionAgent, SelfVerification, StrategySelector, AdaptivePlanner, RetryAgent, MemorySave, DebugReport |

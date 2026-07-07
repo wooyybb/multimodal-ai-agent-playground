@@ -26,11 +26,11 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Split prompt policy into FLUX dense, SDXL Img2Img style, CLIP evaluation, and negative prompt outputs.
 - Added token budget optimization and debug reporting for removed weak/internal prompt phrases.
 
-## Version 4.0
+## Pre-v4.0 Architecture Cleanup
 
-- Added `LLM Requirement Parser` to convert long user requirements into structured Style Transfer Program JSON.
-- Kept `LLM_PROVIDER=rule` as the default and added OpenAI JSON parsing with rule fallback.
-- Added debug report fields for parser provider, parser fallback, requirement program, and reasoning summary.
+- Re-aligned README and architecture docs around the five high-level agents.
+- Marked Requirement Parser as a future Planning Agent module slot without adding LLM API calls.
+- Kept existing generation, evaluation, SDXL Img2Img, IP-Adapter, and ControlNet flows unchanged.
 
 ## Sprint 01-05
 

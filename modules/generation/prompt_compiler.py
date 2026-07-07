@@ -117,11 +117,6 @@ class PromptCompiler:
             "prompt_blocks": prompt_blocks,
             "prompt_rendering": rendered_prompts,
             "style_transfer_program": style_transfer_program,
-            "requirement_parser": llm_style_result.get("requirement_parser"),
-            "parser_provider": llm_style_result.get("parser_provider"),
-            "parser_fallback": llm_style_result.get("parser_fallback"),
-            "requirement_program": llm_style_result.get("requirement_program"),
-            "reasoning_summary": llm_style_result.get("llm_reasoning_summary"),
             "llm_style_transfer_program": llm_style_result.get(
                 "llm_style_transfer_program"
             ),
@@ -152,11 +147,6 @@ class PromptCompiler:
             "compiled_prompt_package": package,
             "reference_conditioning_package": reference_conditioning,
             "style_transfer_program": style_transfer_program,
-            "requirement_parser": llm_style_result.get("requirement_parser"),
-            "parser_provider": llm_style_result.get("parser_provider"),
-            "parser_fallback": llm_style_result.get("parser_fallback"),
-            "requirement_program": llm_style_result.get("requirement_program"),
-            "reasoning_summary": llm_style_result.get("llm_reasoning_summary"),
             "llm_style_transfer_program": llm_style_result.get(
                 "llm_style_transfer_program"
             ),

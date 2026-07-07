@@ -43,6 +43,7 @@ Reference Understanding
 ## Key Implementation Points
 
 - Provider-independent Vision Layer with BLIP default and Florence fallback.
+- Planning Agent has a reserved Requirement Parser slot for future long prompt to JSON program parsing.
 - Style Transfer Program as structured planning output instead of raw prompt text.
 - Semantic Prompt Engine for merge, conflict resolution, validation, and provider-specific rendering.
 - SDXL Img2Img quality route with optional IP-Adapter and ControlNet hooks.

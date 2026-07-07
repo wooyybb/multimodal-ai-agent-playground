@@ -3,6 +3,13 @@ from modules.planning.llm_context_reasoner import LLMContextReasoner
 
 
 class PlanningAgent:
+    MODULE_SLOTS = {
+        "requirement_parser": {
+            "status": "planned",
+            "responsibility": "parse long user requirements into Style Transfer Program JSON",
+        }
+    }
+
     def run(self, user_prompt: str, image_provided: bool) -> dict:
         print("[PlanningAgent] Running...")
         context_reasoning = LLMContextReasoner().run(

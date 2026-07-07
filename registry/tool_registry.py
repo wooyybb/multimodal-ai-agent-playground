@@ -10,6 +10,7 @@ class ToolRegistry:
         ],
         "planning": [
             "llm_context_reasoner",
+            "requirement_parser",
             "goal_planner",
             "scene_planning",
             "character",
@@ -68,6 +69,7 @@ class ToolRegistry:
             "character_program_builder",
             "scene_planning",
             "llm_context_reasoner",
+            "requirement_parser",
         ],
         "context": [
             "retrieval",
