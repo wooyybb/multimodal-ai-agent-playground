@@ -25,6 +25,7 @@ class PromptValidator:
         sdxl_tokens = self.sanitizer.count_tokens(sdxl_prompt)
         clip_tokens = self.sanitizer.count_tokens(clip_prompt)
         required = self._required_preserved(prompts, style_transfer_program)
+        compiler_report = prompts.get("provider_prompt_compiler_report") or {}
         warnings = []
         if survived:
             warnings.append("forbidden concepts survived prompt sanitization")
@@ -45,6 +46,16 @@ class PromptValidator:
             "duplicate_count": duplicate_count,
             "sdxl_token_count": sdxl_tokens,
             "clip_token_count": clip_tokens,
+            "internal_tokens_removed": compiler_report.get(
+                "removed_internal_control_tokens", []
+            ),
+            "duplicate_phrases_removed": compiler_report.get(
+                "duplicate_phrases_removed", []
+            ),
+            "forbidden_concepts_removed": compiler_report.get(
+                "forbidden_concepts_removed", survived
+            ),
+            "passed_token_budget": sdxl_tokens <= 77 and clip_tokens <= 77,
             "required_style_preserved": required["style_preserved"],
             "required_layout_preserved": required["layout_preserved"],
             "warnings": warnings,

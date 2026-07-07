@@ -445,6 +445,22 @@ Provider-specific prompt rendering is applied at Generation Router time:
 
 The CLIP prompt is intentionally short and removes quality-only terms such as `masterpiece`, `8k`, and `ultra detailed` so evaluation focuses on character, outfit, action, and background semantics.
 
+Provider Prompt Compiler V2 converts the Semantic Prompt Program into model-specific prompt views:
+
+```text
+Semantic Program
+  |
+  v
+Provider Prompt Compiler V2
+  |
+  +-- FLUX dense prompt
+  +-- SDXL Img2Img style prompt
+  +-- CLIP evaluation prompt
+  +-- negative prompt
+```
+
+For SDXL Img2Img, the reference image, Img2Img path, and optional IP-Adapter carry identity. The SDXL prompt therefore stays short and style-focused: renderer, color palette, lighting, mood, composition, and quality. Internal planning values such as identity priority, style priority, and strategy scores are removed before the model prompt is produced.
+
 ## Evaluation Prompt Routing
 
 The Evaluation Layer routes prompts by metric instead of sending the full generation prompt everywhere:

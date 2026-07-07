@@ -33,6 +33,7 @@
 | v3.1 | 5-Agent Architecture refactoring and documentation alignment | Complete |
 | v3.2 | Physical file refactoring into agents and modules packages | Complete |
 | v3.3 | Codebase compression into high-level agents and core façades | Complete |
+| v3.4 | Provider Prompt Compiler V2 with provider-specific token budgets | Complete |
 
 ## Completed Sprints
 

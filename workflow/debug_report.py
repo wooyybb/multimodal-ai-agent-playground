@@ -244,6 +244,13 @@ class DebugReportManager:
                 state.get("conflict_resolution_report")
             ),
             "provider_render_report": self._safe(state.get("provider_render_report")),
+            "provider_prompt_compiler_report": self._safe(
+                (state.get("prompt_rendering") or {}).get(
+                    "provider_prompt_compiler_report"
+                )
+                or state.get("provider_prompt_compiler_report")
+                or state.get("provider_render_report")
+            ),
             "forbidden_concepts": self._safe(state.get("forbidden_concepts")),
             "prompt_sanitizer_report": self._safe(
                 state.get("prompt_sanitizer_report")
@@ -423,6 +430,25 @@ class DebugReportManager:
             "PROVIDER RENDERER",
             state.get("provider_render_report"),
         )
+        self._append_block(
+            lines,
+            "PROVIDER PROMPT COMPILER V2",
+            self._provider_prompt_compiler_preview(state),
+        )
+        self._append_block(lines, "SDXL PROMPT", state.get("sdxl_style_prompt"))
+        self._append_block(
+            lines,
+            "FLUX PROMPT",
+            (state.get("prompt_rendering") or {}).get("flux_prompt")
+            or state.get("dense_generation_prompt")
+            or state.get("generation_prompt"),
+        )
+        self._append_block(lines, "CLIP PROMPT", state.get("clip_prompt"))
+        self._append_block(
+            lines,
+            "NEGATIVE PROMPT",
+            state.get("provider_negative_prompt") or state.get("negative_prompt"),
+        )
         self._append_block(lines, "FORBIDDEN CONCEPTS", state.get("forbidden_concepts"))
         self._append_block(
             lines,
@@ -470,7 +496,6 @@ class DebugReportManager:
             "STYLE TRANSFER",
             self._style_transfer_preview(state),
         )
-        self._append_block(lines, "NEGATIVE PROMPT", state.get("provider_negative_prompt") or state.get("negative_prompt"))
         self._append_block(
             lines,
             "EVALUATION PROMPT ROUTING",
@@ -507,6 +532,27 @@ class DebugReportManager:
             ("Constraints", "constraints"),
         ):
             self._append_block(lines, title, program.get(key))
+
+    def _provider_prompt_compiler_preview(self, state):
+        rendering = state.get("prompt_rendering") or {}
+        report = (
+            rendering.get("provider_prompt_compiler_report")
+            or state.get("provider_prompt_compiler_report")
+            or state.get("provider_render_report")
+            or {}
+        )
+        return {
+            "Provider": report.get("provider") or state.get("provider"),
+            "Prompt Type": report.get("prompt_type")
+            or state.get("provider_prompt_type"),
+            "Token Count": report.get("token_count"),
+            "Removed Low Priority Phrases": report.get(
+                "removed_low_priority_phrases", []
+            ),
+            "Removed Internal Control Tokens": report.get(
+                "removed_internal_control_tokens", []
+            ),
+        }
 
     def _to_text(self, value):
         safe_value = self._safe(value)

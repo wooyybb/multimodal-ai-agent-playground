@@ -64,7 +64,12 @@ class PromptCompiler:
             forbidden_concepts=forbidden_concepts,
         )
         semantic_program = semantic_result["semantic_prompt_program"]
-        provider_rendering = ProviderRenderer().render(semantic_program, provider)
+        provider_rendering = ProviderRenderer().render(
+            semantic_program,
+            provider,
+            forbidden_concepts=forbidden_concepts,
+            negative_prompt=negative_prompt,
+        )
         negative = sanitizer.merge_negative_prompt(
             self._negative_prompt(context_program, negative_prompt),
             provider_rendering.get("negative_prompt")
@@ -367,6 +372,11 @@ class PromptCompiler:
             "pickscore_prompt": pickscore_clean["prompt"],
             "vlm_judge_prompt": vlm_judge_clean["prompt"],
             "negative_prompt": negative_clean["prompt"],
+            "flux_prompt": provider_rendering.get("flux_prompt", generation_clean["prompt"]),
+            "provider_prompt_compiler_report": provider_rendering.get(
+                "provider_prompt_compiler_report",
+                provider_rendering.get("provider_render_report", {}),
+            ),
             "prompt_sanitizer_report": sanitizer_report,
         }
 

@@ -1,5 +1,19 @@
 # Interview Notes
 
+## v3.4 Provider Prompt Compiler V2 Questions
+
+Q. 왜 provider별 prompt를 다르게 만들었나요?
+A. FLUX, SDXL Img2Img, CLIP은 prompt를 해석하는 목적이 다릅니다. FLUX는 dense visual prompt를 받을 수 있지만, SDXL Img2Img는 reference image가 identity를 제공하므로 짧은 style prompt가 더 적합합니다. CLIP은 평가용 semantic summary가 필요합니다.
+
+Q. 왜 SDXL Img2Img prompt에서 identity 설명을 줄였나요?
+A. SDXL Img2Img에서는 reference image와 optional IP-Adapter가 identity, hair, outfit, silhouette 같은 visual feature를 담당합니다. Prompt에 identity를 길게 쓰면 reference image와 충돌하거나 77-token budget을 낭비할 수 있어 style, lighting, mood, color, composition 중심으로 줄였습니다.
+
+Q. Prompt token budget은 어떻게 관리했나요?
+A. `PromptBudgetOptimizer`가 phrase 단위로 token count를 계산하고, weak phrase나 internal control phrase를 낮은 우선순위로 제거합니다. SDXL prompt는 40~60 tokens를 목표로 하고 77 tokens를 넘지 않도록 검증합니다. CLIP prompt는 20~40 tokens 중심으로 유지합니다.
+
+Q. internal priority 값은 왜 prompt에 넣지 않나요?
+A. `identity priority 0.8` 같은 값은 planning/debug를 위한 내부 제어 정보이지 image model이 이해할 visual instruction이 아닙니다. 이런 값이 prompt에 들어가면 모델 영향력이 낮고 noise가 되므로 Provider Prompt Compiler V2에서 제거합니다.
+
 ## v3 Agent Architecture Refactoring Questions
 
 Q. 왜 Agent 수를 줄였나요?

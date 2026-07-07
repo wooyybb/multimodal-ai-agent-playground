@@ -20,6 +20,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Removed small compatibility wrappers after moving runtime imports to `modules.*`.
 - Added `core/` façades for style transfer program, semantic prompt engine, reference conditioning, generation routing, evaluation runner, and debug report.
 
+## Version 3.4
+
+- Added Provider Prompt Compiler V2 for model-specific prompt compilation.
+- Split prompt policy into FLUX dense, SDXL Img2Img style, CLIP evaluation, and negative prompt outputs.
+- Added token budget optimization and debug reporting for removed weak/internal prompt phrases.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.
