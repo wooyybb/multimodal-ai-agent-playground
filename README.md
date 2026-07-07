@@ -22,6 +22,8 @@ The framework is explained through five top-level agents:
 
 Existing smaller agents and utilities are treated as internal modules/components inside these five agents.
 
+`OrchestratorAgent` is not a sixth agent. It is a thin workflow coordinator that starts planning, creates the initial state, and delegates execution to `DynamicExecutionEngine`. Tool and module construction is handled by `registry/tool_registry_factory.py`, so orchestration stays separate from registration.
+
 ## Why This Project?
 
 Most image generation demos are direct prompt-to-image scripts. They are hard to inspect when the result is poor.
@@ -83,6 +85,16 @@ Evaluation Agent
   |
   v
 Reflection Agent
+```
+
+Runtime coordination is intentionally separate from agent responsibility:
+
+```text
+OrchestratorAgent
+  |
+  +-- PlanningAgent creates execution_plan
+  +-- build_tool_registry() registers modules by agent group
+  +-- DynamicExecutionEngine runs the planned steps
 ```
 
 ## End-to-End Workflow
@@ -258,7 +270,7 @@ It includes memory, history, debug report, benchmark, report generator, FastAPI,
 
 - Responsibility-based framework architecture
 - DynamicExecutionEngine with layer-readable execution flow
-- ToolRegistry with layer metadata
+- ToolRegistry with agent-group metadata and factory-based registration
 - Provider-independent Vision Layer with BLIP default and Florence-2 fallback support
 - Florence Task Router for caption, detailed caption, and object detection parsing
 - Rule/mock LLM reasoning fallback for local and free execution
@@ -290,9 +302,12 @@ The v3.3 compression refactor keeps `agents/` focused on the five top-level agen
 | Evaluation modules | `modules/evaluation/`, `evaluation/`, `tools/` |
 | Reflection modules | `modules/reflection/` |
 | Compressed core APIs | `core/` |
+| Registry factory | `registry/tool_registry_factory.py` |
 | Infrastructure | `workflow/`, `memory/`, `api/`, `ui/`, `benchmark/`, `docs/` |
 
 `agents/` now contains only `orchestrator_agent.py`, `understanding_agent.py`, `planning_agent.py`, `generation_agent.py`, `evaluation_agent.py`, and `reflection_agent.py`. Small former agent files now live under `modules/`, while prompt, style transfer, generation routing, evaluation, reference conditioning, and debug APIs are collected under `core/`.
+
+`orchestrator_agent.py` remains as the application-facing workflow coordinator. It no longer imports, instantiates, or registers every module directly; that responsibility belongs to `registry/tool_registry_factory.py`.
 
 ## Quick Start
 

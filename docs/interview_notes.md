@@ -1,5 +1,22 @@
 # Interview Notes
 
+## Orchestrator Cleanup Questions
+
+Q. OrchestratorAgent는 Agent인가요?
+A. 아닙니다. 현재 구조에서 OrchestratorAgent는 여섯 번째 Agent가 아니라 workflow coordinator입니다. PlanningAgent로 execution_plan을 만들고, 초기 state를 구성한 뒤 DynamicExecutionEngine에 실행을 위임합니다.
+
+Q. 왜 tool registration을 Orchestrator에서 분리했나요?
+A. Orchestrator가 모든 module을 import, instantiate, register하면 실제 책임보다 너무 많은 일을 하게 됩니다. `registry/tool_registry_factory.py`로 분리하면 Orchestrator는 실행 조율만 담당하고, module 생성과 등록은 factory가 담당합니다.
+
+Q. ToolRegistryFactory는 5-Agent Architecture와 어떻게 연결되나요?
+A. Factory는 `register_understanding_tools`, `register_planning_tools`, `register_generation_tools`, `register_evaluation_tools`, `register_reflection_tools`, `register_infrastructure_tools`로 등록을 나눕니다. 그래서 작은 module은 그대로 유지하면서도 코드상 등록 경계가 5-Agent 설명과 맞아집니다.
+
+Q. 왜 tool 이름과 execution_plan 이름은 바꾸지 않았나요?
+A. 기존 ExecutionEngine, debug report, benchmark, UI/API 흐름이 같은 step 이름을 사용하기 때문입니다. 이번 refactor는 구조 정리이지 기능 변경이 아니므로 runtime contract를 유지했습니다.
+
+Q. LLM Requirement Parser는 어디에 들어갈 예정인가요?
+A. Planning Agent 내부 module slot으로 들어갑니다. Orchestrator는 그 내부 구현을 알 필요가 없고, ToolRegistryFactory가 Planning 그룹 안에서 필요한 module을 등록하는 방식으로 확장됩니다.
+
 ## Pre-v4.0 Requirement Parser Slot Questions
 
 Q. 왜 LLM에게 Prompt를 쓰게 하지 않았나요?

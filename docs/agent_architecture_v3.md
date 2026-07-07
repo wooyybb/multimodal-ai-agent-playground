@@ -88,6 +88,28 @@ core/
 
 The old small `agents/*` compatibility wrappers were removed after Registry and Orchestrator imports were moved to `modules.*`. API, UI, benchmark, and workflow entry points still import only `OrchestratorAgent`, so the runtime contract remains stable.
 
+## Orchestrator and Registry Factory
+
+`OrchestratorAgent` is a workflow coordinator, not an additional top-level agent. Its responsibility is intentionally small:
+
+1. Ask `PlanningAgent` for an `execution_plan`.
+2. Build the initial shared state.
+3. Run the plan through `DynamicExecutionEngine`.
+4. Return the public result dictionary.
+
+Tool construction and registration live in `registry/tool_registry_factory.py`. The factory groups registrations by the five-agent architecture:
+
+```text
+register_understanding_tools
+register_planning_tools
+register_generation_tools
+register_evaluation_tools
+register_reflection_tools
+register_infrastructure_tools
+```
+
+This keeps Orchestrator readable while preserving the existing execution plan names and ToolRegistry contract.
+
 ## 1-Minute Interview Explanation
 
 This project is a reference-aware multimodal AI Agent framework for style transfer. It is not just a prompt-to-image script. The Understanding Agent extracts visual context from the reference image. The Planning Agent turns the user's natural language request into a structured Style Transfer Program and Semantic Prompt Program. The Generation Agent renders provider-specific prompts and runs FLUX or SDXL Img2Img with optional IP-Adapter and ControlNet hooks. The Evaluation Agent scores the result with CLIP, DINO, prompt, and aesthetic metrics. The Reflection Agent analyzes failures and updates the plan for retry.

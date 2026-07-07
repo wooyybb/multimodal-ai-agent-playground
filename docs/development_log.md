@@ -32,6 +32,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Marked Requirement Parser as a future Planning Agent module slot without adding LLM API calls.
 - Kept existing generation, evaluation, SDXL Img2Img, IP-Adapter, and ControlNet flows unchanged.
 
+## Orchestrator Cleanup Refactor
+
+- Slimmed `OrchestratorAgent` into a workflow coordinator responsible for planning, initial state creation, execution delegation, and result shaping.
+- Moved module construction and tool registration into `registry/tool_registry_factory.py`.
+- Grouped registrations by Understanding, Planning, Generation, Evaluation, Reflection, and Infrastructure responsibilities while preserving existing tool names and execution-plan compatibility.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

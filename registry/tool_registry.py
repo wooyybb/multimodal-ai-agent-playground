@@ -120,6 +120,7 @@ class ToolRegistry:
 
     def __init__(self):
         self._tools = {}
+        self._tool_metadata = {}
         self._register_default_tools()
 
     def _register_default_tools(self):
@@ -148,9 +149,11 @@ class ToolRegistry:
         except Exception as error:
             print(f"[ToolRegistry] Default tool registration skipped: {error}")
 
-    def register(self, name: str, callable_obj):
+    def register(self, name: str, callable_obj, agent_group: str | None = None):
         print(f"[ToolRegistry] Registering tool: {name}")
         self._tools[name] = callable_obj
+        if agent_group:
+            self._tool_metadata[name] = {"agent_group": agent_group}
 
     def call(self, name: str, *args, **kwargs):
         print(f"[ToolRegistry] Calling tool: {name}")
@@ -211,6 +214,9 @@ class ToolRegistry:
         return self.LAYER_LABELS.get(self.layer_for(tool_name), "Unmapped Layer")
 
     def agent_group_for(self, tool_name: str) -> str:
+        explicit = self._tool_metadata.get(tool_name, {}).get("agent_group")
+        if explicit:
+            return explicit
         for group, tools in self.AGENT_GROUP_METADATA.items():
             if tool_name in tools:
                 return group

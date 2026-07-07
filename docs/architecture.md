@@ -105,6 +105,28 @@ The codebase mirrors the 5-Agent explanation with compressed `agents/`, `modules
 
 Small `agents/*` wrappers were removed in v3.3. Runtime entry points continue to use `agents.orchestrator_agent.OrchestratorAgent`, while implementation dependencies are imported from `modules.*` and compressed core façades such as `core.semantic_prompt_engine`.
 
+## Runtime Coordination
+
+`OrchestratorAgent` is not part of the five-agent responsibility model. It is the runtime coordinator that asks `PlanningAgent` for the execution plan, creates the initial state, and delegates execution to `DynamicExecutionEngine`.
+
+Tool construction and module registration are isolated in `registry/tool_registry_factory.py`:
+
+```text
+OrchestratorAgent
+  |
+  +-- build_tool_registry()
+  |     +-- register_understanding_tools
+  |     +-- register_planning_tools
+  |     +-- register_generation_tools
+  |     +-- register_evaluation_tools
+  |     +-- register_reflection_tools
+  |     +-- register_infrastructure_tools
+  |
+  +-- DynamicExecutionEngine
+```
+
+The factory preserves existing tool names and adds agent-group metadata where tools are registered. This keeps the code aligned with the five-agent architecture without changing provider, generation, or evaluation behavior.
+
 ## Vision Layer v1.5
 
 The Vision Layer no longer treats BLIP as the framework boundary. `VisionAgent` calls `VLMRouter`, and the selected provider returns a shared `vision_result`.
