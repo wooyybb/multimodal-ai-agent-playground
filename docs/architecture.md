@@ -114,6 +114,8 @@ Tool construction and module registration are isolated in `registry/tool_registr
 ```text
 OrchestratorAgent
   |
+  +-- core/state_keys.py
+  +-- core/result_builder.py
   +-- build_tool_registry()
   |     +-- register_understanding_tools
   |     +-- register_planning_tools
@@ -126,6 +128,8 @@ OrchestratorAgent
 ```
 
 The factory preserves existing tool names and adds agent-group metadata where tools are registered. This keeps the code aligned with the five-agent architecture without changing provider, generation, or evaluation behavior.
+
+`core/result_builder.py` owns the public result dictionary returned by the pipeline. This preserves existing output keys while keeping Orchestrator focused on workflow coordination.
 
 ## Vision Layer v1.5
 

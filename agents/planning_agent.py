@@ -11,7 +11,11 @@ class PlanningAgent:
     }
 
     def run(self, user_prompt: str, image_provided: bool) -> dict:
-        print("[PlanningAgent] Running...")
+        print("[Planning Agent] Running PlanningAgent...")
+        requirement_context = self._prepare_requirement_parser_context(
+            user_prompt=user_prompt,
+            image_provided=image_provided,
+        )
         context_reasoning = LLMContextReasoner().run(
             {
                 "user_prompt": user_prompt,
@@ -75,10 +79,27 @@ class PlanningAgent:
             "reason": self._build_reason(user_prompt, image_provided),
             "context_reasoning": context_reasoning,
             "goal_tree": goal_tree,
+            "requirement_parser_slot": requirement_context,
         }
 
-        print(f"[PlanningAgent] Execution plan: {execution_plan}")
+        print(f"[Planning Agent] Execution plan: {execution_plan}")
         return result
+
+    def _prepare_requirement_parser_context(self, user_prompt, image_provided):
+        return {
+            "status": "reserved",
+            "provider": "rule",
+            "input_keys": [
+                "user_prompt",
+                "vision_result",
+                "reference_image",
+                "character_program",
+            ],
+            "will_parse_to": "style_transfer_program",
+            "llm_call_enabled": False,
+            "user_prompt_preview": str(user_prompt or "")[:160],
+            "image_provided": bool(image_provided),
+        }
 
     def _build_reason(self, user_prompt, image_provided):
         has_prompt = bool(user_prompt and user_prompt.strip())

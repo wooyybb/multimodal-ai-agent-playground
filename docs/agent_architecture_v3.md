@@ -110,6 +110,8 @@ register_infrastructure_tools
 
 This keeps Orchestrator readable while preserving the existing execution plan names and ToolRegistry contract.
 
+Public result shaping lives in `core/result_builder.py`, and high-traffic orchestration state keys live in `core/state_keys.py`. This keeps the return contract auditable without making Orchestrator own a long response dictionary.
+
 ## 1-Minute Interview Explanation
 
 This project is a reference-aware multimodal AI Agent framework for style transfer. It is not just a prompt-to-image script. The Understanding Agent extracts visual context from the reference image. The Planning Agent turns the user's natural language request into a structured Style Transfer Program and Semantic Prompt Program. The Generation Agent renders provider-specific prompts and runs FLUX or SDXL Img2Img with optional IP-Adapter and ControlNet hooks. The Evaluation Agent scores the result with CLIP, DINO, prompt, and aesthetic metrics. The Reflection Agent analyzes failures and updates the plan for retry.

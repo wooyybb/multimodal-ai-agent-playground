@@ -38,6 +38,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Moved module construction and tool registration into `registry/tool_registry_factory.py`.
 - Grouped registrations by Understanding, Planning, Generation, Evaluation, Reflection, and Infrastructure responsibilities while preserving existing tool names and execution-plan compatibility.
 
+## Version 3.5
+
+- Added `core/result_builder.py` to preserve the public pipeline return contract outside Orchestrator.
+- Added `core/state_keys.py` for high-traffic orchestration state keys.
+- Clarified the Planning Agent Requirement Parser slot without adding an LLM call.
+- Added `docs/codebase_structure.md` and `docs/refactoring_notes_v3_5.md`.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

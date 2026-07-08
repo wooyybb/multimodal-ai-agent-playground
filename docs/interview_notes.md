@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v3.5 Codebase Cleanup Questions
+
+Q. Why did you make OrchestratorAgent thin?
+A. OrchestratorAgent should coordinate the workflow, not construct every module. It now runs PlanningAgent, builds initial state, delegates to DynamicExecutionEngine, and returns the result. Tool creation and registration live in ToolRegistryFactory.
+
+Q. How do you distinguish Agent and Module?
+A. An Agent owns a high-level responsibility and feedback boundary. A Module performs a focused function inside an Agent. Vision parsing, prompt validation, provider adaptation, strategy selection, and retry are modules/components inside the five-agent architecture.
+
+Q. Why clean the architecture before adding an LLM Requirement Parser?
+A. The parser needs a clean Planning Agent slot. If Orchestrator, Registry, and Planning responsibilities are mixed, adding LLM parsing would increase coupling. v3.5 prepares a stable place for it without adding an LLM call.
+
+Q. What is the core Agent Flow?
+A. Understanding Agent parses the reference image. Planning Agent creates structured style transfer intent. Generation Agent renders provider prompts and runs SDXL/FLUX. Evaluation Agent scores the result. Reflection Agent adapts the plan and decides retry.
+
+Q. Why separate Result Builder?
+A. The public return dictionary is a contract used by UI, API, benchmark, and debug consumers. Moving it to core/result_builder.py keeps that contract auditable and keeps Orchestrator focused on coordination.
+
 ## Orchestrator Cleanup Questions
 
 Q. OrchestratorAgent는 Agent인가요?

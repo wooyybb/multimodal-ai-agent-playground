@@ -93,6 +93,8 @@ Runtime coordination is intentionally separate from agent responsibility:
 OrchestratorAgent
   |
   +-- PlanningAgent creates execution_plan
+  +-- core/state_keys.py defines high-traffic state keys
+  +-- core/result_builder.py shapes public pipeline output
   +-- build_tool_registry() registers modules by agent group
   +-- DynamicExecutionEngine runs the planned steps
 ```
@@ -301,13 +303,15 @@ The v3.3 compression refactor keeps `agents/` focused on the five top-level agen
 | Generation modules | `modules/generation/`, `generation/`, `provider/`, `config/` |
 | Evaluation modules | `modules/evaluation/`, `evaluation/`, `tools/` |
 | Reflection modules | `modules/reflection/` |
-| Compressed core APIs | `core/` |
+| Compressed core APIs | `core/`, including `state_keys.py` and `result_builder.py` |
 | Registry factory | `registry/tool_registry_factory.py` |
 | Infrastructure | `workflow/`, `memory/`, `api/`, `ui/`, `benchmark/`, `docs/` |
 
 `agents/` now contains only `orchestrator_agent.py`, `understanding_agent.py`, `planning_agent.py`, `generation_agent.py`, `evaluation_agent.py`, and `reflection_agent.py`. Small former agent files now live under `modules/`, while prompt, style transfer, generation routing, evaluation, reference conditioning, and debug APIs are collected under `core/`.
 
 `orchestrator_agent.py` remains as the application-facing workflow coordinator. It no longer imports, instantiates, or registers every module directly; that responsibility belongs to `registry/tool_registry_factory.py`.
+
+v3.5 also moves the public pipeline return shape into `core/result_builder.py`. This keeps the Orchestrator focused on coordination while preserving existing output keys for UI, API, benchmark, and debug consumers.
 
 ## Quick Start
 
@@ -555,8 +559,10 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 
 - [Architecture](docs/architecture.md)
 - [Agent Architecture v3](docs/agent_architecture_v3.md)
+- [Codebase Structure v3.5](docs/codebase_structure.md)
 - [Layer Map](docs/layer_map.md)
 - [Project Summary](docs/project_summary.md)
+- [Refactoring Notes v3.5](docs/refactoring_notes_v3_5.md)
 - [Design Specification v1.0](docs/design_spec_v1.md)
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)
