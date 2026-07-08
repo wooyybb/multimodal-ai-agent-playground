@@ -54,6 +54,7 @@ Reference Understanding
 - Semantic Prompt Engine for merge, conflict resolution, validation, and provider-specific rendering.
 - SDXL Img2Img quality route with optional IP-Adapter and ControlNet hooks.
 - Multi-metric evaluation using CLIP, DINO identity, prompt consistency, and aesthetic heuristics.
+- Evaluation metric implementations are consolidated in `evaluation/metrics.py`, while aggregation and weighting remain in `evaluation/evaluation_aggregator.py`.
 - Debug reports that store state, prompt lifecycle, provider routing, evaluation result, and v3 agent traces.
 - FastAPI, Gradio, benchmark, and report generation as infrastructure around the same core pipeline.
 

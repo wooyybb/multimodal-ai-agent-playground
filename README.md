@@ -301,7 +301,7 @@ The v3.3 compression refactor keeps `agents/` focused on the five top-level agen
 | Understanding modules | `modules/understanding/`, `tools/vlm/` |
 | Planning modules | `modules/planning/`, `modules/prompt/`, `context/`, `llm/`, `knowledge/` |
 | Generation modules | `modules/generation/`, `generation/`, `provider/`, `config/` |
-| Evaluation modules | `modules/evaluation/`, `evaluation/`, `tools/` |
+| Evaluation modules | `modules/evaluation/`, `evaluation/metrics.py`, `evaluation/evaluation_aggregator.py`, `tools/` |
 | Reflection modules | `modules/reflection/` |
 | Compressed core APIs | `core/`, including `state_keys.py` and `result_builder.py` |
 | Registry factory | `registry/tool_registry_factory.py` |
@@ -312,6 +312,8 @@ The v3.3 compression refactor keeps `agents/` focused on the five top-level agen
 `orchestrator_agent.py` remains as the application-facing workflow coordinator. It no longer imports, instantiates, or registers every module directly; that responsibility belongs to `registry/tool_registry_factory.py`.
 
 v3.5 also moves the public pipeline return shape into `core/result_builder.py`. This keeps the Orchestrator focused on coordination while preserving existing output keys for UI, API, benchmark, and debug consumers.
+
+v3.6 applies a conservative code diet to the Evaluation Layer. Metric implementations that were split across many small files now live in `evaluation/metrics.py`, while `evaluation/evaluation_aggregator.py` keeps weighting and result schema ownership. Metric behavior and weights are unchanged.
 
 ## Quick Start
 
@@ -563,6 +565,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 - [Layer Map](docs/layer_map.md)
 - [Project Summary](docs/project_summary.md)
 - [Refactoring Notes v3.5](docs/refactoring_notes_v3_5.md)
+- [Refactoring Notes v3.6](docs/refactoring_notes_v3_6.md)
 - [Design Specification v1.0](docs/design_spec_v1.md)
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)

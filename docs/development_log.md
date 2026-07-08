@@ -45,6 +45,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Clarified the Planning Agent Requirement Parser slot without adding an LLM call.
 - Added `docs/codebase_structure.md` and `docs/refactoring_notes_v3_5.md`.
 
+## Version 3.6
+
+- Consolidated Evaluation metric implementations into `evaluation/metrics.py`.
+- Kept `evaluation/evaluation_aggregator.py` responsible for metric execution, weighting, fallback normalization, and stable result schema.
+- Removed separate metric implementation files without changing metric names, weights, score calculation, or public evaluation result shape.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

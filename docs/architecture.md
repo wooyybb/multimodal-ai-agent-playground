@@ -402,6 +402,8 @@ When a reference image and generated image are available, the DINO metric attemp
 
 ## Evaluation Layer Stabilization v1.6
 
+v3.6 consolidates concrete metric implementations into `evaluation/metrics.py`; `evaluation/evaluation_aggregator.py` still owns metric execution, weighting, fallback normalization, and the stable result schema.
+
 Every metric returns the same schema:
 
 ```json

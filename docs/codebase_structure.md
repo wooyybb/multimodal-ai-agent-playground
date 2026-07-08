@@ -60,13 +60,10 @@ The current SDXL path remains SDXL Img2Img with optional IP-Adapter and ControlN
 
 `evaluation/` owns metrics and aggregation:
 
-- CLIP semantic alignment.
-- DINO identity consistency.
-- Prompt consistency.
-- Aesthetic heuristic.
-- Evaluation aggregation and stable score schema.
+- `metrics.py`: CLIP semantic alignment, DINO identity consistency, prompt consistency, identity heuristic, aesthetic heuristic, and shared metric base.
+- `evaluation_aggregator.py`: metric execution, weighted score, result schema, routing summary, and fallback normalization.
 
-v3.5 does not add metrics.
+v3.6 does not add metrics; it only consolidates the existing metric implementations.
 
 ## Registry and Workflow
 

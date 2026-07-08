@@ -1,8 +1,10 @@
-from evaluation.aesthetic_metric import AestheticMetric
-from evaluation.clip_metric import ClipMetric
-from evaluation.dino_metric import DINOIdentityMetric
-from evaluation.identity_metric import IdentityMetric
-from evaluation.prompt_metric import PromptMetric
+from evaluation.metrics import (
+    AestheticMetric,
+    ClipMetric,
+    DINOIdentityMetric,
+    IdentityMetric,
+    PromptMetric,
+)
 
 
 class EvaluationAggregator:
