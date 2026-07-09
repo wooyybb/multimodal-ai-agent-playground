@@ -62,15 +62,15 @@ flowchart TD
 4. Evaluation Agent scores the output with metric-specific prompts and image similarity metrics.
 5. Reflection Agent analyzes failure modes, updates planning strategy, decides retry, and records memory/debug output.
 
-## Requirement Parser Slot
+## LLM Requirement Parser v4.0
 
-The Planning Agent reserves a Requirement Parser slot for future long prompt parsing. This cleanup does not add a new LLM API call.
+The Planning Agent owns the Requirement Parser. Its job is to convert long user requirements into Style Transfer Program JSON. It is not a prompt writer.
 
 ```text
 User Requirement
   |
   v
-Requirement Parser Slot
+LLM Requirement Parser
   |
   v
 Structured Style Transfer Program JSON
@@ -85,7 +85,7 @@ Provider Prompt Compiler
 Generation
 ```
 
-Current execution remains on the existing rule/mock fallback path. A future LLM Requirement Parser can be inserted in this slot to produce Style Transfer Program JSON, while Semantic Prompt Compiler and Provider Prompt Compiler continue to own final prompt rendering.
+`LLM_PROVIDER=rule` uses deterministic parsing. `LLM_PROVIDER=openai` attempts OpenAI JSON parsing with `OPENAI_MODEL` defaulting to `gpt-5-mini`; missing API keys, client errors, or invalid JSON all fall back to rule parsing. Semantic Prompt Compiler and Provider Prompt Compiler continue to own final prompt rendering.
 
 ## Physical Module Layout v3.3
 

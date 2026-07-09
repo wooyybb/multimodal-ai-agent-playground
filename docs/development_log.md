@@ -51,6 +51,13 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Kept `evaluation/evaluation_aggregator.py` responsible for metric execution, weighting, fallback normalization, and stable result schema.
 - Removed separate metric implementation files without changing metric names, weights, score calculation, or public evaluation result shape.
 
+## Version 4.0
+
+- Added `llm/requirement_parser.py` as the Planning Agent Requirement Parser.
+- Parser converts long user requirements into Style Transfer Program JSON, not final prompts.
+- `LLM_PROVIDER=rule` keeps deterministic parsing; `LLM_PROVIDER=openai` attempts OpenAI JSON parsing and falls back safely.
+- Debug reports now include parser provider, fallback status, raw text, error, and reasoning summary.
+
 ## Sprint 01-05
 
 - Built the initial agent skeleton.

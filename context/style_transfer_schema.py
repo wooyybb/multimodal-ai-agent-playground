@@ -1,6 +1,53 @@
 class StyleTransferSchema:
     DEFAULT_NEGATIVE = ["low quality", "blurry", "bad anatomy", "duplicate subject"]
 
+    def from_requirement_program(self, program: dict) -> dict:
+        program = program or {}
+        task = program.get("task") or {}
+        identity = program.get("identity") or {}
+        style = program.get("style") or {}
+        layout = program.get("layout") or {}
+        negative = program.get("negative") or {}
+        strategy = program.get("generation_strategy") or {}
+        return {
+            "task_type": task.get("type", "reference_aware_style_transfer"),
+            "style_goal": task.get("goal", ""),
+            "identity_policy": {
+                "preserve_identity": bool(identity.get("preserve_identity", True)),
+                "preserve_hair": bool(identity.get("preserve_hairstyle", True)),
+                "preserve_outfit": bool(identity.get("preserve_outfit", True)),
+                "preserve_color_palette": bool(identity.get("preserve_palette", True)),
+                "allow_minor_redraw": True,
+            },
+            "style": {
+                "name": style.get("name", ""),
+                "renderer": style.get("renderer", ""),
+                "lineart": style.get("lineart", ""),
+                "color_palette": style.get("palette", ""),
+                "lighting": style.get("lighting", ""),
+                "texture": style.get("texture", ""),
+                "mood": style.get("mood", ""),
+            },
+            "layout": {
+                "format": layout.get("format", ""),
+                "composition": layout.get("composition", ""),
+                "background": layout.get("background", ""),
+                "decorations": layout.get("decorations", []),
+            },
+            "generation_strategy": {
+                "provider": strategy.get("provider", "sdxl_quality"),
+                "use_img2img": bool(strategy.get("use_img2img", True)),
+                "use_ip_adapter": bool(strategy.get("use_ip_adapter", True)),
+                "use_controlnet": bool(strategy.get("use_controlnet", False)),
+                "style_strength": strategy.get("style_strength", 0.6),
+                "identity_strength": strategy.get("identity_strength", 0.8),
+                "structure_strength": strategy.get("structure_strength", 0.5),
+            },
+            "forbidden_concepts": list(negative.get("remove") or []),
+            "negative_prompt": list(negative.get("remove") or self.DEFAULT_NEGATIVE),
+            "reasoning_summary": program.get("reasoning_summary", ""),
+        }
+
     def from_rule_program(self, program: dict) -> dict:
         program = program or {}
         style = program.get("style") or {}
@@ -48,6 +95,8 @@ class StyleTransferSchema:
         }
 
     def normalize(self, candidate: dict, fallback_program: dict) -> dict:
+        if isinstance(candidate, dict) and "task" in candidate:
+            candidate = self.from_requirement_program(candidate)
         fallback = self.from_rule_program(fallback_program)
         candidate = candidate or {}
         output = dict(fallback)
@@ -70,6 +119,8 @@ class StyleTransferSchema:
         return output
 
     def to_legacy_program(self, llm_program: dict, fallback_program: dict) -> dict:
+        if isinstance(llm_program, dict) and "task" in llm_program:
+            llm_program = self.from_requirement_program(llm_program)
         llm_program = self.normalize(llm_program, fallback_program)
         fallback = dict(fallback_program or {})
         style = llm_program.get("style") or {}

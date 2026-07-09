@@ -178,6 +178,24 @@ class DebugReportManager:
             "llm_reasoning_raw_text": self._safe(
                 self._llm_summary(state).get("llm_reasoning_raw_text")
             ),
+            "llm_requirement_parser_enabled": self._safe(
+                self._requirement_parser_summary(state).get("enabled")
+            ),
+            "parser_provider": self._safe(
+                self._requirement_parser_summary(state).get("provider")
+            ),
+            "parser_used_fallback": self._safe(
+                self._requirement_parser_summary(state).get("used_fallback")
+            ),
+            "parser_error": self._safe(
+                self._requirement_parser_summary(state).get("error")
+            ),
+            "llm_raw_text": self._safe(
+                self._requirement_parser_summary(state).get("raw_text")
+            ),
+            "requirement_reasoning_summary": self._safe(
+                self._requirement_parser_summary(state).get("reasoning_summary")
+            ),
             "planner_result": self._safe(state.get("planner_result")),
             "goal_tree": self._safe(state.get("goal_tree")),
             "context_reasoning": self._safe(state.get("context_reasoning")),
@@ -411,12 +429,13 @@ class DebugReportManager:
         )
         self._append_block(
             lines,
-            "REQUIREMENT PARSER SLOT",
-            {
-                "agent_group": "planning",
-                "status": "reserved for future LLM Requirement Parser",
-                "current_behavior": "rule/LLM style transfer planning fallback remains unchanged",
-            },
+            "LLM REQUIREMENT PARSER",
+            self._requirement_parser_preview(state),
+        )
+        self._append_block(
+            lines,
+            "REQUIREMENT STYLE TRANSFER PROGRAM",
+            self._requirement_style_transfer_program(state),
         )
         self._append_block(
             lines,
@@ -599,6 +618,40 @@ class DebugReportManager:
             "used_fallback": state.get("llm_used_fallback"),
             "metadata": state.get("llm_style_transfer_metadata", {}),
             "final_style_transfer_program": state.get("final_style_transfer_program"),
+        }
+
+    def _requirement_parser_summary(self, state):
+        planner = state.get("planner_result") or {}
+        summary = planner.get("requirement_parser") or {}
+        if not summary:
+            program = state.get("style_transfer_program") or {}
+            summary = program.get("requirement_parser") or {}
+        return {
+            "enabled": summary.get("enabled", False),
+            "provider": summary.get("provider")
+            or planner.get("parser_provider")
+            or "rule",
+            "used_fallback": summary.get(
+                "used_fallback",
+                planner.get("parser_used_fallback", True),
+            ),
+            "error": summary.get("error") or planner.get("parser_error", ""),
+            "raw_text": summary.get("raw_text") or planner.get("llm_raw_text", ""),
+            "reasoning_summary": summary.get("reasoning_summary")
+            or planner.get("reasoning_summary", ""),
+        }
+
+    def _requirement_style_transfer_program(self, state):
+        planner = state.get("planner_result") or {}
+        return planner.get("style_transfer_program") or state.get("style_transfer_program")
+
+    def _requirement_parser_preview(self, state):
+        summary = self._requirement_parser_summary(state)
+        return {
+            "provider": summary.get("provider"),
+            "fallback": summary.get("used_fallback"),
+            "error": summary.get("error"),
+            "reasoning_summary": summary.get("reasoning_summary"),
         }
 
     def _compiled_prompt_package_preview(self, package):

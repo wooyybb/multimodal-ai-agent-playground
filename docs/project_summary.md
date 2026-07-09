@@ -22,7 +22,9 @@ Existing smaller agents are treated as modules inside these higher-level agents.
 
 The runtime `OrchestratorAgent` is a coordinator rather than a sixth agent. It starts the workflow, asks the Planning Agent for an execution plan, builds the initial state, and hands execution to `DynamicExecutionEngine`. Module construction and ToolRegistry registration are centralized in `registry/tool_registry_factory.py`.
 
-v3.5 keeps that boundary explicit: public output shaping lives in `core/result_builder.py`, common orchestration keys live in `core/state_keys.py`, and Planning Agent keeps a reserved Requirement Parser slot for future long requirement parsing.
+v3.5 keeps that boundary explicit: public output shaping lives in `core/result_builder.py`, common orchestration keys live in `core/state_keys.py`, and Planning Agent keeps a reserved Requirement Parser slot for long requirement parsing.
+
+v4.0 activates the Requirement Parser slot. The parser converts long user requirements into Style Transfer Program JSON. It never writes final prompts; final model-facing prompts remain owned by the Semantic Prompt Engine and Provider Prompt Compiler.
 
 ## Core Flow
 
@@ -48,6 +50,7 @@ Reference Understanding
 
 - Provider-independent Vision Layer with BLIP default and Florence fallback.
 - Planning Agent has a reserved Requirement Parser slot for future long prompt to JSON program parsing.
+- LLM Requirement Parser can parse long requirements into Style Transfer Program JSON with rule fallback.
 - Orchestrator is thin; ToolRegistryFactory owns module creation and grouped registration.
 - Result Builder preserves the public pipeline response shape outside Orchestrator.
 - Style Transfer Program as structured planning output instead of raw prompt text.

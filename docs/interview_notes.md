@@ -1,5 +1,22 @@
 # Interview Notes
 
+## v4.0 LLM Requirement Parser Questions
+
+Q. What role does the LLM play in this project?
+A. The LLM is a Requirement Parser inside the Planning Agent. It converts a long user request into structured Style Transfer Program JSON. It does not write the final image prompt.
+
+Q. Why not let the LLM write the final prompt directly?
+A. Final prompts are provider-specific and need token budgets, forbidden concept handling, reference conditioning, and evaluation prompt routing. Keeping prompt rendering inside the framework makes the workflow debuggable and controllable.
+
+Q. How are long user requirements handled?
+A. The parser reads the long requirement and extracts task, identity policy, style, layout, pose/expression, text rules, negative/remove concepts, and generation strategy. Those fields are then rendered by the Semantic Prompt Engine and Provider Prompt Compiler.
+
+Q. What is a Style Transfer Program?
+A. It is a structured planning representation. It stores what should be preserved, what style should be applied, what layout is requested, what should be removed, and how generation should be guided.
+
+Q. Why keep rule fallback?
+A. OpenAI may be unavailable, API keys may be missing, or JSON parsing can fail. Rule fallback keeps the workflow local, stable, and testable without crashing.
+
 ## v3.5 Codebase Cleanup Questions
 
 Q. Why did you make OrchestratorAgent thin?

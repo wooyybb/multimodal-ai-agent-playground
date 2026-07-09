@@ -66,6 +66,8 @@ Adaptive Planning
 
 The LLM does not write the final prompt directly. The Planning Agent has a reserved Requirement Parser slot for future long natural-language requirement parsing. Today, the existing rule/LLM style transfer planning fallback remains unchanged, and the Semantic Prompt Engine renders provider-specific prompts from the current Style Transfer Program.
 
+v4.0 activates that slot as an LLM Requirement Parser. `LLM_PROVIDER=rule` keeps the local rule parser. `LLM_PROVIDER=openai` attempts to parse the long user requirement into Style Transfer Program JSON, and falls back to rule parsing if the API key, client, or JSON parsing fails. The LLM still never writes the final provider prompt.
+
 ## 5-Agent Architecture
 
 ```text
@@ -97,6 +99,27 @@ OrchestratorAgent
   +-- core/result_builder.py shapes public pipeline output
   +-- build_tool_registry() registers modules by agent group
   +-- DynamicExecutionEngine runs the planned steps
+```
+
+Long requirement parsing now sits inside the Planning Agent:
+
+```text
+User Long Requirement
+  |
+  v
+Planning Agent
+  |
+  v
+LLM Requirement Parser
+  |
+  v
+Style Transfer Program JSON
+  |
+  v
+Semantic Prompt Engine
+  |
+  v
+Provider Prompt Compiler
 ```
 
 ## End-to-End Workflow
@@ -203,7 +226,9 @@ Semantic Prompt Program
 
 Semantic Merge reduces meaning-level duplication such as `anime`, `anime style`, and `anime illustration` into one canonical phrase. Conflict Resolver applies user intent first, so `remove weapon` becomes a constraint that prevents weapon-related text from being rendered into FLUX, SDXL, or CLIP prompts. Provider Renderer then creates a dense FLUX prompt, a short SDXL style prompt, and a compact CLIP evaluation prompt from the same semantic source.
 
-The Planning Agent reserves a future Requirement Parser module. That slot will convert long natural-language requirements into structured Style Transfer Program JSON later. In the current pre-v4.0 cleanup, no new LLM API call is added and the final prompt is still created by the Semantic Prompt Engine, not by the LLM.
+The Planning Agent owns the Requirement Parser module. It converts long natural-language requirements into structured Style Transfer Program JSON. In rule mode, this is deterministic. In OpenAI mode, the parser requests JSON only and falls back without crashing if OpenAI is unavailable or returns invalid JSON.
+
+The parser output is still not a final prompt. The Semantic Prompt Engine and Provider Prompt Compiler remain responsible for producing FLUX, SDXL, CLIP, and negative prompt variants.
 
 ### Generation Agent
 
@@ -411,9 +436,9 @@ Debug reports include `executed_layers`, `skipped_layers`, and `dirty_reasons`, 
 | Variable | Purpose |
 | --- | --- |
 | `HF_TOKEN` | Hugging Face access token for model/provider access. |
-| `LLM_PROVIDER` | Use `rule` or `mock` for the current free/local setup. |
-| `OPENAI_API_KEY` | Optional key for future OpenAI reasoning. Never commit real keys. |
-| `OPENAI_MODEL` | Optional OpenAI model name for future reasoning experiments. |
+| `LLM_PROVIDER` | `rule` by default, or `openai` to enable LLM Requirement Parser. |
+| `OPENAI_API_KEY` | Optional key for OpenAI requirement parsing. Never commit real keys. |
+| `OPENAI_MODEL` | Optional OpenAI model name. Default parser model is `gpt-5-mini`. |
 | `VLM_PROVIDER` | `blip` or `florence`; BLIP is the default. |
 | `GENERATION_PROVIDER` | `flux_fast` or `sdxl_quality`; default is `flux_fast`. |
 | `SDXL_MODEL_ID` | Optional Diffusers model id for SDXL Img2Img. Default is `stabilityai/stable-diffusion-xl-base-1.0`. |
@@ -486,13 +511,13 @@ For SDXL Img2Img, the reference image, Img2Img path, and optional IP-Adapter car
 
 ## Requirement Parser Slot
 
-The pre-v4.0 architecture reserves a Requirement Parser slot inside the Planning Agent. This is a structural preparation step only; no new LLM API call is added here.
+v4.0 turns the Requirement Parser slot into an active Planning Agent module.
 
 ```text
 Long User Requirement
   |
   v
-Requirement Parser Slot
+LLM Requirement Parser
   |
   v
 Structured Style Transfer Program JSON
@@ -504,7 +529,7 @@ Semantic Prompt Compiler
 Provider Prompt Compiler
 ```
 
-Default execution remains unchanged and uses the existing rule/mock fallback path. The future parser will output structured data, while final model prompts will continue to be produced by the Semantic Prompt Engine and Provider Prompt Compiler.
+Default execution remains unchanged with `LLM_PROVIDER=rule`. With `LLM_PROVIDER=openai`, the parser attempts OpenAI JSON parsing and falls back to rule parsing when the key, client, or JSON output is unavailable. Final model prompts continue to be produced by the Semantic Prompt Engine and Provider Prompt Compiler.
 
 ## Evaluation Prompt Routing
 
@@ -566,6 +591,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 - [Project Summary](docs/project_summary.md)
 - [Refactoring Notes v3.5](docs/refactoring_notes_v3_5.md)
 - [Refactoring Notes v3.6](docs/refactoring_notes_v3_6.md)
+- [Refactoring Notes v4.0](docs/refactoring_notes_v4_0.md)
 - [Design Specification v1.0](docs/design_spec_v1.md)
 - [Demo Guide](docs/demo_guide.md)
 - [Interview Notes](docs/interview_notes.md)

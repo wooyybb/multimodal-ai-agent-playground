@@ -1,5 +1,6 @@
 from modules.planning.goal_planner import GoalPlanner
 from modules.planning.llm_context_reasoner import LLMContextReasoner
+from llm.requirement_parser import RequirementParser
 
 
 class PlanningAgent:
@@ -12,9 +13,11 @@ class PlanningAgent:
 
     def run(self, user_prompt: str, image_provided: bool) -> dict:
         print("[Planning Agent] Running PlanningAgent...")
-        requirement_context = self._prepare_requirement_parser_context(
-            user_prompt=user_prompt,
-            image_provided=image_provided,
+        requirement_result = RequirementParser().parse(
+            {
+                "user_prompt": user_prompt,
+                "image_provided": image_provided,
+            }
         )
         context_reasoning = LLMContextReasoner().run(
             {
@@ -79,16 +82,33 @@ class PlanningAgent:
             "reason": self._build_reason(user_prompt, image_provided),
             "context_reasoning": context_reasoning,
             "goal_tree": goal_tree,
-            "requirement_parser_slot": requirement_context,
+            "requirement_parser_slot": self._prepare_requirement_parser_context(
+                user_prompt=user_prompt,
+                image_provided=image_provided,
+                requirement_result=requirement_result,
+            ),
+            "style_transfer_program": requirement_result.get("style_transfer_program"),
+            "requirement_parser": requirement_result.get("requirement_parser"),
+            "parser_provider": requirement_result.get("parser_provider"),
+            "parser_used_fallback": requirement_result.get("parser_used_fallback"),
+            "parser_error": requirement_result.get("parser_error"),
+            "llm_raw_text": requirement_result.get("llm_raw_text"),
+            "reasoning_summary": requirement_result.get("reasoning_summary"),
         }
 
         print(f"[Planning Agent] Execution plan: {execution_plan}")
         return result
 
-    def _prepare_requirement_parser_context(self, user_prompt, image_provided):
+    def _prepare_requirement_parser_context(
+        self,
+        user_prompt,
+        image_provided,
+        requirement_result=None,
+    ):
+        requirement_result = requirement_result or {}
         return {
-            "status": "reserved",
-            "provider": "rule",
+            "status": "active",
+            "provider": requirement_result.get("parser_provider", "rule"),
             "input_keys": [
                 "user_prompt",
                 "vision_result",
@@ -96,7 +116,9 @@ class PlanningAgent:
                 "character_program",
             ],
             "will_parse_to": "style_transfer_program",
-            "llm_call_enabled": False,
+            "llm_call_enabled": requirement_result.get("parser_provider") == "openai",
+            "used_fallback": requirement_result.get("parser_used_fallback", True),
+            "parser_error": requirement_result.get("parser_error", ""),
             "user_prompt_preview": str(user_prompt or "")[:160],
             "image_provided": bool(image_provided),
         }

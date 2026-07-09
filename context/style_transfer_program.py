@@ -1,5 +1,7 @@
 import re
 
+from context.style_transfer_schema import StyleTransferSchema
+
 
 class StyleTransferProgramBuilder:
     PHOTObooth_KEYWORDS = (
@@ -55,6 +57,19 @@ class StyleTransferProgramBuilder:
             "caption": caption,
             "presets": self._detected_presets(user_prompt),
         }
+        planner_program = (state.get("planner_result") or {}).get(
+            "style_transfer_program"
+        )
+        if planner_program:
+            program = StyleTransferSchema().to_legacy_program(
+                planner_program,
+                program,
+            )
+            program["requirement_parser"] = (state.get("planner_result") or {}).get(
+                "requirement_parser",
+                {},
+            )
+            program["source_summary"]["requirement_parser_used"] = True
         return program
 
     def _base_program(self):
