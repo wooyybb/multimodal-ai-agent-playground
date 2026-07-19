@@ -94,3 +94,9 @@ Reference Understanding
 - Benchmark dashboard.
 - Multi-session memory.
 - CI smoke tests and public demo release.
+
+## v4.1 Dynamic Planning Summary
+
+v4.1 adds constrained LLM tool planning without changing the project identity. The framework remains a reference-aware style transfer system. PlanningAgent can now choose tools from an allowlisted catalog, but the output is validated JSON plan data rather than code or final prompts.
+
+This improves explainability: reports show which tools were selected, why they were selected, which tools ran, which were skipped, and whether replanning was needed.

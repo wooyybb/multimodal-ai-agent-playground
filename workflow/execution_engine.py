@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 from core.generation_router import GenerationRouter
 from workflow.agent_state import AgentState
@@ -179,6 +179,14 @@ class DynamicExecutionEngine:
         state.setdefault("executed_layers", [])
         state.setdefault("skipped_layers", [])
         state.setdefault("dirty_reasons", [])
+        state.setdefault("executed_tools", [])
+        state.setdefault("skipped_tools", [])
+        state.setdefault("tool_arguments", {})
+        state.setdefault("tool_results_summary", {})
+        state.setdefault("replan_count", 0)
+        state.setdefault("replan_reason", "")
+        state.setdefault("final_stop_condition", "")
+        self._copy_planning_observability(state)
         state["agent_architecture_version"] = "v3"
         state.setdefault("executed_agent_groups", [])
         state.setdefault("component_trace", [])
@@ -202,10 +210,12 @@ class DynamicExecutionEngine:
                 if handler is None:
                     message = f"Unknown step skipped: {step}"
                     print(f"[ExecutionEngine] {message}")
+                    state.setdefault("skipped_tools", []).append(step)
                     state["agent_trace"].append(message)
                     continue
 
                 if self._try_skip_step(step, state):
+                    state.setdefault("skipped_tools", []).append(step)
                     state["agent_trace"].append(f"ExecutionEngine skipped {step}")
                     continue
 
@@ -224,6 +234,7 @@ class DynamicExecutionEngine:
                 if step != "memory_save":
                     raise
 
+        self._record_final_stop_condition(state)
         print("[ExecutionEngine] Dynamic execution completed.")
         final_state = AgentState.from_dict(state)
         final_state.validate()
@@ -233,6 +244,42 @@ class DynamicExecutionEngine:
         final_dict.pop("_active_component_step", None)
         return final_dict
 
+    def _copy_planning_observability(self, state):
+        planner_result = state.get("planner_result") or {}
+        for key in (
+            "planning_mode",
+            "llm_tool_planner_enabled",
+            "tool_plan",
+            "plan_validation_result",
+            "selected_tools",
+            "planner_used_fallback",
+            "planner_fallback_reason",
+            "tool_planner_raw_text",
+            "parser_used_fallback",
+        ):
+            if key in planner_result and key not in state:
+                state[key] = planner_result.get(key)
+
+    def _record_final_stop_condition(self, state):
+        evaluation_result = state.get("evaluation_result") or {}
+        threshold_met = False
+        weighted_score = evaluation_result.get("weighted_score", state.get("score"))
+        if isinstance(weighted_score, (int, float)):
+            threshold_met = weighted_score >= 0.7
+        if threshold_met:
+            state["final_stop_condition"] = "evaluation_threshold_met"
+        elif state.get("output_image_path") or state.get("best_output_image_path"):
+            state["final_stop_condition"] = "generation_success"
+        else:
+            state["final_stop_condition"] = "workflow_completed_with_fallback"
+
+        if state.get("retry_needed"):
+            state["replan_count"] = min(int(state.get("replan_count") or 0) + 1, 1)
+            state["replan_reason"] = (
+                state.get("reflection")
+                or state.get("fallback_reason")
+                or "evaluation requested retry"
+            )
     def _run_memory_load(self, registry, state):
         state["last_run"] = registry.call("memory_load")
 
@@ -1318,6 +1365,7 @@ class DynamicExecutionEngine:
         }
 
     def _record_executed_step(self, registry, step, state):
+        state.setdefault("executed_tools", []).append(step)
         state.setdefault("executed_layers", []).append(
             {
                 "step": step,
@@ -1412,6 +1460,7 @@ class DynamicExecutionEngine:
         print(f"[{self._layer_label(registry, step)}] Running state-based step: {step}")
         result = registry.run_with_state(step, state)
         state.update(result)
+        state.setdefault("tool_results_summary", {})[step] = sorted(result.keys())
         print(f"[{self._layer_label(registry, step)}] State updated by: {step}")
         return result
 
@@ -1510,3 +1559,6 @@ class DynamicExecutionEngine:
         except Exception as error:
             print(f"[DebugReport] Save failed: {error}")
             state["agent_trace"].append(f"debug_report failed: {error}")
+
+
+

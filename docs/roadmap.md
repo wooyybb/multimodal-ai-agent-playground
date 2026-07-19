@@ -134,3 +134,7 @@
 - Add CI checks for Docker build and FastAPI health.
 - Add persistent multi-session memory.
 - Add benchmark dashboard for visual comparison.
+
+## v4.1
+
+- Completed constrained dynamic planning with Tool Catalog, Tool Planner, Plan Validator, and bounded replanning observability.

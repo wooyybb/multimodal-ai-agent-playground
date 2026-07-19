@@ -421,3 +421,12 @@ This log keeps a short summary of each sprint. Detailed notes live in `docs/spri
 - Keep this file short.
 - Move deep sprint details to `docs/sprint_book/`.
 - Keep architecture changes reflected in README and `docs/architecture.md`.
+
+## v4.1 Development Log
+
+- Added `registry/tool_catalog.py` as the allowlisted planning surface.
+- Added `llm/tool_planner.py` for rule/OpenAI-backed JSON tool plans.
+- Added `core/tool_plan_schema.py` for normalized dynamic plan shape.
+- Added `workflow/plan_validator.py` to block unknown or unsafe tools and invalid ordering.
+- PlanningAgent now produces a validated execution plan and falls back to the rule plan when needed.
+- Debug report now records dynamic planning, validation, executed/skipped tools, and bounded replanning fields.

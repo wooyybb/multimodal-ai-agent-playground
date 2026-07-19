@@ -1,4 +1,4 @@
-# Multimodal AI Agent Playground
+﻿# Multimodal AI Agent Playground
 
 **Reference-aware Multimodal AI Agent Framework for Style Transfer**
 
@@ -585,6 +585,7 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Dynamic Planning](docs/dynamic_planning.md)
 - [Agent Architecture v3](docs/agent_architecture_v3.md)
 - [Codebase Structure v3.5](docs/codebase_structure.md)
 - [Layer Map](docs/layer_map.md)
@@ -602,3 +603,36 @@ The Evaluation Layer returns a stable `evaluation_result` schema with `metrics`,
 ## License
 
 No license has been selected yet. Add a license before public distribution.
+
+## Constrained Dynamic Planning
+
+v4.1 adds constrained tool calling for the Planning Agent. This is not a fully autonomous agent system. The LLM or rule fallback can only select from an allowlisted Tool Catalog, and the Plan Validator blocks unknown tools, shell-like tools, arbitrary code execution, and invalid ordering.
+
+```text
+User Requirement
+  |
+  v
+Planning Agent
+  +-- Requirement Parser
+  +-- Dynamic Tool Planner
+  +-- Plan Validator
+  |
+  v
+Validated Execution Plan
+  |
+  v
+Understanding -> Generation -> Evaluation -> Reflection
+```
+
+The Planning Agent may use `LLM_PROVIDER=openai` to propose a structured tool plan, but the output is still JSON plan data, not final prompts or code. If OpenAI is unavailable, missing an API key, or returns invalid JSON, the workflow falls back to the rule-based plan.
+
+Dynamic planning remains bounded:
+
+- tools must exist in `registry/tool_catalog.py`
+- max dynamic steps defaults to 12
+- replanning defaults to a maximum of 1 bounded adjustment
+- Reflection can adjust generation strategy parameters, not install models or create new tools
+- Memory is used for previous run context and failure avoidance, not exaggerated as autonomous long-term memory
+
+Debug reports now include `tool_plan`, `plan_validation_result`, `selected_tools`, `executed_tools`, `skipped_tools`, `replan_count`, `replan_reason`, and `final_stop_condition`.
+

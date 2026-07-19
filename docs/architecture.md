@@ -665,3 +665,30 @@ The project contains many specialized components. Listing every agent makes the 
 - Organize AgentState fields by layer ownership.
 - Add CI smoke tests for compile, import, FastAPI, and Docker.
 - Polish demo assets for v1.0 release.
+
+## v4.1 Constrained Dynamic Planning
+
+The architecture now includes a Dynamic Tool Planner inside PlanningAgent. It converts the current state and Style Transfer Program into an allowlisted JSON tool plan. The Plan Validator checks the plan before DynamicExecutionEngine runs it.
+
+```text
+Understanding Agent
+  |
+  v
+Planning Agent
+  +-- Requirement Parser
+  +-- Dynamic Tool Planner
+  +-- Plan Validator
+  |
+  v
+Generation Agent
+  |
+  v
+Evaluation Agent
+  |
+  v
+Reflection Agent
+  +-- Failure Analysis
+  +-- Bounded Replanning
+```
+
+The ExecutionEngine does not call an LLM. It only executes the validated plan. Invalid or unavailable LLM planning falls back to the rule-based execution plan.

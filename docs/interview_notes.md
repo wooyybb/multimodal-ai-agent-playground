@@ -804,3 +804,33 @@ A. AdaptivePlanner는 selected_strategy를 읽어 context_updates와 priority_ch
 - Queue-based generation
 - Dashboard and benchmark dashboard
 - Multi-session memory
+
+## v4.1 Dynamic Planning Interview Notes
+
+### Q. How is tool calling implemented in this project?
+
+PlanningAgent creates a JSON tool plan from an allowlisted Tool Catalog. The plan is validated, then mapped to existing ExecutionEngine tool names. The LLM never calls Python functions directly.
+
+### Q. Can the LLM call any tool?
+
+No. It can only select aliases from `registry/tool_catalog.py`. Unknown tools, shell-like tools, eval/code execution, file deletion, and invalid ordering are blocked by `workflow/plan_validator.py`.
+
+### Q. What is the difference between Dynamic Planning and a fixed pipeline?
+
+A fixed pipeline always runs the same sequence. Dynamic Planning lets the Planning Agent choose and explain the needed tools while keeping the same bounded execution engine and fallback plan.
+
+### Q. Why limit replanning?
+
+Bounded replanning prevents runaway loops and makes failure recovery inspectable. The default behavior allows at most one focused adjustment before stopping.
+
+### Q. Why is this not a fully autonomous agent?
+
+The system is constrained by a fixed Tool Catalog, JSON schema, max step count, plan validation, no arbitrary code execution, no model installation, and rule fallback.
+
+### Q. When is rule fallback used?
+
+Rule fallback is used when `LLM_PROVIDER=rule`, when OpenAI credentials are missing, when LLM JSON parsing fails, or when the Plan Validator rejects the proposed plan.
+
+### Q. What is Memory used for?
+
+Memory is used to retrieve previous run context, previous failure patterns, and previous parameters. It is not presented as open-ended autonomous long-term memory.

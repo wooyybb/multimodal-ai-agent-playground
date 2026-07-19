@@ -1,4 +1,4 @@
-import json
+﻿import json
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -171,6 +171,32 @@ class DebugReportManager:
             "executed_layers": self._safe(state.get("executed_layers", [])),
             "skipped_layers": self._safe(state.get("skipped_layers", [])),
             "dirty_reasons": self._safe(state.get("dirty_reasons", [])),
+            "planning_mode": self._safe(state.get("planning_mode")),
+            "llm_tool_planner_enabled": self._safe(
+                state.get("llm_tool_planner_enabled")
+            ),
+            "tool_plan": self._safe(state.get("tool_plan")),
+            "plan_validation_result": self._safe(
+                state.get("plan_validation_result")
+            ),
+            "selected_tools": self._safe(state.get("selected_tools", [])),
+            "executed_tools": self._safe(state.get("executed_tools", [])),
+            "skipped_tools": self._safe(state.get("skipped_tools", [])),
+            "tool_arguments": self._safe(state.get("tool_arguments", {})),
+            "tool_results_summary": self._safe(
+                state.get("tool_results_summary", {})
+            ),
+            "planner_used_fallback": self._safe(
+                state.get("planner_used_fallback")
+            ),
+            "planner_fallback_reason": self._safe(
+                state.get("planner_fallback_reason")
+            ),
+            "replan_count": self._safe(state.get("replan_count", 0)),
+            "replan_reason": self._safe(state.get("replan_reason", "")),
+            "final_stop_condition": self._safe(
+                state.get("final_stop_condition", "")
+            ),
             "llm_provider": self._safe(self._llm_summary(state).get("llm_provider")),
             "llm_used_fallback": self._safe(
                 self._llm_summary(state).get("llm_used_fallback")
@@ -339,8 +365,13 @@ class DebugReportManager:
                 "executed_layers": state.get("executed_layers", []),
                 "skipped_layers": state.get("skipped_layers", []),
                 "dirty_reasons": state.get("dirty_reasons", []),
+                "executed_tools": state.get("executed_tools", []),
+                "skipped_tools": state.get("skipped_tools", []),
             },
         )
+        self._append_block(lines, "DYNAMIC TOOL PLAN", self._dynamic_tool_plan_preview(state))
+        self._append_block(lines, "PLAN VALIDATION", self._plan_validation_preview(state))
+        self._append_block(lines, "REPLANNING", self._replanning_preview(state))
         self._append_block(lines, "GOAL TREE", state.get("goal_tree"))
         self._append_block(
             lines,
@@ -542,6 +573,44 @@ class DebugReportManager:
         self._append_block(lines, "AGENT TRACE", "\n".join(state.get("agent_trace", [])))
         return "\n".join(lines).strip() + "\n"
 
+    def _dynamic_tool_plan_preview(self, state):
+        plan = state.get("tool_plan") or {}
+        steps = []
+        for step in plan.get("steps") or []:
+            if not isinstance(step, dict):
+                continue
+            steps.append(
+                f"{step.get('step_id')}. {step.get('tool')} / {step.get('reason')}"
+            )
+        return {
+            "Goal": plan.get("goal"),
+            "Strategy": plan.get("selected_strategy"),
+            "Confidence": plan.get("confidence"),
+            "Planning Mode": state.get("planning_mode"),
+            "LLM Tool Planner Enabled": state.get("llm_tool_planner_enabled"),
+            "Planner Fallback": state.get("planner_used_fallback"),
+            "Selected Tools": state.get("selected_tools", []),
+            "Steps": steps,
+        }
+
+    def _plan_validation_preview(self, state):
+        result = state.get("plan_validation_result") or {}
+        return {
+            "Valid": result.get("valid"),
+            "Warnings": result.get("warnings", []),
+            "Errors": result.get("errors", []),
+            "Fallback": result.get("fallback_used"),
+            "Execution Plan": result.get("execution_plan", []),
+        }
+
+    def _replanning_preview(self, state):
+        return {
+            "Count": state.get("replan_count", 0),
+            "Reason": state.get("replan_reason", ""),
+            "Changed Tools": state.get("replan_changed_tools", []),
+            "Changed Parameters": state.get("replan_changed_parameters", {}),
+            "Final Stop Condition": state.get("final_stop_condition", ""),
+        }
     def _append_block(self, lines, title, value):
         lines.append(f"========== {title} ==========")
         lines.append(self._to_text(value))
@@ -1092,3 +1161,5 @@ class DebugReportManager:
         if isinstance(value, (list, tuple, set)):
             return [self._safe(item) for item in value]
         return str(value)
+
+
