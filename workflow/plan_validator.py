@@ -19,6 +19,8 @@ class PlanValidator:
 
     def validate(self, tool_plan, state=None, *, replan=False):
         state = state or {}
+        raw_steps = (tool_plan or {}).get("steps") if isinstance(tool_plan, dict) else []
+        raw_step_count = len(raw_steps) if isinstance(raw_steps, list) else 0
         plan = ToolPlanSchema.normalize(tool_plan)
         errors = []
         warnings = []
@@ -31,7 +33,9 @@ class PlanValidator:
             )
 
         steps = list(plan.get("steps") or [])
-        if len(steps) > self.max_steps:
+        if raw_step_count > self.max_steps:
+            errors.append(f"step count {raw_step_count} exceeds limit {self.max_steps}")
+        elif len(steps) > self.max_steps:
             errors.append(f"step count {len(steps)} exceeds limit {self.max_steps}")
 
         produced_state = set(state.keys())
@@ -117,5 +121,7 @@ class PlanValidator:
             "evaluation_result",
             "reflection",
         }
+
+
 
 

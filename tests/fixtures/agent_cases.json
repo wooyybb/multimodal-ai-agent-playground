@@ -1,0 +1,67 @@
+﻿[
+  {
+    "case_id": "photobooth_reference",
+    "description": "Reference-aware photobooth style transfer",
+    "input": {
+      "user_prompt": "preserve identity and make a soft photobooth style transfer",
+      "image_provided": true
+    },
+    "expected_selected_tools": ["understand_reference", "generate_sdxl_with_ip_adapter", "evaluate_dino"],
+    "expected_skipped_tools": [],
+    "expected_constraints": [],
+    "expected_replan_count": 0
+  },
+  {
+    "case_id": "ugly_cute_text_only",
+    "description": "Ugly-cute illustration style transfer without reference image",
+    "input": {
+      "user_prompt": "make an ugly-cute childish lineart illustration",
+      "image_provided": false
+    },
+    "expected_selected_tools": ["generate_flux", "aggregate_evaluation"],
+    "expected_skipped_tools": ["understand_reference", "generate_sdxl_with_ip_adapter"],
+    "expected_constraints": [],
+    "expected_replan_count": 0
+  },
+  {
+    "case_id": "weapon_removal",
+    "description": "Weapon removal with identity preservation",
+    "input": {
+      "user_prompt": "preserve identity but remove the sword, no weapons",
+      "image_provided": true,
+      "vision_caption": "character holding a sword"
+    },
+    "expected_selected_tools": ["understand_reference", "generate_sdxl_with_ip_adapter", "evaluate_dino"],
+    "expected_skipped_tools": ["generate_sdxl_with_controlnet"],
+    "expected_constraints": ["sword", "weapon"],
+    "expected_replan_count": 0
+  },
+  {
+    "case_id": "no_structure_constraint",
+    "description": "Reference image without structure constraint",
+    "input": {
+      "user_prompt": "preserve identity and draw as watercolor portrait",
+      "image_provided": true
+    },
+    "expected_selected_tools": ["generate_sdxl_with_ip_adapter"],
+    "expected_skipped_tools": ["generate_sdxl_with_controlnet"],
+    "expected_constraints": [],
+    "expected_replan_count": 0
+  },
+  {
+    "case_id": "low_identity_replan",
+    "description": "Low identity score causing one bounded replan",
+    "input": {
+      "user_prompt": "preserve identity and same pose composition",
+      "image_provided": true,
+      "mock_evaluation": {
+        "weighted_score": 0.42,
+        "identity_preservation": 0.35
+      }
+    },
+    "expected_selected_tools": ["generate_sdxl_with_controlnet", "evaluate_dino"],
+    "expected_skipped_tools": [],
+    "expected_constraints": [],
+    "expected_replan_count": 1
+  }
+]

@@ -636,3 +636,46 @@ Dynamic planning remains bounded:
 
 Debug reports now include `tool_plan`, `plan_validation_result`, `selected_tools`, `executed_tools`, `skipped_tools`, `replan_count`, `replan_reason`, and `final_stop_condition`.
 
+
+## Agent Validation
+
+v4.2 adds validation evidence for the constrained agent workflow. The tests do not call heavy models by default; they validate planning, allowlist enforcement, fallback, state ordering, and bounded replanning with unit-level mocks and fixtures.
+
+Run validation:
+
+```bash
+pytest -q
+python scripts/run_agent_validation.py
+```
+
+Validation artifacts:
+
+- `tests/fixtures/agent_cases.json`
+- `artifacts/agent_validation_summary.json`
+- `docs/agent_validation_report.md`
+
+Tool plan example:
+
+```text
+parse_requirement -> understand_reference -> parse_reference -> build_character_program -> prepare_context -> compile_semantic_prompt -> render_provider_prompt -> generate_sdxl_with_ip_adapter -> evaluate_dino -> aggregate_evaluation -> analyze_failure -> adjust_generation_strategy
+```
+
+Invalid tool blocking example:
+
+```json
+{"tool": "delete_workspace", "reason": "cleanup"}
+```
+
+The Plan Validator rejects it because it is not in the allowlisted Tool Catalog.
+
+Rule fallback example:
+
+```text
+LLM_PROVIDER=openai without OPENAI_API_KEY -> planner_used_fallback=true -> rule plan
+```
+
+Bounded replanning example:
+
+```text
+low identity score -> replan_count=1 -> adjust allowed generation parameters -> no unlimited loop
+```
